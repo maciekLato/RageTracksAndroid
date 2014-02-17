@@ -1,8 +1,6 @@
 package com.macieklato.ragetracks.activity;
 
 import com.macieklato.ragetracks.R;
-import com.macieklato.ragetracks.R.id;
-import com.macieklato.ragetracks.R.layout;
 import com.macieklato.ragetracks.widget.MyAdapter;
 
 import android.os.Bundle;

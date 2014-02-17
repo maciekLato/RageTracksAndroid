@@ -4,9 +4,6 @@ import java.util.ArrayList;
 import java.util.List;
 
 import com.macieklato.ragetracks.R;
-import com.macieklato.ragetracks.R.drawable;
-import com.macieklato.ragetracks.R.id;
-import com.macieklato.ragetracks.R.layout;
 
 import android.content.Context;
 import android.view.LayoutInflater;
