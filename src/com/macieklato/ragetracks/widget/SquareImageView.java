@@ -1,4 +1,4 @@
-package com.macieklato.ragetracks;
+package com.macieklato.ragetracks.widget;
 
 import android.content.Context;
 import android.util.AttributeSet;

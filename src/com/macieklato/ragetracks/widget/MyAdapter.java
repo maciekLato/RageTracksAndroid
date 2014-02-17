@@ -1,7 +1,12 @@
-package com.macieklato.ragetracks;
+package com.macieklato.ragetracks.widget;
 
 import java.util.ArrayList;
 import java.util.List;
+
+import com.macieklato.ragetracks.R;
+import com.macieklato.ragetracks.R.drawable;
+import com.macieklato.ragetracks.R.id;
+import com.macieklato.ragetracks.R.layout;
 
 import android.content.Context;
 import android.view.LayoutInflater;
@@ -11,7 +16,7 @@ import android.widget.BaseAdapter;
 import android.widget.ImageView;
 import android.widget.TextView;
 
-class MyAdapter extends BaseAdapter {
+public class MyAdapter extends BaseAdapter {
     private List<Item> items = new ArrayList<Item>();
     private LayoutInflater inflater;
 
