@@ -3,4 +3,6 @@
     <string name="app_name">RageTracks</string>
     <string name="app_id"></string>
     <string name="nowplaying">Now Playing</string>
+    <string name="bookmarks">Bookmarks</string>
+    <string name="generes">Generes</string>
 </resources>

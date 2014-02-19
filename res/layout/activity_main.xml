@@ -5,26 +5,71 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="horizontal"
-    android:layout_margin="0dp"
     >
-    <View
+    <LinearLayout
    	    android:id="@+id/leftmenu"
    	    android:layout_width="200dp"
    	    android:layout_height="match_parent"
-   	   	android:background="#0000ff"
+   	   	android:background="#000000"
+   	   	android:orientation="vertical"
    	   	android:visibility="gone"
-   	   	/>
-    <LinearLayout
+   	   	>
+   	   	<TextView
+   	   	    android:id="@+id/bookmark_menu_text"
+   	   	    android:textColor="#ffffff"
+   	   	    android:textSize="15sp"
+   	   	    android:text="@string/bookmarks"
+   	   	    android:layout_width="match_parent"
+   	   	    android:layout_height="50dp"
+   	   	    android:gravity="center"
+   	   	    android:onClick="onBookmarksListClicked"
+   	   	    android:clickable="true"
+   	   	    />
+   	   	<View 
+   	   	    android:id="@+id/bookmark_list"
+   	   	    android:layout_width="match_parent"
+   	   	    android:layout_height="2dp"
+   	   	    android:background="#222222"
+   	   	    />
+   	   	<TextView
+   	   	    android:id="@+id/genere_menu_text"
+   	   	    android:textColor="#ffffff"
+   	   	    android:textSize="15sp"
+   	   	    android:text="@string/generes"
+   	   	    android:layout_width="match_parent"
+   	   	    android:layout_height="50dp"
+   	   	    android:gravity="center"
+   	   	    android:onClick="onGeneresListClicked"
+   	   	    android:clickable="true"
+   	   	    />
+   	   	<View 
+   	   	    android:id="@+id/genere_list"
+   	   	    android:layout_width="match_parent"
+   	   	    android:layout_height="2dp"
+   	   	    android:background="#222222"
+   	   	    />
+        </LinearLayout>
+    <RelativeLayout
         android:id="@+id/right_menu"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:orientation="vertical"
         >
-        <LinearLayout
-	   	    android:id="@+id/topmenu"
+	   	<GridView
+	        android:id="@+id/gridview"
+	        android:layout_width="match_parent"
+	        android:layout_height="match_parent"
+	        android:verticalSpacing="0dp"
+	        android:horizontalSpacing="0dp"
+	        android:stretchMode="columnWidth"
+	        android:numColumns="2" 
+	      	/>
+	   	<LinearLayout
+	   	    android:id="@+id/top_menu"
 	   	    android:layout_width="match_parent"
 			android:layout_height="50dp"
 			android:orientation="horizontal"
+			android:background="#000000"
 	   	    >
 	   	    <ImageView 
 	   	        android:id="@+id/menu_button"
@@ -45,35 +90,22 @@
 	   	        android:gravity="center" 
 	   	        />
    	    	</LinearLayout> 
-   	  	<RelativeLayout 
-   	  	    android:id="@+id/right_container"
-   	  	    android:layout_width="match_parent"
-   	  	    android:layout_height="0dp"
-   	  	    android:layout_weight="1"
-   	  	    >
-		   	<GridView
-		        android:id="@+id/gridview"
-		        android:layout_width="match_parent"
-		        android:layout_height="match_parent"
-		        android:verticalSpacing="0dp"
-		        android:horizontalSpacing="0dp"
-		        android:stretchMode="columnWidth"
-		        android:numColumns="2" 
-		      	/>
-		   	<TextView 
-		       android:id="@+id/nowplaying"
-		       android:layout_width="match_parent"
-		       android:layout_height="50dp"
-		       android:textColor="#ffffff"
-		       android:textSize="15sp"
-		       android:text="@string/nowplaying"
-		       android:background="#cc000000"
-		       />
-	   	</RelativeLayout>
+	   	<TextView 
+	       android:id="@+id/nowplaying"
+	       android:layout_width="match_parent"
+	       android:layout_height="50dp"
+	       android:textColor="#ffffff"
+	       android:textSize="15sp"
+	       android:text="@string/nowplaying"
+	       android:background="#cc000000"
+	       android:layout_marginTop="50dp"
+	       />
 	   	<LinearLayout
 	   	    android:id="@+id/bottommenu"
 	   	    android:layout_width="match_parent"
 	   	    android:layout_height="50dp"
+	   	    android:layout_alignParentBottom="true"
+	   	    android:background="#000000"
 	   	    >
 	   	    <ImageView
 	   	        android:id="@+id/bookmark_button"
@@ -116,5 +148,5 @@
 	   	        android:onClick="onShareClicked"
    	            />
  	    </LinearLayout>
-   	</LinearLayout>
+   	</RelativeLayout>
 </LinearLayout>
