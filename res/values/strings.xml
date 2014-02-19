@@ -1,9 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-
     <string name="app_name">RageTracks</string>
-    <string name="action_settings">Settings</string>
-    <string name="hello_world">Hello world!</string>
-    <string name="yolo_string">yolo</string>
-
+    <string name="app_id"></string>
+    <string name="nowplaying">Now Playing</string>
 </resources>
