@@ -33,19 +33,18 @@ public class MainActivity extends Activity {
         init(); //initialize state
         setContentView(R.layout.activity_main); //set view
         GridView gridView = (GridView)findViewById(R.id.gridview); 
-        gridView.setOnTouchListener(menuHider); //add pull listener
         gridView.setAdapter(new MyAdapter(this)); //add grid view adapter
+        gridView.setOnTouchListener(menuHider);
     }
     
     /**
      * initializes any variables for the initial state
      */
     private void init() {
-    	
     	//set the pull events for the menu hider
     	menuHider = new OnPullListener(this.getApplicationContext()) {
     		@Override
-    		public void onPullUp(View v) {	
+    		public void onBottomToTop() {	
     			//hide top menus and display bottom menu
     			findViewById(R.id.top_menu).setVisibility(View.GONE);
     			findViewById(R.id.nowplaying).setVisibility(View.GONE);
@@ -53,7 +52,7 @@ public class MainActivity extends Activity {
     		}
 
     		@Override
-    		public void onPullDown(View v) {	
+    		public void onTopToBottom() {	
     			//hide bottom menu and display top menus
     			findViewById(R.id.top_menu).setVisibility(View.VISIBLE);
     			findViewById(R.id.nowplaying).setVisibility(View.VISIBLE);
@@ -61,15 +60,13 @@ public class MainActivity extends Activity {
     		}
 
     		@Override
-    		public void onPullLeft(View v) {}
+    		public void onLeftToRight() {}
 
     		@Override
-    		public void onPullRight(View v) {}
-    		
-    		@Override
-    		public void onRelease(View v){}
-    	};
+    		public void onRightToLeft() {}
+       	};
     }
+
     
     /**
      * callback for clicking the menu button

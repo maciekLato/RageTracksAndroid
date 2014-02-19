@@ -1,54 +1,60 @@
 package com.macieklato.ragetracks.widget;
 
 import android.content.Context;
-import android.util.DisplayMetrics;
 import android.view.MotionEvent;
 import android.view.View;
 import android.view.View.OnTouchListener;
 
 public abstract class OnPullListener implements OnTouchListener{
 
-	float x; //last x touch position recorded
-	float y; //last y touch position recorded
-	float epsilonX; //minimum distance to activate pull left/right
-	float epsilonY; //minimum distance to activate pull up/down
+	float x;
+	float y;
+	float epsilonX;
+	float epsilonY;
 	
 	public OnPullListener(Context c){
-		DisplayMetrics d = c.getResources().getDisplayMetrics();
-		epsilonX = d.xdpi/4f;
-		epsilonY = d.ydpi/4f;
+		epsilonX = c.getResources().getDisplayMetrics().xdpi/4;
+		epsilonY = c.getResources().getDisplayMetrics().ydpi/4;
 	}
 	
 	@Override
-	public boolean onTouch(View v, MotionEvent event) {
-		int action = event.getAction(); 
-			if(action == MotionEvent.ACTION_DOWN) { //on touch, set x,y
-				x = event.getX();
-				y = event.getY();
-			}
-			else if(action == MotionEvent.ACTION_MOVE) { //on move calculate change in distance
-				float ex = event.getX();
-				float ey = event.getY();
-				if(Math.abs(x-ex) > epsilonX) { 
-					if(ex < x) onPullLeft(v);
-					else onPullRight(v);
-				}
-				else if(Math.abs(y-ey) > epsilonY) {
-					if(ey < y) onPullUp(v);
-					else onPullDown(v);
-				}
-			}
-			else if(action == MotionEvent.ACTION_UP) {
-			onRelease(v);
+	public boolean onTouch(View v, MotionEvent e) {
+		int action = e.getAction();
+		switch(action){
+		case MotionEvent.ACTION_DOWN:
+			x = e.getX();
+			y = e.getY();
+			break;
+		case MotionEvent.ACTION_MOVE:
+			checkHorizontal(e.getX());
+			checkVertical(e.getY());
+			break;
+		case MotionEvent.ACTION_UP:
+			checkHorizontal(e.getX());
+			checkVertical(e.getY());
+			break;
 		}
 		
 		return false;
 	}
 	
-	public abstract void onPullUp(View v);
-	public abstract void onPullDown(View v);
-	public abstract void onPullLeft(View v);
-	public abstract void onPullRight(View v);
-	public abstract void onRelease(View v);
+	public void checkHorizontal(float x2) {
+		if(Math.abs(x-x2) > epsilonX) {
+			if(x2 > x) onLeftToRight();
+			else onRightToLeft();
+		}
+	}
+	
+	public void checkVertical(float y2) {
+		if(Math.abs(y-y2) > epsilonY) {
+			if(y2 > y) onTopToBottom();
+			else onBottomToTop();
+		}
+	}
+	
+	public abstract void onTopToBottom();
+	public abstract void onBottomToTop();
+	public abstract void onLeftToRight();
+	public abstract void onRightToLeft();
 
 }
