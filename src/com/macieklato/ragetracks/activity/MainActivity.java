@@ -151,7 +151,7 @@ public class MainActivity extends Activity {
     
     /**
      * callback for clicking the next button
-     * @param v - the next botton view
+     * @param v - the next button view
      */
     public void onNextClicked(View v){
     	Toast.makeText(this.getApplicationContext(), "You clicked next", Toast.LENGTH_SHORT).show();
