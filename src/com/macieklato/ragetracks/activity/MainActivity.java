@@ -7,7 +7,9 @@ import com.macieklato.ragetracks.widget.OnPullListener;
 
 import android.os.Bundle;
 import android.app.Activity;
+import android.content.Context;
 import android.view.View;
+import android.view.inputmethod.InputMethodManager;
 import android.widget.FrameLayout;
 import android.widget.FrameLayout.LayoutParams;
 import android.widget.GridView;
@@ -121,6 +123,34 @@ public class MainActivity extends Activity {
      */
     public void onSearchClicked(View v){
     	Toast.makeText(this.getApplicationContext(), "You clicked search", Toast.LENGTH_SHORT).show();
+    	findViewById(R.id.top_menu_1).setVisibility(View.GONE);
+    	findViewById(R.id.top_menu_2).setVisibility(View.VISIBLE);
+    }
+    
+    /**
+     * callback for when a search is commited
+     * @param v - commit search image view
+     */
+    public void onCommitSearchClicked(View v){
+    	Toast.makeText(this.getApplicationContext(), "You clicked commit search", Toast.LENGTH_SHORT).show();
+    	closeKeyboard();
+    }
+    
+    /**
+     * callback for when a search is canceled
+     * @param v - cancel search image view
+     */
+    public void onCancelSearchClicked(View v){
+    	Toast.makeText(this.getApplicationContext(), "You clicked cancel search", Toast.LENGTH_SHORT).show();
+    	findViewById(R.id.top_menu_1).setVisibility(View.VISIBLE);
+    	findViewById(R.id.top_menu_2).setVisibility(View.GONE);
+    	closeKeyboard();
+    }
+    
+    private void closeKeyboard(){
+    	InputMethodManager inputManager = (InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE); 
+    	inputManager.hideSoftInputFromWindow(getCurrentFocus().getWindowToken(),
+                   InputMethodManager.HIDE_NOT_ALWAYS);
     }
     
     /**
@@ -211,12 +241,12 @@ public class MainActivity extends Activity {
     }
     
     /**
-     * callback for clicking genere header in left-side menu
-     * @param v - genere header view
+     * callback for clicking genre header in left-side menu
+     * @param v - genre header view
      */
-    public void onGeneresListClicked(View v){
+    public void onGenresListClicked(View v){
     	//TODO::fix this mock implementation
-    	View v2 = findViewById(id.genere_list);
+    	View v2 = findViewById(id.genre_list);
     	float ydpi = this.getResources().getDisplayMetrics().ydpi;
     	int collapsedHeight = (int)(2f*ydpi/160f);
     	LinearLayout.LayoutParams p =  (LinearLayout.LayoutParams) v2.getLayoutParams();
@@ -228,9 +258,7 @@ public class MainActivity extends Activity {
     		p.height = (int)(150*ydpi/160f);
     		v2.setLayoutParams(p);
     	}
-    	Toast.makeText(this.getApplicationContext(), "You clicked toggle generes", Toast.LENGTH_SHORT).show();
-    }
-    
-    
+    	Toast.makeText(this.getApplicationContext(), "You clicked toggle genres", Toast.LENGTH_SHORT).show();
+    } 
     
 }

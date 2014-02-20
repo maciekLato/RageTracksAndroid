@@ -4,5 +4,15 @@
     <string name="app_id"></string>
     <string name="nowplaying">Now Playing</string>
     <string name="bookmarks">Bookmarks</string>
-    <string name="generes">Generes</string>
+    <string name="genres">Genres</string>
+    <string name="cancel">Cancel</string>
+    <string name="share_button">Share button</string>
+    <string name="bookmark_button">Bookmarks button</string>
+    <string name="next_button">Next button</string>
+    <string name="play_pause_button">Play and Pause button</string>
+    <string name="previous_button">Cancel</string>
+    <string name="commit_search_button">Commit search button</string>
+    <string name="cancel_search_button">Cancel search button</string>
+    <string name="open_search_button">Open search button</string>
+    <string name="menu_button">Menu button</string>
 </resources>
