@@ -21,50 +21,82 @@ public class MainActivity extends Activity {
 	public static final int PLAY = 0;
 	public static final int PAUSE = 1;
 	
-	//touch listener for menu hiding
-	OnPullListener menuHider;
-	
 	//current state
 	int state = PAUSE;
 	
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        init(); //initialize state
         setContentView(R.layout.activity_main); //set view
+        setListeners(); //initialize state
         GridView gridView = (GridView)findViewById(R.id.gridview); 
         gridView.setAdapter(new MyAdapter(this)); //add grid view adapter
-        gridView.setOnTouchListener(menuHider);
     }
     
     /**
      * initializes any variables for the initial state
      */
-    private void init() {
+    private void setListeners() {
     	//set the pull events for the menu hider
-    	menuHider = new OnPullListener(this.getApplicationContext()) {
+    	OnPullListener gridListener = new OnPullListener(this.getApplicationContext()) {
     		@Override
     		public void onBottomToTop() {	
-    			//hide top menus and display bottom menu
     			findViewById(R.id.top_menu).setVisibility(View.GONE);
-    			findViewById(R.id.nowplaying).setVisibility(View.GONE);
-    			findViewById(R.id.bottommenu).setVisibility(View.VISIBLE);
-    		}
-
-    		@Override
-    		public void onTopToBottom() {	
-    			//hide bottom menu and display top menus
-    			findViewById(R.id.top_menu).setVisibility(View.VISIBLE);
-    			findViewById(R.id.nowplaying).setVisibility(View.VISIBLE);
+    			//findViewById(R.id.nowplaying).setVisibility(View.GONE);
     			findViewById(R.id.bottommenu).setVisibility(View.GONE);
     		}
 
     		@Override
-    		public void onLeftToRight() {}
+    		public void onTopToBottom() {	
+    			findViewById(R.id.top_menu).setVisibility(View.VISIBLE);
+    			//findViewById(R.id.nowplaying).setVisibility(View.VISIBLE);
+    			findViewById(R.id.bottommenu).setVisibility(View.VISIBLE);
+    		}
 
     		@Override
-    		public void onRightToLeft() {}
+    		public void onLeftToRight() {
+    			showMenu();
+    		}
+    		@Override
+    		public void onRightToLeft() {
+    			hideMenu();
+    		}
        	};
+       	findViewById(R.id.gridview).setOnTouchListener(gridListener);
+    }
+    
+    /**
+     * hides the left side menu and adjusts the main screen
+     */
+    private void hideMenu(){
+    	
+    	//hide side menu
+    	View menu = findViewById(R.id.leftmenu);
+    	if(menu.getVisibility() == View.GONE) return;
+    	menu.setVisibility(View.GONE);
+    	
+    	//move main screen to the left
+    	View mainScreen = findViewById(R.id.main_screen);
+    	LayoutParams p = (FrameLayout.LayoutParams) mainScreen.getLayoutParams();
+    	p.rightMargin = 0;
+    }
+    
+    /**
+     * makes the left side menu visible and adjusts the main screen
+     */
+    private void showMenu(){
+    	//show side menu
+    	View menu = findViewById(R.id.leftmenu);
+    	if(menu.getVisibility() == View.VISIBLE) return;
+    	menu.setVisibility(View.VISIBLE);
+    	
+    	//move main screen to the right
+    	View mainScreen = findViewById(R.id.main_screen);
+    	LayoutParams p = (FrameLayout.LayoutParams) mainScreen.getLayoutParams();
+    	p.rightMargin = -menu.getWidth();
+    	if(p.rightMargin == 0) { //something went wrong (only happens the first time), this is a bit of a hack
+			p.rightMargin = (int) (-200*this.getResources().getDisplayMetrics().xdpi/160f);
+		}
     }
 
     
@@ -75,19 +107,11 @@ public class MainActivity extends Activity {
     public void onMenuClicked(View v){
     	Toast.makeText(this.getApplicationContext(), "You clicked menu", Toast.LENGTH_SHORT).show();
     	View v2 = findViewById(R.id.leftmenu);
-    	LinearLayout v3 = (LinearLayout) findViewById(R.id.main_screen);
-		LayoutParams p = (FrameLayout.LayoutParams) v3.getLayoutParams();
     	if(v2.getVisibility() == View.VISIBLE) {
-    		p.rightMargin = 0;
-    		v2.setVisibility(View.GONE);
+    		hideMenu();
     	} 
     	else {
-    		v2.setVisibility(View.VISIBLE);
-    		p.rightMargin = -v2.getWidth();
-    		if(p.rightMargin == 0) { //something went wrong (only happens the first time), this is a bit of a hack
-    			p.rightMargin = (int) (-200*this.getResources().getDisplayMetrics().xdpi/160f);
-    		}
-    		//v3.setLayoutParams(p);
+    		showMenu();
     	}
     }
     
@@ -96,7 +120,7 @@ public class MainActivity extends Activity {
      * @param v - the search button view
      */
     public void onSearchClicked(View v){
-    	Toast.makeText(this.getApplicationContext(), "You clicked next", Toast.LENGTH_SHORT).show();
+    	Toast.makeText(this.getApplicationContext(), "You clicked search", Toast.LENGTH_SHORT).show();
     }
     
     /**

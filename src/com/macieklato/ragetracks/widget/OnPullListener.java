@@ -6,15 +6,15 @@ import android.view.View;
 import android.view.View.OnTouchListener;
 
 public abstract class OnPullListener implements OnTouchListener{
-
+	
 	float x;
 	float y;
 	float epsilonX;
 	float epsilonY;
 	
 	public OnPullListener(Context c){
-		epsilonX = c.getResources().getDisplayMetrics().xdpi/4;
-		epsilonY = c.getResources().getDisplayMetrics().ydpi/4;
+		epsilonX = c.getResources().getDisplayMetrics().xdpi/4f;
+		epsilonY = c.getResources().getDisplayMetrics().ydpi/4f;
 	}
 	
 	@Override
@@ -22,26 +22,29 @@ public abstract class OnPullListener implements OnTouchListener{
 		int action = e.getAction();
 		switch(action){
 		case MotionEvent.ACTION_DOWN:
-			x = e.getX();
-			y = e.getY();
+			x = e.getRawX();
+			y = e.getRawY();
 			break;
 		case MotionEvent.ACTION_MOVE:
-			checkHorizontal(e.getX());
-			checkVertical(e.getY());
+			checkPull(e.getRawX(), e.getRawY());
 			break;
 		case MotionEvent.ACTION_UP:
-			checkHorizontal(e.getX());
-			checkVertical(e.getY());
+			checkPull(e.getRawX(), e.getRawY());
 			break;
 		}
-		
 		return false;
+	}
+	
+	public void checkPull(float ex, float ey){
+			checkHorizontal(ex);
+			checkVertical(ey);
 	}
 	
 	public void checkHorizontal(float x2) {
 		if(Math.abs(x-x2) > epsilonX) {
 			if(x2 > x) onLeftToRight();
 			else onRightToLeft();
+			x = x2;
 		}
 	}
 	
@@ -49,6 +52,7 @@ public abstract class OnPullListener implements OnTouchListener{
 		if(Math.abs(y-y2) > epsilonY) {
 			if(y2 > y) onTopToBottom();
 			else onBottomToTop();
+			y = y2;
 		}
 	}
 	

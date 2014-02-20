@@ -36,33 +36,36 @@ public final class R {
         public static final int previousprevious=0x7f02000c;
         public static final int rage=0x7f02000d;
         public static final int repeat=0x7f02000e;
-        public static final int share=0x7f02000f;
-        public static final int stop=0x7f020010;
-        public static final int volumehigh=0x7f020011;
-        public static final int volumelow=0x7f020012;
-        public static final int volumenone=0x7f020013;
+        public static final int search=0x7f02000f;
+        public static final int share=0x7f020010;
+        public static final int stop=0x7f020011;
+        public static final int volumehigh=0x7f020012;
+        public static final int volumelow=0x7f020013;
+        public static final int volumenone=0x7f020014;
     }
     public static final class id {
-        public static final int bookmark_button=0x7f07000d;
+        public static final int bookmark_button=0x7f07000f;
         public static final int bookmark_list=0x7f070003;
         public static final int bookmark_menu_text=0x7f070002;
-        public static final int bottommenu=0x7f07000c;
+        public static final int bottommenu=0x7f07000e;
         public static final int genere_list=0x7f070005;
         public static final int genere_menu_text=0x7f070004;
-        public static final int gridview=0x7f070007;
+        public static final int gridview=0x7f07000d;
         public static final int leftmenu=0x7f070001;
         public static final int main_screen=0x7f070000;
         public static final int menu_button=0x7f070009;
-        public static final int next_button=0x7f070010;
-        public static final int nowplaying=0x7f07000b;
-        public static final int picture=0x7f070012;
-        public static final int play_pause_button=0x7f07000f;
-        public static final int previous_button=0x7f07000e;
+        public static final int next_button=0x7f070012;
+        public static final int picture=0x7f070014;
+        public static final int play_pause_button=0x7f070011;
+        public static final int previous_button=0x7f070010;
         public static final int right_menu=0x7f070006;
-        public static final int search=0x7f07000a;
-        public static final int share_button=0x7f070011;
-        public static final int text=0x7f070013;
-        public static final int top_menu=0x7f070008;
+        public static final int search_button=0x7f07000b;
+        public static final int share_button=0x7f070013;
+        public static final int text=0x7f070015;
+        public static final int title=0x7f07000a;
+        public static final int top_menu=0x7f070007;
+        public static final int top_menu_1=0x7f070008;
+        public static final int top_menu_2=0x7f07000c;
     }
     public static final class layout {
         public static final int activity_main=0x7f030000;
