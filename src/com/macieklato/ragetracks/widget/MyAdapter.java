@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import com.macieklato.ragetracks.R;
+import com.macieklato.ragetracks.network.DownloadImageTask;
 
 import android.content.Context;
 import android.view.LayoutInflater;
@@ -44,20 +45,26 @@ public class MyAdapter extends BaseAdapter {
             v = inflater.inflate(R.layout.grid_item, null, false);
             v.setTag(R.id.picture, v.findViewById(R.id.picture));
             v.setTag(R.id.text, v.findViewById(R.id.text));
+            v.setTag(R.id.play, v.findViewById(R.id.play));
+            v.setTag(R.id.pause, v.findViewById(R.id.pause));
             v.setOnClickListener(new SongController(song));
-        }
-        
-        ImageView picture = (ImageView)v.getTag(R.id.picture);
-        TextView name = (TextView)v.getTag(R.id.text);
+            
+            ImageView picture = (ImageView)v.getTag(R.id.picture);
+            TextView name = (TextView)v.getTag(R.id.text);
 
-        picture.setImageBitmap(song.getThumbnail());
-        name.setText(song.getTitle());
+            picture.setImageResource(R.drawable.default_cover);
+            DownloadImageTask task = new DownloadImageTask(picture);
+            task.execute(song.getThumbnailUrl());
+            name.setText(song.getArtist() + "\n" + song.getTitle());
+        }
+
         
         return v;
     }
     
     public void addSong(Song s) {
     	items.add(s);
+    	this.notifyDataSetChanged();
     }
 
 }

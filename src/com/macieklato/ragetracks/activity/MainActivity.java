@@ -1,23 +1,25 @@
 package com.macieklato.ragetracks.activity;
 
+
+import org.apache.commons.lang3.StringEscapeUtils;
+
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
 import com.macieklato.ragetracks.R;
 import com.macieklato.ragetracks.R.id;
-import com.macieklato.ragetracks.network.DownloadImageTask;
 import com.macieklato.ragetracks.network.Network;
-import com.macieklato.ragetracks.network.OnImageDownloadListener;
 import com.macieklato.ragetracks.widget.MyAdapter;
 import com.macieklato.ragetracks.widget.OnPullListener;
 import com.macieklato.ragetracks.widget.Song;
+import com.macieklato.ragetracks.widget.SongController;
+import com.macieklato.ragetracks.widget.SongStateListener;
 
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.app.Activity;
 import android.content.Context;
-import android.graphics.Bitmap;
 import android.util.Log;
 import android.view.View;
 import android.view.inputmethod.InputMethodManager;
@@ -29,15 +31,10 @@ import android.widget.LinearLayout;
 import android.widget.Toast;
 
 public class MainActivity extends Activity {
-
-	//state variables
-	public static final int PLAY = 0;
-	public static final int PAUSE = 1;
-	
-	//current state
-	int state = PAUSE;
 	
 	private static final String CLIENT_ID = "7622aa84a50c9f7609e2f7ed8bc85e81";
+	private static final int NUMSONGS = 50;
+	private static final int DIVIDER = 8211;
 	
 	//views
 	MyAdapter adapter;
@@ -45,12 +42,13 @@ public class MainActivity extends Activity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        Log.d("test", "ok");
         setContentView(R.layout.activity_main); //set view
         setListeners(); //initialize state
         GridView gridView = (GridView)findViewById(R.id.gridview);
         adapter = new MyAdapter(this.getApplicationContext());
         gridView.setAdapter(adapter); //add grid view adapter
-        loadPosts(5);
+        loadPosts(NUMSONGS);
     }
     
     /**
@@ -83,6 +81,20 @@ public class MainActivity extends Activity {
     		}
        	};
        	findViewById(R.id.gridview).setOnTouchListener(gridListener);
+       	
+       	SongStateListener songListener = new SongStateListener() {
+
+			@Override
+			public void onPlay() {
+				play();
+			}
+
+			@Override
+			public void onPause() {	
+				pause();
+			}
+       	};
+       	SongController.setOnStateChangedListener(songListener);
     }
     
     /**
@@ -192,11 +204,22 @@ public class MainActivity extends Activity {
      * @param v - the play/pause view
      */
     public void onPlayPauseClicked(View v){
-    	if(state == PLAY){
+    	if(SongController.isPlaying()){
     		onPauseClicked(v);
-    	} else {
+    	} 
+    	else if (SongController.isPaused()){
     		onPlayClicked(v);
     	}
+    }
+    
+    public void play() {
+    	ImageView img = (ImageView) findViewById(R.id.play_pause_button);
+		img.setImageResource(R.drawable.pause);
+    }
+   
+    public void pause() {
+		ImageView img = (ImageView) findViewById(R.id.play_pause_button);
+		img.setImageResource(R.drawable.play);
     }
     
     /**
@@ -204,10 +227,7 @@ public class MainActivity extends Activity {
      * @param v - play view
      */
     public void onPlayClicked(View v){
-    	Toast.makeText(this.getApplicationContext(), "You clicked play", Toast.LENGTH_SHORT).show();
-		ImageView img = (ImageView) findViewById(R.id.play_pause_button);
-		img.setImageResource(R.drawable.pause);
-		state = PLAY;
+    	SongController.play();
     }
     
     /**
@@ -215,10 +235,7 @@ public class MainActivity extends Activity {
      * @param v - pause view
      */
     public void onPauseClicked(View v){
-    	Toast.makeText(this.getApplicationContext(), "You clicked pause", Toast.LENGTH_SHORT).show();
-		ImageView img = (ImageView) findViewById(R.id.play_pause_button);
-		img.setImageResource(R.drawable.play);
-		state = PAUSE;
+    	SongController.pause();
     }
     
     /**
@@ -306,7 +323,7 @@ public class MainActivity extends Activity {
     	for(int i=0; i<posts.length(); i++) {
     		JSONObject post = posts.getJSONObject(i);
     		long id = post.getInt("id");
-    		String temp = post.getString("title");
+    		String temp = StringEscapeUtils.unescapeHtml4(post.getString("title"));
     		String title = parseTitle(temp);
     		String artist = parseArtist(temp);
     		String url = parseContent(post.getString("content"));
@@ -326,7 +343,9 @@ public class MainActivity extends Activity {
      * @return String that indicates the song title
      */
     public String parseTitle(String str) {
-    	return str;
+    	int end = str.lastIndexOf(DIVIDER)-1;
+    	if(end < 0) return str;
+    	return str.substring(0, end);
     }
     
     /**
@@ -335,7 +354,9 @@ public class MainActivity extends Activity {
      * @return String that indicates the artist
      */
     public String parseArtist(String str) {
-    	return str;
+    	int start = str.lastIndexOf(DIVIDER)+1;
+    	if(start <= 0 || start > str.length()) return "";
+    	return str.substring(start);
     }
     
     /**
@@ -371,18 +392,8 @@ public class MainActivity extends Activity {
      * @param thumbnailUrl
      */
     public void onNewSong(long id, String title, String author, String streamUrl, String thumbnailUrl) {
-    	final Song s = new Song(this.getApplicationContext(), id, title, author, streamUrl);
+    	final Song s = new Song(id, title, author, streamUrl, thumbnailUrl);
     	adapter.addSong(s);
-    	OnImageDownloadListener cb = new OnImageDownloadListener() {
-			@Override
-			public void onDownloadComplete(Bitmap bmp) {
-				s.setThumbnail(bmp);
-				adapter.notifyDataSetChanged();
-			}
-    	};
-    	
-    	DownloadImageTask task = new DownloadImageTask(cb);
-    	task.execute(thumbnailUrl);
     }
     
 }

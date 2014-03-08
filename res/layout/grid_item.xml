@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 
-<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
    	android:layout_width="match_parent"
 	android:layout_height="match_parent">
     <com.macieklato.ragetracks.widget.SquareImageView
@@ -19,8 +19,30 @@
         android:paddingRight="10dp"
         android:paddingTop="15dp"
         android:paddingBottom="15dp"
-        android:layout_gravity="bottom"
+        android:layout_alignParentBottom="true"
         android:textColor="@android:color/white"
         android:background="#55000000"
         />
-</FrameLayout>
+    <com.macieklato.ragetracks.widget.SquareImageView
+        android:id="@+id/pause"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:scaleType="centerCrop"
+        android:padding="25dp"
+        android:background="#55000000"
+        android:src="@drawable/pause"
+        android:visibility="gone"
+      	android:clickable="false"
+        />
+    <com.macieklato.ragetracks.widget.SquareImageView
+        android:id="@+id/play"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:scaleType="centerCrop"
+        android:padding="25dp"
+        android:background="#55000000"
+        android:src="@drawable/play"
+        android:visibility="gone"
+        android:clickable="false"
+        />
+</RelativeLayout>
