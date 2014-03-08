@@ -1,33 +1,23 @@
 package com.macieklato.ragetracks.widget;
 
-import com.macieklato.ragetracks.R;
-
-import android.content.Context;
-import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
 
 public class Song {
 	private String title;
 	private String artist;
 	private String streamUrl;
-	private Bitmap thumbnail;
+	private String thumbnailURL;
 	private long id;
 	
-	private static Context context;
-	private static Bitmap none;
-	
-	public Song(Context c) {
-		if(Song.context == null) Song.context = c;
-		setThumbnail(none);
+	public Song() {
+		setThumbnailURL(null);
 	}
 	
-	public Song(Context c, long id, String title, String artist, String streamUrl) {
-		if(Song.context == null) Song.context = c;
+	public Song(long id, String title, String artist, String streamUrl, String thumbnail) {
 		setId(id);
 		setTitle(title);
 		setArtist(artist);
 		setStreamUrl(streamUrl);
-		setThumbnail(none);
+		setThumbnailURL(thumbnail);
 	}
 	
 	public void setId(long id) {
@@ -46,11 +36,8 @@ public class Song {
 		this.streamUrl = url;
 	}
 	
-	public void setThumbnail(Bitmap bmp) {
-		if(bmp == null) {
-			bmp = BitmapFactory.decodeResource(Song.context.getResources(), R.drawable.default_cover);
-		}
-		this.thumbnail = bmp;
+	public void setThumbnailURL(String thumbnail) {
+		this.thumbnailURL = thumbnail;
 	}
 	
 
@@ -70,7 +57,7 @@ public class Song {
 		return this.streamUrl;
 	}
 	
-	public Bitmap getThumbnail() {
-		return this.thumbnail;
+	public String getThumbnailURL() {
+		return this.thumbnailURL;
 	}
 }

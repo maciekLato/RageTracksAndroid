@@ -142,7 +142,7 @@
 		   	       	android:contentDescription="@string/cancel_search_button"
 		   	       	/>
    	    	</LinearLayout>
-   		</LinearLayout> 
+   		</LinearLayout>
 	   	<GridView
 	        android:id="@+id/gridview"
 	        android:layout_width="match_parent"
@@ -159,6 +159,16 @@
 	   	    android:layout_height="50dp"
 	   	    android:background="#000000"
 	   	    >
+
+	   		<ImageView
+	   		    android:id="@+id/previous_button"
+	   		    android:layout_width="0dp"
+	   		    android:layout_height="match_parent"
+	   		    android:layout_weight="1"
+	   		    android:contentDescription="@string/previous_button"
+	   		    android:onClick="onPreviousClicked"
+	   		    android:src="@drawable/previous" />
+
 	   	    <ImageView
 	   	        android:id="@+id/bookmark_button"
 	   	        android:src="@drawable/bookmark"
@@ -167,15 +177,6 @@
 	   	        android:layout_weight="1"
 	   	        android:onClick="onBookmarkClicked"
 	   	        android:contentDescription="@string/bookmark_button"
-	   	        />
-	   	    <ImageView	
-	   	        android:id="@+id/previous_button"
-	   	        android:src="@drawable/previous"
-	   	        android:layout_width="0dp"
-	   	        android:layout_height="match_parent"
-	   	        android:layout_weight="1"
-	   	        android:onClick="onPreviousClicked"
-	   	        android:contentDescription="@string/previous_button"
 	   	        />    
    	        <ImageView
    	            android:id="@+id/play_pause_button"
