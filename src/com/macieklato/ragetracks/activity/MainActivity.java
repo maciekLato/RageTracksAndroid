@@ -1,13 +1,24 @@
 package com.macieklato.ragetracks.activity;
 
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
+
 import com.macieklato.ragetracks.R;
 import com.macieklato.ragetracks.R.id;
+import com.macieklato.ragetracks.network.DownloadImageTask;
+import com.macieklato.ragetracks.network.Network;
+import com.macieklato.ragetracks.network.OnImageDownloadListener;
 import com.macieklato.ragetracks.widget.MyAdapter;
 import com.macieklato.ragetracks.widget.OnPullListener;
+import com.macieklato.ragetracks.widget.Song;
 
+import android.os.AsyncTask;
 import android.os.Bundle;
 import android.app.Activity;
 import android.content.Context;
+import android.graphics.Bitmap;
+import android.util.Log;
 import android.view.View;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.FrameLayout;
@@ -26,13 +37,20 @@ public class MainActivity extends Activity {
 	//current state
 	int state = PAUSE;
 	
+	private static final String CLIENT_ID = "7622aa84a50c9f7609e2f7ed8bc85e81";
+	
+	//views
+	MyAdapter adapter;
+	
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main); //set view
         setListeners(); //initialize state
-        GridView gridView = (GridView)findViewById(R.id.gridview); 
-        gridView.setAdapter(new MyAdapter(this)); //add grid view adapter
+        GridView gridView = (GridView)findViewById(R.id.gridview);
+        adapter = new MyAdapter(this.getApplicationContext());
+        gridView.setAdapter(adapter); //add grid view adapter
+        loadPosts(5);
     }
     
     /**
@@ -260,5 +278,111 @@ public class MainActivity extends Activity {
     	}
     	Toast.makeText(this.getApplicationContext(), "You clicked toggle genres", Toast.LENGTH_SHORT).show();
     } 
+    
+    /**
+     * loads count number of posts (new songs)
+     * @param count
+     */
+    public void loadPosts(final int count) {
+    	AsyncTask<Void, Void, JSONArray> task = new AsyncTask<Void, Void, JSONArray>(){
+			@Override
+			protected JSONArray doInBackground(Void... params) {
+				return Network.load(count);
+			}
+			@Override
+			protected void onPostExecute(JSONArray posts) {
+		        parsePosts(posts);
+		    }
+        };
+        task.execute();
+    }
+    
+    /**
+     * parses an json array of posts into song data
+     * @param posts
+     */
+    public void parsePosts(JSONArray posts) {
+    	try {
+    	for(int i=0; i<posts.length(); i++) {
+    		JSONObject post = posts.getJSONObject(i);
+    		long id = post.getInt("id");
+    		String temp = post.getString("title");
+    		String title = parseTitle(temp);
+    		String artist = parseArtist(temp);
+    		String url = parseContent(post.getString("content"));
+    		String thumbnail = parseAttachments(post.getJSONArray("attachments"));
+    		Log.d("post", String.format("title:%s\nartist:%s\nurl:%s\nthumbnail:%s\n", 
+    				title, artist, url, thumbnail));
+    		onNewSong(id, title, artist, url, thumbnail);
+    	}
+    	} catch(Exception e) {
+    		e.printStackTrace();
+    	}
+    }
+    
+    /**
+     * parses the song title out of a string
+     * @param str
+     * @return String that indicates the song title
+     */
+    public String parseTitle(String str) {
+    	return str;
+    }
+    
+    /**
+     * parses the artist out of a string
+     * @param str
+     * @return String that indicates the artist
+     */
+    public String parseArtist(String str) {
+    	return str;
+    }
+    
+    /**
+     * parses the stream url out of a content string
+     * @param content
+     * @return String representing the streaming url
+     */
+    public String parseContent(String content) {
+    	int start = content.indexOf("tracks/") + 7;
+    	int end = content.indexOf("&", start);
+    	String track = content.substring(start, end);
+    	return String.format("http://api.soundcloud.com/tracks/%s/stream?client_id=%s", track, CLIENT_ID);
+    }
+    
+    /**
+     * parses the thumbnail image url from the attachments string
+     * @param attachments
+     * @return String representing the thumbnail url for the song
+     * @throws JSONException if attachments->images->medium->url is not in the json array
+     */
+    public String parseAttachments(JSONArray attachments) throws JSONException {
+    	return attachments.getJSONObject(0)
+    			.getJSONObject("images")
+    			.getJSONObject("thumbnail")
+    			.getString("url");
+    }
+    
+    /**
+     * creates a new song object and adds it the grid
+     * @param title
+     * @param author
+     * @param streamUrl
+     * @param thumbnailUrl
+     */
+    public void onNewSong(long id, String title, String author, String streamUrl, String thumbnailUrl) {
+    	final Song s = new Song(this.getApplicationContext(), id, title, author, streamUrl);
+    	adapter.addSong(s);
+    	OnImageDownloadListener cb = new OnImageDownloadListener() {
+			@Override
+			public void onDownloadComplete(Bitmap bmp) {
+				s.setThumbnail(bmp);
+				adapter.notifyDataSetChanged();
+			}
+    	};
+    	
+    	DownloadImageTask task = new DownloadImageTask(cb);
+    	task.execute(thumbnailUrl);
+    }
     
 }
