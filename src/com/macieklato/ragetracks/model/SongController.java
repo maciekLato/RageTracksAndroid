@@ -7,39 +7,30 @@ import android.media.MediaPlayer.OnPreparedListener;
 public class SongController {
 
 	public static final int PLAYING = 0;
-	public static final int PAUSED = 0;
-	public static final int LOADING = 0;
-	public static final int UNINITIALIZED = 0;
+	public static final int PAUSED = 1;
+	public static final int LOADING = 2;
 
-	
+	//static variables
+	private static SongController singleton = new SongController();
+
+	//instance variables
 	private MediaPlayer media;
-	private int state = UNINITIALIZED;
+	private int state = -1;
 	private Song song;
 	
-	private static SongController singleton = new SongController();
-	
-	private SongController(){ }
-	
-	public static SongController getInstance() {
-	   return singleton;
+	//private methods
+	private SongController(){
+		media = new MediaPlayer();
 	}
 	
-	public void toggle(Song s) {
-		if(state == UNINITIALIZED) {
-			init();
-			loadSong(s);
-		} else if(state != LOADING) {
-			if(s == song) {
-				if(state == PLAYING) media.pause();
-				else media.start();
-			} else {
-				media.reset();
-				loadSong(s);
-			}
-		}
+	private void play() {
+		media.start();
+		state = PLAYING;
 	}
 	
-	private void init() {
+	private void pause() {
+		media.pause();
+		state = PAUSED;
 	}
 	
 	private void loadSong(Song s) {
@@ -47,7 +38,7 @@ public class SongController {
 		song = s;
 		media.setOnPreparedListener(new OnPreparedListener(){
 			public void onPrepared(MediaPlayer player) {
-				media.start();
+				play();
 			}
 		});
 		media.setAudioStreamType(AudioManager.STREAM_MUSIC);
@@ -58,4 +49,34 @@ public class SongController {
 		}
 		media.prepareAsync();
 	}
+	
+	//public methods
+	public static SongController getInstance() {
+	   return singleton;
+	}
+	
+	public void toggle(Song s) {
+		if(state != LOADING) {
+			if(s == song) {
+				if(state == PLAYING) pause();
+				else play();
+			} else {
+				media.reset();
+				loadSong(s);
+			}
+		}
+	}
+	
+	public void seek(int msec) {
+		if(state == PLAYING || state == PAUSED) {
+			media.seekTo(msec);
+		}
+	}
+	
+	public void destroy() {
+		media.pause();
+		media.stop();
+		media.release();
+	}
+
 }

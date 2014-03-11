@@ -69,19 +69,22 @@ public class MyAdapter extends BaseAdapter {
 			v = inflater.inflate(R.layout.grid_item, null, false);
 			v.setTag(R.id.picture, v.findViewById(R.id.picture));
 			v.setTag(R.id.text, v.findViewById(R.id.text));
-			v.setOnClickListener(new OnClickListener(){
-				public void onClick(View v) {
-					SongController.getInstance().toggle(song);
-				}
-			});
 		}
+		
+		v.setOnClickListener(new OnClickListener(){
+			public void onClick(View v) {
+				SongController.getInstance().toggle(song);
+			}
+		});
 
 		SquareImageView picture = (SquareImageView) v.getTag(R.id.picture);
 		TextView name = (TextView) v.getTag(R.id.text);
 
 		picture.setImageUrl(song.getThumbnailURL(), mImageLoader);
 		picture.setDefaultImageResId(R.drawable.default_cover);
-		name.setText(song.getTitle());
+		name.setText(song.getArtist() + "\n" + song.getTitle());
+		name.setHorizontallyScrolling(true);
+
 
 		return v;
 	}

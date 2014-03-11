@@ -6,6 +6,7 @@ import android.app.Activity;
 import android.content.Context;
 import android.os.AsyncTask;
 import android.os.Bundle;
+import android.view.MotionEvent;
 import android.view.View;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.FrameLayout;
@@ -18,20 +19,24 @@ import android.widget.Toast;
 import com.macieklato.ragetracks.R;
 import com.macieklato.ragetracks.R.id;
 import com.macieklato.ragetracks.model.Song;
+import com.macieklato.ragetracks.model.SongController;
 import com.macieklato.ragetracks.util.JSONUtil;
 import com.macieklato.ragetracks.util.Network;
 
 public class MainActivity extends Activity {
 
-	// state variables
+	//constant variables
 	public static final int PLAY = 0;
 	public static final int PAUSE = 1;
+	public static final int COUNT = 50;
 
-	// current state
-	int state = PAUSE;
+	// current state 
+	private int state = PAUSE;
 
-	// views
-	MyAdapter adapter;
+	// controllers
+	private MyAdapter adapter;
+	private OnPullListener pullListener;
+	
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -41,7 +46,7 @@ public class MainActivity extends Activity {
 		GridView gridView = (GridView) findViewById(R.id.gridview);
 		adapter = new MyAdapter(this.getApplicationContext());
 		gridView.setAdapter(adapter); // add grid view adapter
-		loadPosts(500);
+		loadPosts(COUNT);
 	}
 
 	/**
@@ -49,7 +54,7 @@ public class MainActivity extends Activity {
 	 */
 	private void setListeners() {
 		// set the pull events for the menu hider
-		OnPullListener gridListener = new OnPullListener(
+		pullListener = new OnPullListener(
 				this.getApplicationContext()) {
 			@Override
 			public void onBottomToTop() {
@@ -75,7 +80,6 @@ public class MainActivity extends Activity {
 				hideMenu();
 			}
 		};
-		findViewById(R.id.gridview).setOnTouchListener(gridListener);
 	}
 
 	/**
@@ -337,5 +341,16 @@ public class MainActivity extends Activity {
 			}
 		};
 		task.execute();
+	}
+	
+	@Override
+	public void onBackPressed() {
+		SongController.getInstance().destroy();
+		super.onBackPressed();
+	}
+	
+	public boolean dispatchTouchEvent(MotionEvent e) {
+		if(pullListener.onTouch(null, e)) return true;
+		return super.dispatchTouchEvent(e);
 	}
 }

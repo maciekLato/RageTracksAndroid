@@ -51,26 +51,26 @@ public class JSONUtil {
 	}
 
     
+	/**
+     * parses the artist out of a string
+     * @param str
+     * @return String that indicates the artist
+     */
+    public static String parseArtist(String str) {
+    	int end = str.lastIndexOf(JSONUtil.DIVIDER)-1;
+    	if(end < 0) return str;
+    	return str.substring(0, end).trim();
+    }
+    
     /**
      * parses the song title out of a string
      * @param str
      * @return String that indicates the song title
      */
     public static String parseTitle(String str) {
-    	int end = str.lastIndexOf(JSONUtil.DIVIDER)-1;
-    	if(end < 0) return str;
-    	return str.substring(0, end);
-    }
-    
-    /**
-     * parses the artist out of a string
-     * @param str
-     * @return String that indicates the artist
-     */
-    public static String parseArtist(String str) {
     	int start = str.lastIndexOf(JSONUtil.DIVIDER)+1;
     	if(start <= 0 || start > str.length()) return "";
-    	return str.substring(start);
+    	return str.substring(start).trim();
     }
     
     /**
