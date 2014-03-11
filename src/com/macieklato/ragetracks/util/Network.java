@@ -39,6 +39,9 @@ public class Network {
 	
 	//return values
 	public static final String POSTS = "posts";
+
+	//authorization
+	public static final String CLIENT_ID = "7622aa84a50c9f7609e2f7ed8bc85e81";
 	
 	/**
 	 * Makes a request to the server

@@ -2,8 +2,6 @@ package com.macieklato.ragetracks.controller;
 
 import java.util.ArrayList;
 
-import org.json.JSONArray;
-
 import android.app.Activity;
 import android.content.Context;
 import android.os.AsyncTask;
@@ -31,8 +29,6 @@ public class MainActivity extends Activity {
 
 	// current state
 	int state = PAUSE;
-
-	private static final String CLIENT_ID = "7622aa84a50c9f7609e2f7ed8bc85e81";
 
 	// views
 	MyAdapter adapter;
