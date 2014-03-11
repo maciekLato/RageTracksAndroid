@@ -1,4 +1,4 @@
-package com.macieklato.ragetracks.widget;
+package com.macieklato.ragetracks.model;
 
 import android.media.AudioManager;
 import android.media.MediaPlayer;

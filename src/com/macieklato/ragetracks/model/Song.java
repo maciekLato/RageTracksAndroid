@@ -1,4 +1,4 @@
-package com.macieklato.ragetracks.widget;
+package com.macieklato.ragetracks.model;
 
 
 public class Song {

@@ -1,4 +1,4 @@
-package com.macieklato.ragetracks.widget;
+package com.macieklato.ragetracks.controller;
 
 import android.content.Context;
 import android.view.MotionEvent;

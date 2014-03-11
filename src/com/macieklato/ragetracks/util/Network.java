@@ -1,4 +1,4 @@
-package com.macieklato.ragetracks.network;
+package com.macieklato.ragetracks.util;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -19,13 +19,9 @@ import org.json.JSONObject;
 import android.util.Log;
 
 public class Network {
-	
 
 	//host
 	public static final String HOST = "http://ragetracks.com/";
-	
-	//urls
-	public static final String LOAD = HOST+"json=1&count=1&page=0&custom_fields=PostThumb&include=title,content,attachments";
 
 	//parts
 	public static final String JSON = "json";

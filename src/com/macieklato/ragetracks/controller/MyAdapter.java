@@ -1,4 +1,4 @@
-package com.macieklato.ragetracks.widget;
+package com.macieklato.ragetracks.controller;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -10,13 +10,15 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.BaseAdapter;
-import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.android.volley.RequestQueue;
 import com.android.volley.toolbox.ImageLoader;
 import com.android.volley.toolbox.Volley;
 import com.macieklato.ragetracks.R;
+import com.macieklato.ragetracks.model.Song;
+import com.macieklato.ragetracks.model.SongController;
+import com.macieklato.ragetracks.widget.SquareImageView;
 
 public class MyAdapter extends BaseAdapter {
 	private RequestQueue queue;

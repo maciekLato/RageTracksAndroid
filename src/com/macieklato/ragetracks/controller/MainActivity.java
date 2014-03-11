@@ -1,4 +1,4 @@
-package com.macieklato.ragetracks.activity;
+package com.macieklato.ragetracks.controller;
 
 import java.util.ArrayList;
 
@@ -19,11 +19,9 @@ import android.widget.Toast;
 
 import com.macieklato.ragetracks.R;
 import com.macieklato.ragetracks.R.id;
-import com.macieklato.ragetracks.network.Network;
+import com.macieklato.ragetracks.model.Song;
 import com.macieklato.ragetracks.util.JSONUtil;
-import com.macieklato.ragetracks.widget.MyAdapter;
-import com.macieklato.ragetracks.widget.OnPullListener;
-import com.macieklato.ragetracks.widget.Song;
+import com.macieklato.ragetracks.util.Network;
 
 public class MainActivity extends Activity {
 
