@@ -1,66 +1,46 @@
 package com.macieklato.ragetracks.model;
 
-import android.media.AudioManager;
 import android.media.MediaPlayer;
-import android.media.MediaPlayer.OnPreparedListener;
-import android.util.Log;
-import android.view.View;
-import android.view.View.OnClickListener;
 
-public class SongController implements OnClickListener{
+public class SongController {
+
+	public static final int PLAYING = 0;
+	public static final int PAUSED = 0;
+	public static final int LOADING = 0;
+	public static final int UNINITIALIZED = 0;
+
 	
-	public static MediaPlayer player;
-	private boolean init = false;
+	private MediaPlayer media;
+	private int state = UNINITIALIZED;
 	private Song song;
 	
-	public SongController(Song song) {
-		this.song = song;
+	private static SongController singleton = new SongController();
+	
+	private SongController(){ }
+	
+	public static SongController getInstance() {
+	   return singleton;
 	}
-
-	@Override
-	public void onClick(View arg0) {
-		if(!init || player == null || !player.isPlaying()) play();
-		else pause();
+	
+	public void toggle(Song s) {
+		if(state == UNINITIALIZED) {
+			init();
+			loadSong(s);
+		} else if(state != LOADING) {
+			if(s == song) {
+				if(state == PLAYING) media.pause();
+				else media.start();
+			} else {
+				media.reset();
+				loadSong(s);
+			}
+		}
 	}
 	
 	private void init() {
-		if(player != null) {
-			player.pause();
-			player.stop();
-			player.release();
-		}
-		Log.d("player", "initializing player:"+song.getStreamUrl());
-		player = new MediaPlayer();
-		init = true;
-		player.setOnPreparedListener(new OnPreparedListener(){
-			public void onPrepared(MediaPlayer player) {
-				Log.d("player", "prepared:"+song.getStreamUrl());
-				play();
-			}
-		});
-		player.setAudioStreamType(AudioManager.STREAM_MUSIC);
-		try{
-			player.setDataSource(song.getStreamUrl());
-		} catch(Exception e) {
-			e.printStackTrace();
-		}
-		player.prepareAsync();
 	}
 	
-	public void play() {
-		if(!init || player == null) {
-			init();
-		} else player.start();
+	private void loadSong(Song s) {
+		state = LOADING;
 	}
-	
-	public void pause() {
-		player.pause();
-	}
-	
-	public void seek(int msec) {
-		if(player != null) {
-			player.seekTo(msec);
-		}
-	}
-
 }

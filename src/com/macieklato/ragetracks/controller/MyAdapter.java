@@ -8,6 +8,7 @@ import android.graphics.Bitmap;
 import android.support.v4.util.LruCache;
 import android.view.LayoutInflater;
 import android.view.View;
+import android.view.View.OnClickListener;
 import android.view.ViewGroup;
 import android.widget.BaseAdapter;
 import android.widget.TextView;
@@ -62,13 +63,17 @@ public class MyAdapter extends BaseAdapter {
 	@Override
 	public View getView(int i, View view, ViewGroup viewGroup) {
 		View v = view;
-		Song song = (Song) getItem(i);
+		final Song song = (Song) getItem(i);
 
 		if (v == null) {
 			v = inflater.inflate(R.layout.grid_item, null, false);
 			v.setTag(R.id.picture, v.findViewById(R.id.picture));
 			v.setTag(R.id.text, v.findViewById(R.id.text));
-			v.setOnClickListener(new SongController(song));
+			v.setOnClickListener(new OnClickListener(){
+				public void onClick(View v) {
+					SongController.getInstance().toggle(song);
+				}
+			});
 		}
 
 		SquareImageView picture = (SquareImageView) v.getTag(R.id.picture);

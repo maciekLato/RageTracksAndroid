@@ -13,7 +13,7 @@ import com.macieklato.ragetracks.model.Song;
 
 public class JSONUtil {
 	
-	public static int DIVIDER = 8321; 
+	public static int DIVIDER = 8211; 
 
 	/**
 	 * parses a JSONArray of posts into an ArrayList of Song data
