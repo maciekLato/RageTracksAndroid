@@ -1,6 +1,8 @@
 package com.macieklato.ragetracks.model;
 
+import android.media.AudioManager;
 import android.media.MediaPlayer;
+import android.media.MediaPlayer.OnPreparedListener;
 
 public class SongController {
 
@@ -42,5 +44,18 @@ public class SongController {
 	
 	private void loadSong(Song s) {
 		state = LOADING;
+		song = s;
+		media.setOnPreparedListener(new OnPreparedListener(){
+			public void onPrepared(MediaPlayer player) {
+				media.start();
+			}
+		});
+		media.setAudioStreamType(AudioManager.STREAM_MUSIC);
+		try{
+			media.setDataSource(song.getStreamUrl());
+		} catch(Exception e) {
+			e.printStackTrace();
+		}
+		media.prepareAsync();
 	}
 }
