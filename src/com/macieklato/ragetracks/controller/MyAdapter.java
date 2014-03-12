@@ -74,17 +74,16 @@ public class MyAdapter extends BaseAdapter {
 			v.setTag(R.id.overlay, v.findViewById(R.id.overlay));
 		}
 		
+		SquareNetworkImageView picture = (SquareNetworkImageView) v.getTag(R.id.picture);
+		SquareImageView overlay = (SquareImageView) v.getTag(R.id.overlay);
+		final TextView artist = (TextView) v.getTag(R.id.artist);
+		final TextView title = (TextView) v.getTag(R.id.title);
+		
 		v.setOnClickListener(new OnClickListener(){
 			public void onClick(View v) {
 				SongController.getInstance().toggle(song);
 			}
 		});
-
-		SquareNetworkImageView picture = (SquareNetworkImageView) v.getTag(R.id.picture);
-		SquareImageView overlay = (SquareImageView) v.getTag(R.id.overlay);
-		TextView artist = (TextView) v.getTag(R.id.artist);
-		TextView title = (TextView) v.getTag(R.id.title);
-
 
 		if(song.isIdle()) {
 			overlay.setVisibility(View.GONE);
@@ -95,11 +94,10 @@ public class MyAdapter extends BaseAdapter {
 			overlay.setImageResource(R.drawable.pause);
 			if(!artist.isSelected()) artist.setSelected(true);
 			if(!title.isSelected()) title.setSelected(true);
+			
 		} else if(song.isPaused()) {
 			overlay.setVisibility(View.VISIBLE);
 			overlay.setImageResource(R.drawable.play);
-			if(!artist.isSelected()) artist.setSelected(true);
-			if(!title.isSelected()) title.setSelected(true);
 		}
 		
 		picture.setImageUrl(song.getThumbnailURL(), mImageLoader);
