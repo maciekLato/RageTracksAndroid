@@ -20,23 +20,19 @@ import com.macieklato.ragetracks.R;
 import com.macieklato.ragetracks.R.id;
 import com.macieklato.ragetracks.model.Song;
 import com.macieklato.ragetracks.model.SongController;
+import com.macieklato.ragetracks.model.SongStateChangeListener;
 import com.macieklato.ragetracks.util.JSONUtil;
 import com.macieklato.ragetracks.util.Network;
 
 public class MainActivity extends Activity {
 
 	//constant variables
-	public static final int PLAY = 0;
-	public static final int PAUSE = 1;
-	public static final int COUNT = 50;
-
-	// current state 
-	private int state = PAUSE;
+	public static final int COUNT = 5;
 
 	// controllers
 	private MyAdapter adapter;
 	private OnPullListener pullListener;
-	
+	private SongController songController = SongController.getInstance();
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -80,6 +76,29 @@ public class MainActivity extends Activity {
 				hideMenu();
 			}
 		};
+		
+		songController.addStateListener(new SongStateChangeListener() {
+
+			@Override
+			public void onPause(Song s) {
+				ImageView button = (ImageView)findViewById(R.id.play_pause_button);
+				button.setImageResource(R.drawable.play);
+				adapter.notifyDataSetChanged();
+			}
+
+			@Override
+			public void onPlay(Song s) {
+				ImageView button = (ImageView)findViewById(R.id.play_pause_button);
+				button.setImageResource(R.drawable.pause);
+				adapter.notifyDataSetChanged();
+			}
+
+			@Override
+			public void onStop(Song s) {
+				adapter.notifyDataSetChanged();
+			}
+			
+		});
 	}
 
 	/**
@@ -215,39 +234,7 @@ public class MainActivity extends Activity {
 	 *            - the play/pause view
 	 */
 	public void onPlayPauseClicked(View v) {
-		if (state == PLAY) {
-			onPauseClicked(v);
-		} else {
-			onPlayClicked(v);
-		}
-	}
-
-	/**
-	 * callback for clicking the play button
-	 * 
-	 * @param v
-	 *            - play view
-	 */
-	public void onPlayClicked(View v) {
-		Toast.makeText(this.getApplicationContext(), "You clicked play",
-				Toast.LENGTH_SHORT).show();
-		ImageView img = (ImageView) findViewById(R.id.play_pause_button);
-		img.setImageResource(R.drawable.pause);
-		state = PLAY;
-	}
-
-	/**
-	 * callback for click the pause button
-	 * 
-	 * @param v
-	 *            - pause view
-	 */
-	public void onPauseClicked(View v) {
-		Toast.makeText(this.getApplicationContext(), "You clicked pause",
-				Toast.LENGTH_SHORT).show();
-		ImageView img = (ImageView) findViewById(R.id.play_pause_button);
-		img.setImageResource(R.drawable.play);
-		state = PAUSE;
+		songController.toggle();
 	}
 
 	/**

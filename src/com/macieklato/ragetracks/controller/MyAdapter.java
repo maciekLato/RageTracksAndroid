@@ -20,6 +20,7 @@ import com.macieklato.ragetracks.R;
 import com.macieklato.ragetracks.model.Song;
 import com.macieklato.ragetracks.model.SongController;
 import com.macieklato.ragetracks.widget.SquareImageView;
+import com.macieklato.ragetracks.widget.SquareNetworkImageView;
 
 public class MyAdapter extends BaseAdapter {
 	private RequestQueue queue;
@@ -68,7 +69,9 @@ public class MyAdapter extends BaseAdapter {
 		if (v == null) {
 			v = inflater.inflate(R.layout.grid_item, null, false);
 			v.setTag(R.id.picture, v.findViewById(R.id.picture));
-			v.setTag(R.id.text, v.findViewById(R.id.text));
+			v.setTag(R.id.artist, v.findViewById(R.id.artist));
+			v.setTag(R.id.title, v.findViewById(R.id.title));
+			v.setTag(R.id.overlay, v.findViewById(R.id.overlay));
 		}
 		
 		v.setOnClickListener(new OnClickListener(){
@@ -77,15 +80,34 @@ public class MyAdapter extends BaseAdapter {
 			}
 		});
 
-		SquareImageView picture = (SquareImageView) v.getTag(R.id.picture);
-		TextView name = (TextView) v.getTag(R.id.text);
+		SquareNetworkImageView picture = (SquareNetworkImageView) v.getTag(R.id.picture);
+		SquareImageView overlay = (SquareImageView) v.getTag(R.id.overlay);
+		TextView artist = (TextView) v.getTag(R.id.artist);
+		TextView title = (TextView) v.getTag(R.id.title);
 
+
+		if(song.isIdle()) {
+			overlay.setVisibility(View.GONE);
+			artist.setSelected(false);
+			title.setSelected(false);
+		} else if(song.isPlaying()) {
+			overlay.setVisibility(View.VISIBLE);
+			overlay.setImageResource(R.drawable.pause);
+			if(!artist.isSelected()) artist.setSelected(true);
+			if(!title.isSelected()) title.setSelected(true);
+		} else if(song.isPaused()) {
+			overlay.setVisibility(View.VISIBLE);
+			overlay.setImageResource(R.drawable.play);
+			if(!artist.isSelected()) artist.setSelected(true);
+			if(!title.isSelected()) title.setSelected(true);
+		}
+		
 		picture.setImageUrl(song.getThumbnailURL(), mImageLoader);
 		picture.setDefaultImageResId(R.drawable.default_cover);
-		name.setText(song.getArtist() + "\n" + song.getTitle());
-		name.setHorizontallyScrolling(true);
-
-
+		artist.setText(song.getArtist());
+		title.setText(song.getTitle());
+		v.setId((int)song.getId());
+		
 		return v;
 	}
 

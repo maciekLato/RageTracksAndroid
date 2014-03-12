@@ -3,7 +3,7 @@
 <FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
    	android:layout_width="match_parent"
 	android:layout_height="match_parent">
-    <com.macieklato.ragetracks.widget.SquareImageView
+    <com.macieklato.ragetracks.widget.SquareNetworkImageView
         android:id="@+id/picture"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
@@ -11,17 +11,49 @@
         android:padding="2dp"
         android:background="#000000"
         />
-    <TextView
-        android:id="@+id/text"
+    <LinearLayout 
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:background="#55000000"
+        android:orientation="vertical"
         android:paddingLeft="10dp"
         android:paddingRight="10dp"
         android:paddingTop="15dp"
         android:paddingBottom="15dp"
-        android:textSize="12sp"
-        android:layout_gravity="bottom"
-        android:textColor="@android:color/white"
+       	android:layout_gravity="bottom"
+        >
+        <TextView
+	        android:id="@+id/artist"
+	        android:layout_width="match_parent"
+	        android:layout_height="wrap_content"
+	        android:textSize="12sp"
+	        android:textColor="@android:color/white"
+	        android:ellipsize="marquee" 
+		    android:marqueeRepeatLimit="marquee_forever"
+		    android:scrollHorizontally="true" 
+		    android:focusable="true" 
+		    android:focusableInTouchMode="true" 
+        	/>
+        <TextView
+	        android:id="@+id/title"
+	        android:layout_width="match_parent"
+	        android:layout_height="wrap_content"
+	        android:textSize="12sp"
+	        android:textColor="@android:color/white"
+	        android:ellipsize="marquee" 
+		    android:marqueeRepeatLimit="marquee_forever"
+		    android:scrollHorizontally="true" 
+		    android:focusable="true" 
+		    android:focusableInTouchMode="true" 
+        	/>
+    </LinearLayout>
+    <com.macieklato.ragetracks.widget.SquareImageView
+        android:id="@+id/overlay"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:scaleType="centerCrop"
+        android:padding="25dp"
         android:background="#55000000"
+        android:visibility="gone"
         />
 </FrameLayout>

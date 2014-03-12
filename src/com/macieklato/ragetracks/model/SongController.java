@@ -1,5 +1,7 @@
 package com.macieklato.ragetracks.model;
 
+import java.util.ArrayList;
+
 import android.media.AudioManager;
 import android.media.MediaPlayer;
 import android.media.MediaPlayer.OnPreparedListener;
@@ -17,24 +19,48 @@ public class SongController {
 	private MediaPlayer media;
 	private int state = -1;
 	private Song song;
+	private ArrayList<SongStateChangeListener> listeners;
 	
 	//private methods
 	private SongController(){
 		media = new MediaPlayer();
+		listeners = new ArrayList<SongStateChangeListener>();
 	}
 	
 	private void play() {
 		media.start();
 		state = PLAYING;
+		song.setState(Song.PLAYING);
+		for(SongStateChangeListener listener: listeners) {
+			listener.onPlay(song);
+		}
+	}
+	
+	private void stop() {
+		if(media.isPlaying()) {
+			media.stop();
+		}
+		media.reset();
+		if(song != null) {
+			song.setState(Song.IDLE);
+			for(SongStateChangeListener listener: listeners) {
+				listener.onStop(song);
+			}
+		}
 	}
 	
 	private void pause() {
 		media.pause();
 		state = PAUSED;
+		song.setState(Song.PAUSED);
+		for(SongStateChangeListener listener: listeners) {
+			listener.onPause(song);
+		}
 	}
 	
 	private void loadSong(Song s) {
 		state = LOADING;
+		stop();
 		song = s;
 		media.setOnPreparedListener(new OnPreparedListener(){
 			public void onPrepared(MediaPlayer player) {
@@ -61,10 +87,14 @@ public class SongController {
 				if(state == PLAYING) pause();
 				else play();
 			} else {
-				media.reset();
 				loadSong(s);
 			}
 		}
+	}
+	
+	public void toggle() {
+		if(state == PLAYING) pause();
+		else if (state == PAUSED) play();
 	}
 	
 	public void seek(int msec) {
@@ -77,6 +107,14 @@ public class SongController {
 		media.pause();
 		media.stop();
 		media.release();
+	}
+	
+	public Song getSong() {
+		return song;
+	}
+	
+	public void addStateListener(SongStateChangeListener listener) {
+		listeners.add(listener);
 	}
 
 }

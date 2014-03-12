@@ -58,7 +58,7 @@ public class JSONUtil {
      */
     public static String parseArtist(String str) {
     	int end = str.lastIndexOf(JSONUtil.DIVIDER)-1;
-    	if(end < 0) return str;
+    	if(end < 0) return "";
     	return str.substring(0, end).trim();
     }
     
@@ -69,7 +69,7 @@ public class JSONUtil {
      */
     public static String parseTitle(String str) {
     	int start = str.lastIndexOf(JSONUtil.DIVIDER)+1;
-    	if(start <= 0 || start > str.length()) return "";
+    	if(start <= 0 || start > str.length()) return str;
     	return str.substring(start).trim();
     }
     

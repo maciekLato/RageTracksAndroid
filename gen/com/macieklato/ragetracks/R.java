@@ -49,6 +49,7 @@ public final class R {
         public static final int volumenone=0x7f020019;
     }
     public static final class id {
+        public static final int artist=0x7f070019;
         public static final int bookmark_button=0x7f070014;
         public static final int bookmark_list=0x7f070003;
         public static final int bookmark_menu_text=0x7f070002;
@@ -62,6 +63,7 @@ public final class R {
         public static final int main_screen=0x7f070000;
         public static final int menu_button=0x7f070009;
         public static final int next_button=0x7f070016;
+        public static final int overlay=0x7f07001a;
         public static final int picture=0x7f070018;
         public static final int play_pause_button=0x7f070015;
         public static final int previous_button=0x7f070013;
@@ -70,7 +72,6 @@ public final class R {
         public static final int search_menu=0x7f07000d;
         public static final int search_text_edit=0x7f07000e;
         public static final int share_button=0x7f070017;
-        public static final int text=0x7f070019;
         public static final int title=0x7f07000a;
         public static final int top_menu=0x7f070007;
         public static final int top_menu_1=0x7f070008;

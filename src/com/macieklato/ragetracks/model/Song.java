@@ -2,14 +2,20 @@ package com.macieklato.ragetracks.model;
 
 
 public class Song {
+	public static final int IDLE = 0;
+	public static final int PLAYING = 1;
+	public static final int PAUSED = 2;
+	
 	private String title;
 	private String artist;
 	private String streamUrl;
 	private String thumbnailURL;
 	private long id;
+	private int state;
 	
 	public Song() {
 		setThumbnailURL(null);
+		setState(IDLE);
 	}
 	
 	public Song(long id, String title, String artist, String streamUrl, String thumbnail) {
@@ -18,6 +24,7 @@ public class Song {
 		setArtist(artist);
 		setStreamUrl(streamUrl);
 		setThumbnailURL(thumbnail);
+		setState(IDLE);
 	}
 	
 	public void setId(long id) {
@@ -40,6 +47,9 @@ public class Song {
 		this.thumbnailURL = thumbnail;
 	}
 	
+	public void setState(int state) {
+		this.state = state;
+	}
 
 	public long getId() {
 		return this.id;
@@ -59,5 +69,28 @@ public class Song {
 	
 	public String getThumbnailURL() {
 		return this.thumbnailURL;
+	}
+	
+	public int getState() {
+		return state;
+	}
+	
+	public boolean isIdle() {
+		return state == IDLE;
+	}
+	
+	public boolean isPlaying() {
+		return state == PLAYING;
+	}
+	
+	public boolean isPaused() {
+		return state == PAUSED;
+	}
+	
+	public boolean equals(Object obj) {
+		if(obj instanceof Song) {
+			return this.streamUrl.equals(((Song)obj).streamUrl);
+		} 
+		return false;
 	}
 }
