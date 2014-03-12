@@ -20,7 +20,7 @@
         android:paddingRight="10dp"
         android:paddingTop="15dp"
         android:paddingBottom="15dp"
-       	android:layout_gravity="bottom"
+       	android:layout_alignParentBottom="true"
         >
         <TextView
 	        android:id="@+id/artist"
