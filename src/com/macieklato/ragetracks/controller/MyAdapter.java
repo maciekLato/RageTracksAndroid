@@ -6,10 +6,12 @@ import java.util.List;
 import android.content.Context;
 import android.graphics.Bitmap;
 import android.support.v4.util.LruCache;
+import android.text.TextUtils;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.view.ViewGroup;
+import android.view.animation.Animation;
 import android.widget.BaseAdapter;
 import android.widget.TextView;
 
@@ -84,7 +86,19 @@ public class MyAdapter extends BaseAdapter {
 				SongController.getInstance().toggle(song);
 			}
 		});
-
+		
+		artist.setEllipsize(TextUtils.TruncateAt.MARQUEE);
+		artist.setHorizontallyScrolling(true);
+		artist.setFocusable(true);
+		artist.setFocusableInTouchMode(true);
+		artist.setMarqueeRepeatLimit(Animation.INFINITE);
+		
+		title.setEllipsize(TextUtils.TruncateAt.MARQUEE);
+		title.setHorizontallyScrolling(true);
+		title.setFocusable(true);
+		title.setFocusableInTouchMode(true);
+		title.setMarqueeRepeatLimit(Animation.INFINITE);
+		
 		if(song.isIdle()) {
 			overlay.setVisibility(View.GONE);
 			artist.setSelected(false);
@@ -94,10 +108,12 @@ public class MyAdapter extends BaseAdapter {
 			overlay.setImageResource(R.drawable.pause);
 			if(!artist.isSelected()) artist.setSelected(true);
 			if(!title.isSelected()) title.setSelected(true);
-			
 		} else if(song.isPaused()) {
 			overlay.setVisibility(View.VISIBLE);
 			overlay.setImageResource(R.drawable.play);
+		}	else if(song.isLoading()) {
+			overlay.setVisibility(View.VISIBLE);
+			//overlay.setImageResource(R.drawable.loading);
 		}
 		
 		picture.setImageUrl(song.getThumbnailURL(), mImageLoader);
@@ -111,6 +127,11 @@ public class MyAdapter extends BaseAdapter {
 
 	public void addSong(Song s) {
 		items.add(s);
+		notifyDataSetChanged();
+	}
+	
+	public void removeSong(Song s) {
+		items.remove(s);
 		notifyDataSetChanged();
 	}
 

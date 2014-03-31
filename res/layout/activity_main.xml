@@ -5,6 +5,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="horizontal"
+    android:animateLayoutChanges="true"
     >
     <LinearLayout
    	    android:id="@+id/leftmenu"
@@ -13,6 +14,7 @@
    	   	android:background="#000000"
    	   	android:orientation="vertical"
    	   	android:visibility="gone"
+   	   	android:animateLayoutChanges="true"
    	   	>
    	   	<TextView
    	   	    android:id="@+id/bookmark_menu_text"
@@ -54,19 +56,23 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:orientation="vertical"
+        android:animateLayoutChanges="true"
         >
    	   	<LinearLayout
 	   	    android:id="@+id/top_menu"
 	   	    android:layout_width="match_parent"
 			android:layout_height="50dp"
 			android:orientation="horizontal"
-			android:background="#000000"
+	   	    android:background="#000000"
+	   	    android:animateLayoutChanges="true"
 	   	    >
 	   	    <LinearLayout
 	   	        android:id="@+id/top_menu_1"
 	   	        android:layout_width="match_parent"
 	   	        android:layout_height="match_parent"
 	   	        android:orientation="horizontal"
+	   	        android:background="#000000"
+	   	        android:animateLayoutChanges="true"
 	   	        >
 		   	    <ImageView 
 		   	        android:id="@+id/menu_button"
@@ -101,7 +107,8 @@
 	   	        android:layout_width="match_parent"
 	   	        android:layout_height="match_parent"
 	   	        android:orientation="horizontal"
-	   	       	android:visibility="gone"	   	        	   	        
+	   	       	android:visibility="gone"	  
+	   	       	android:animateLayoutChanges="true" 	        	   	        
 	   	        >
 		   	    <LinearLayout
 		   	        android:id="@+id/search_menu"
@@ -112,6 +119,7 @@
 		   	      	android:layout_marginBottom="5dp"
 		   	        android:orientation="horizontal"
 		   	        android:layout_weight="1"
+		   	        android:animateLayoutChanges="true"
 			   	    >
 			   	    <EditText
 			   	        android:id="@+id/search_text_edit"
@@ -152,12 +160,14 @@
 	        android:stretchMode="columnWidth"
 	        android:numColumns="2" 
 	        android:layout_weight="1"
+	        android:animateLayoutChanges="true"
 	      	/>
 	   	<LinearLayout
 	   	    android:id="@+id/bottommenu"
 	   	    android:layout_width="match_parent"
 	   	    android:layout_height="50dp"
 	   	    android:background="#000000"
+	   	    android:animateLayoutChanges="true"
 	   	    >
 
 	   		<ImageView

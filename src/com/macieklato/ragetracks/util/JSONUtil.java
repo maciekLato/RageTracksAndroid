@@ -24,7 +24,8 @@ public class JSONUtil {
 		ArrayList<Song> songs = new ArrayList<Song>();
 		for(int i=0; i<posts.length(); i++) {
 			try {
-				songs.add(JSONUtil.parsePost(posts.getJSONObject(i)));
+				Song s = JSONUtil.parsePost(posts.getJSONObject(i));
+				if(s != null) songs.add(s);
 			} catch (JSONException e) {
 				e.printStackTrace();
 			}
@@ -47,6 +48,7 @@ public class JSONUtil {
 		String thumbnail = parseAttachments(post.getJSONArray("attachments"));
 		Log.d("post", String.format("title:%s\nartist:%s\nurl:%s\nthumbnail:%s\n", 
 				title, artist, url, thumbnail));
+		if(title == null || artist == null || url == null || thumbnail == null) return null;
 		return new Song(id, title, artist, url, thumbnail);
 	}
 
@@ -79,8 +81,10 @@ public class JSONUtil {
      * @return String representing the streaming url
      */
     public static String parseContent(String content) {
+    	Log.d("parse", "content:"+content);
     	int start = content.indexOf("tracks/") + 7;
     	int end = content.indexOf("&", start);
+    	if(end < start || start < 0) return null;
     	String track = content.substring(start, end);
     	return String.format("http://api.soundcloud.com/tracks/%s/stream?client_id=%s", track, Network.CLIENT_ID);
     }

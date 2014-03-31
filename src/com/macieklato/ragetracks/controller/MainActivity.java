@@ -77,12 +77,20 @@ public class MainActivity extends Activity {
 			}
 		};
 		
+		final Context c = this.getApplicationContext();
 		songController.addStateListener(new SongStateChangeListener() {
 
 			@Override
 			public void onPause(Song s) {
 				ImageView button = (ImageView)findViewById(R.id.play_pause_button);
 				button.setImageResource(R.drawable.play);
+				s.setState(Song.PAUSED);
+				adapter.notifyDataSetChanged();
+			}
+			
+			@Override
+			public void onLoading(Song s) {
+				s.setState(Song.LOADING);
 				adapter.notifyDataSetChanged();
 			}
 
@@ -90,12 +98,20 @@ public class MainActivity extends Activity {
 			public void onPlay(Song s) {
 				ImageView button = (ImageView)findViewById(R.id.play_pause_button);
 				button.setImageResource(R.drawable.pause);
+				s.setState(Song.PLAYING);
 				adapter.notifyDataSetChanged();
 			}
 
 			@Override
 			public void onStop(Song s) {
+				s.setState(Song.IDLE);
 				adapter.notifyDataSetChanged();
+			}
+			
+			@Override 
+			public void onError(Song s) {
+				Toast.makeText(c, "Song unavilable", Toast.LENGTH_SHORT).show();
+				adapter.removeSong(s);
 			}
 			
 		});

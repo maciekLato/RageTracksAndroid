@@ -28,11 +28,6 @@
 	        android:layout_height="wrap_content"
 	        android:textSize="12sp"
 	        android:textColor="@android:color/white"
-	        android:ellipsize="marquee" 
-		    android:marqueeRepeatLimit="marquee_forever"
-		    android:scrollHorizontally="true" 
-		    android:focusable="true" 
-		    android:focusableInTouchMode="true" 
         	/>
         <TextView
 	        android:id="@+id/title"
@@ -40,11 +35,6 @@
 	        android:layout_height="wrap_content"
 	        android:textSize="12sp"
 	        android:textColor="@android:color/white"
-	        android:ellipsize="marquee" 
-		    android:marqueeRepeatLimit="marquee_forever"
-		    android:scrollHorizontally="true" 
-		    android:focusable="true" 
-		    android:focusableInTouchMode="true" 
         	/>
     </LinearLayout>
     <com.macieklato.ragetracks.widget.SquareImageView

@@ -4,10 +4,12 @@ import java.util.ArrayList;
 
 import android.media.AudioManager;
 import android.media.MediaPlayer;
+import android.media.MediaPlayer.OnErrorListener;
 import android.media.MediaPlayer.OnPreparedListener;
 
 public class SongController {
 
+	public static final int UNINITIALIZED = -1;
 	public static final int PLAYING = 0;
 	public static final int PAUSED = 1;
 	public static final int LOADING = 2;
@@ -17,20 +19,35 @@ public class SongController {
 
 	//instance variables
 	private MediaPlayer media;
-	private int state = -1;
+	private int state = UNINITIALIZED;
 	private Song song;
 	private ArrayList<SongStateChangeListener> listeners;
 	
 	//private methods
 	private SongController(){
 		media = new MediaPlayer();
+		media.setOnPreparedListener(new OnPreparedListener(){
+			public void onPrepared(MediaPlayer player) {
+				play();
+			}
+		});
+		media.setOnErrorListener(new OnErrorListener() {
+			public boolean onError(MediaPlayer player, int what, int extra) {
+				for(SongStateChangeListener listener: listeners) {
+					listener.onError(song);
+				}
+				stop();
+				return false;
+			}
+		});
+		media.setAudioStreamType(AudioManager.STREAM_MUSIC);
+		
 		listeners = new ArrayList<SongStateChangeListener>();
 	}
 	
 	private void play() {
 		media.start();
 		state = PLAYING;
-		song.setState(Song.PLAYING);
 		for(SongStateChangeListener listener: listeners) {
 			listener.onPlay(song);
 		}
@@ -42,36 +59,32 @@ public class SongController {
 		}
 		media.reset();
 		if(song != null) {
-			song.setState(Song.IDLE);
 			for(SongStateChangeListener listener: listeners) {
 				listener.onStop(song);
 			}
 		}
+		state = UNINITIALIZED;
 	}
 	
 	private void pause() {
 		media.pause();
 		state = PAUSED;
-		song.setState(Song.PAUSED);
 		for(SongStateChangeListener listener: listeners) {
 			listener.onPause(song);
 		}
 	}
 	
 	private void loadSong(Song s) {
-		state = LOADING;
 		stop();
+		state = LOADING;
 		song = s;
-		media.setOnPreparedListener(new OnPreparedListener(){
-			public void onPrepared(MediaPlayer player) {
-				play();
-			}
-		});
-		media.setAudioStreamType(AudioManager.STREAM_MUSIC);
 		try{
 			media.setDataSource(song.getStreamUrl());
 		} catch(Exception e) {
 			e.printStackTrace();
+		}
+		for(SongStateChangeListener listener: listeners) {
+			listener.onLoading(song);
 		}
 		media.prepareAsync();
 	}

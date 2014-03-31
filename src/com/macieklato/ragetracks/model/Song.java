@@ -5,6 +5,7 @@ public class Song {
 	public static final int IDLE = 0;
 	public static final int PLAYING = 1;
 	public static final int PAUSED = 2;
+	public static final int LOADING = 3;
 	
 	private String title;
 	private String artist;
@@ -85,6 +86,10 @@ public class Song {
 	
 	public boolean isPaused() {
 		return state == PAUSED;
+	}
+	
+	public boolean isLoading() {
+		return state == LOADING;
 	}
 	
 	public boolean equals(Object obj) {
