@@ -30,7 +30,7 @@ import com.macieklato.ragetracks.util.Network;
 public class MainActivity extends Activity {
 
 	//constant variables
-	public static final int COUNT = 10;
+	public static final int COUNT = 5;
 	
 	// controllers
 	private MyAdapter adapter;
