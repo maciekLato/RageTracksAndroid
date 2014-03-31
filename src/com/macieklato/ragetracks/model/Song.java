@@ -9,24 +9,26 @@ public class Song {
 	private String title;
 	private String artist;
 	private String streamUrl;
-	private String thumbnailURL;
+	private String thumbnailUrl;
+	private String rageTracksUrl;
 	private int page;
 	private int index;
 	private long id;
 	private int state;
 
 	public Song() {
-		setThumbnailURL(null);
+		setThumbnailUrl(null);
 		setState(IDLE);
 	}
 
-	public Song(long id, String title, String artist, String streamUrl,
+	public Song(long id, String rageTracksUrl, String title, String artist, String streamUrl,
 			String thumbnail, int page, int index) {
 		setId(id);
+		setRageTracksUrl(rageTracksUrl);
 		setTitle(title);
 		setArtist(artist);
 		setStreamUrl(streamUrl);
-		setThumbnailURL(thumbnail);
+		setThumbnailUrl(thumbnail);
 		setState(IDLE);
 		setPage(page);
 		setIndex(index);
@@ -34,6 +36,10 @@ public class Song {
 
 	public void setId(long id) {
 		this.id = id;
+	}
+	
+	public void setRageTracksUrl(String url) {
+		this.rageTracksUrl = url;
 	}
 
 	public void setTitle(String title) {
@@ -48,8 +54,8 @@ public class Song {
 		this.streamUrl = url;
 	}
 
-	public void setThumbnailURL(String thumbnail) {
-		this.thumbnailURL = thumbnail;
+	public void setThumbnailUrl(String thumbnail) {
+		this.thumbnailUrl = thumbnail;
 	}
 
 	public void setState(int state) {
@@ -67,6 +73,10 @@ public class Song {
 	public long getId() {
 		return this.id;
 	}
+	
+	public String getRageTracksUrl() {
+		return this.rageTracksUrl;
+	}
 
 	public String getTitle() {
 		return this.title;
@@ -80,8 +90,8 @@ public class Song {
 		return this.streamUrl;
 	}
 
-	public String getThumbnailURL() {
-		return this.thumbnailURL;
+	public String getThumbnailUrl() {
+		return this.thumbnailUrl;
 	}
 
 	public int getState() {

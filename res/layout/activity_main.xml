@@ -21,6 +21,7 @@
 		    android:layout_width="match_parent"
 		    android:layout_height="50dp"
 		    android:orientation="vertical"
+		    android:animateLayoutChanges="true"
             />
         <TextView
             android:id="@+id/bookmark_menu_text"
@@ -241,6 +242,7 @@
         <RelativeLayout
             android:id="@+id/seek_bar_container"
             style="@+style/SeekBarAppTheme"
+            android:animateLayoutChanges="true"
             android:layout_width="match_parent"
             android:layout_height="50dp"
             android:contentDescription="@string/seek_bar"
@@ -257,6 +259,7 @@
             <SeekBar
                 android:id="@+id/seek_bar"
                 style="@+style/SeekBarAppTheme"
+                android:animateLayoutChanges="true"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_centerInParent="true"

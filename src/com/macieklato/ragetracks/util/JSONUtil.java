@@ -47,6 +47,7 @@ public class JSONUtil {
 	public static Song parsePost(JSONObject post, int page, int index)
 			throws JSONException {
 		long id = post.getInt("id");
+		String rageTracksUrl = StringEscapeUtils.unescapeHtml4(post.getString("url"));
 		String temp = StringEscapeUtils.unescapeHtml4(post.getString("title"));
 		String title = parseTitle(temp);
 		String artist = parseArtist(temp);
@@ -55,11 +56,11 @@ public class JSONUtil {
 		Log.d("post", String.format(
 				"title:%s\nartist:%s\nurl:%s\nthumbnail:%s\n", title, artist,
 				url, thumbnail));
-		if (url == null || thumbnail == null)
+		if (rageTracksUrl == null || url == null || thumbnail == null)
 			return null;
-		return new Song(id, title, artist, url, thumbnail, page, index);
+		return new Song(id, rageTracksUrl, title, artist, url, thumbnail, page, index);
 	}
-
+	
 	/**
 	 * parses the artist out of a string
 	 * 

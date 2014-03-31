@@ -35,8 +35,9 @@ public class Network {
 	public static final String INCLUDE_TITLE = "title";
 	public static final String INCLUDE_CONTENT = "content";
 	public static final String INCLUDE_ATTACHMENTS = "attachments";
+	public static final String INCLUDE_URL = "url";
 	public static final String INCLUDE_ALL = INCLUDE_TITLE + ","
-			+ INCLUDE_CONTENT + "," + INCLUDE_ATTACHMENTS;
+			+ INCLUDE_CONTENT + "," + INCLUDE_ATTACHMENTS + "," + INCLUDE_URL;
 
 	// return values
 	public static final String POSTS = "posts";

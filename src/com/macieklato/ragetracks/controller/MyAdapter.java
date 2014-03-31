@@ -126,7 +126,7 @@ public class MyAdapter extends BaseAdapter {
 			progressBar.setVisibility(View.VISIBLE);
 		}
 
-		picture.setImageUrl(song.getThumbnailURL(), mImageLoader);
+		picture.setImageUrl(song.getThumbnailUrl(), mImageLoader);
 		picture.setDefaultImageResId(R.drawable.default_cover);
 		artist.setText(song.getArtist());
 		title.setText(song.getTitle());

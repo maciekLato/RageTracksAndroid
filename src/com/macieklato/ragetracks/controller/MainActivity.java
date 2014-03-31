@@ -31,7 +31,7 @@ import com.macieklato.ragetracks.model.SongController;
 import com.macieklato.ragetracks.model.SongStateChangeListener;
 import com.macieklato.ragetracks.util.JSONUtil;
 import com.macieklato.ragetracks.util.Network;
-import com.macieklato.ragetracks.widget.LoginFragment;
+import com.macieklato.ragetracks.widget.FacebookFragment;
 
 public class MainActivity extends FragmentActivity {
 
@@ -43,7 +43,7 @@ public class MainActivity extends FragmentActivity {
 	private OnPullListener pullListener;
 	private SongController songController = SongController.getInstance();
 	private GridView gridView;
-	private LoginFragment loginButton;
+	private FacebookFragment facebook;
 
 	// instance vairables
 	private int songIndex = -1;
@@ -57,20 +57,18 @@ public class MainActivity extends FragmentActivity {
 		gridView = (GridView) findViewById(R.id.gridview);
 		setListeners(); // initialize state
 		loadSongs();
-		
+
 		if (savedInstanceState == null) {
-	        // Add the fragment on initial activity setup
-	        loginButton = new LoginFragment();
-	        getSupportFragmentManager()
-	        .beginTransaction()
-	        .add(R.id.login_container, loginButton)
-	        .commit();
-	    } else {
-	        // Or set the fragment from restored state info
-	    	loginButton = (LoginFragment) getSupportFragmentManager()
-	        .findFragmentById(R.id.login_container);
-	    }
-	    
+			// Add the fragment on initial activity setup
+			facebook = new FacebookFragment();
+			getSupportFragmentManager().beginTransaction()
+					.add(R.id.login_container, facebook).commit();
+		} else {
+			// Or set the fragment from restored state info
+			facebook = (FacebookFragment) getSupportFragmentManager()
+					.findFragmentById(R.id.login_container);
+		}
+
 	}
 
 	/**
@@ -359,8 +357,10 @@ public class MainActivity extends FragmentActivity {
 	 *            - the share button view
 	 */
 	public void onShareClicked(View v) {
-		Toast.makeText(this.getApplicationContext(), "You clicked share",
-				Toast.LENGTH_SHORT).show();
+		Song s = songController.getSong();
+		if (s != null) {
+			facebook.share(s);
+		}
 	}
 
 	/**
@@ -437,7 +437,8 @@ public class MainActivity extends FragmentActivity {
 			@Override
 			protected ArrayList<Song> doInBackground(Void... params) {
 				JSONArray posts = Network.load(COUNT, page);
-				if(posts == null) return null;
+				if (posts == null)
+					return null;
 				return JSONUtil.parsePosts(posts, page);
 			}
 
@@ -450,7 +451,9 @@ public class MainActivity extends FragmentActivity {
 					if (songs.size() > 0)
 						page++;
 				} else {
-					Toast.makeText(c, "Poor network connection, try turning on wifi", Toast.LENGTH_SHORT).show();
+					Toast.makeText(c,
+							"Poor network connection, try turning on wifi",
+							Toast.LENGTH_SHORT).show();
 				}
 				if (autoPlay) {
 					onNextClicked(null);
