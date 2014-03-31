@@ -13,7 +13,7 @@ import com.macieklato.ragetracks.model.Song;
 
 public class JSONUtil {
 	
-	public static int DIVIDER = 8211; 
+	public static String DIVIDER = "–"; 
 
 	/**
 	 * parses a JSONArray of posts into an ArrayList of Song data
@@ -48,7 +48,7 @@ public class JSONUtil {
 		String thumbnail = parseAttachments(post.getJSONArray("attachments"));
 		Log.d("post", String.format("title:%s\nartist:%s\nurl:%s\nthumbnail:%s\n", 
 				title, artist, url, thumbnail));
-		if(title == null || artist == null || url == null || thumbnail == null) return null;
+		if(url == null) return null;
 		return new Song(id, title, artist, url, thumbnail, page, index);
 	}
 
@@ -59,7 +59,8 @@ public class JSONUtil {
      * @return String that indicates the artist
      */
     public static String parseArtist(String str) {
-    	int end = str.lastIndexOf(JSONUtil.DIVIDER)-1;
+    	if(str == null) return "";
+    	int end = str.lastIndexOf(JSONUtil.DIVIDER);
     	if(end < 0) return "";
     	return str.substring(0, end).trim();
     }
@@ -70,6 +71,7 @@ public class JSONUtil {
      * @return String that indicates the song title
      */
     public static String parseTitle(String str) {
+    	if(str == null) return "";
     	int start = str.lastIndexOf(JSONUtil.DIVIDER)+1;
     	if(start <= 0 || start > str.length()) return str;
     	return str.substring(start).trim();
@@ -81,6 +83,7 @@ public class JSONUtil {
      * @return String representing the streaming url
      */
     public static String parseContent(String content) {
+    	if(content == null) return null;
     	Log.d("parse", "content:"+content);
     	int start = content.indexOf("tracks/") + 7;
     	int end = content.indexOf("&", start);
@@ -95,11 +98,17 @@ public class JSONUtil {
      * @return String representing the thumbnail url for the song
      * @throws JSONException if attachments->images->medium->url is not in the json array
      */
-    public static String parseAttachments(JSONArray attachments) throws JSONException {
-    	return attachments.getJSONObject(0)
-    			.getJSONObject("images")
-    			.getJSONObject("thumbnail")
-    			.getString("url");
+    public static String parseAttachments(JSONArray attachments) {
+    	try {
+	    	if(attachments == null) return null;
+	    	return attachments.getJSONObject(0)
+	    			.getJSONObject("images")
+	    			.getJSONObject("thumbnail")
+	    			.getString("url");
+    	} catch(JSONException e) {
+    		e.printStackTrace();
+    		return null;
+    	}
     }
 
 }

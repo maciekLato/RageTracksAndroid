@@ -37,7 +37,7 @@ public class MyAdapter extends BaseAdapter {
 		queue = Volley.newRequestQueue(context);
 		mImageLoader = new ImageLoader(queue, new ImageLoader.ImageCache() {
 			private final LruCache<String, Bitmap> mCache = new LruCache<String, Bitmap>(
-					10);
+					20);
 
 			public void putBitmap(String url, Bitmap bitmap) {
 				mCache.put(url, bitmap);
