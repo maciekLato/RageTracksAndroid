@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
+
     <string name="app_name">RageTracks</string>
     <string name="app_id"></string>
     <string name="nowplaying">Now Playing</string>
@@ -17,4 +18,5 @@
     <string name="menu_button">Menu button</string>
     <string name="options_button">Options button</string>
     <string name="seek_bar">Seek bar</string>
+
 </resources>

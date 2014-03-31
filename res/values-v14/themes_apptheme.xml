@@ -3,10 +3,8 @@
 <!-- Generated with http://android-holo-colors.com -->
 <resources xmlns:android="http://schemas.android.com/apk/res/android">
 
-  <style name="AppTheme" parent="android:Theme.Holo">
-
-    <item name="android:seekBarStyle">@style/SeekBarAppTheme</item>
-
-  </style>
+    <style name="AppTheme" parent="android:Theme.Holo">
+        <item name="android:seekBarStyle">@style/SeekBarAppTheme</item>
+    </style>
 
 </resources>

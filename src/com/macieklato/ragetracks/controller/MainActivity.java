@@ -32,20 +32,20 @@ import com.macieklato.ragetracks.util.Network;
 
 public class MainActivity extends Activity {
 
-	//constant variables
+	// constant variables
 	public static final int COUNT = 10;
-	
+
 	// controllers
 	private MyAdapter adapter;
 	private OnPullListener pullListener;
 	private SongController songController = SongController.getInstance();
 	private GridView gridView;
-	
-	//instance vairables
+
+	// instance vairables
 	private int songIndex = -1;
 	private int page = 1;
 	private boolean autoPlay = false;
-	
+
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
@@ -60,8 +60,7 @@ public class MainActivity extends Activity {
 	 */
 	private void setListeners() {
 		// set the pull events for the menu hider
-		pullListener = new OnPullListener(
-				this.getApplicationContext()) {
+		pullListener = new OnPullListener(this.getApplicationContext()) {
 			@Override
 			public void onBottomToTop() {
 				findViewById(R.id.top_menu).setVisibility(View.GONE);
@@ -84,18 +83,18 @@ public class MainActivity extends Activity {
 				hideMenu();
 			}
 		};
-		
+
 		final Context c = this.getApplicationContext();
 		songController.addStateListener(new SongStateChangeListener() {
 
 			@Override
 			public void onPause(Song s) {
-				ImageView button = (ImageView)findViewById(R.id.play_pause_button);
+				ImageView button = (ImageView) findViewById(R.id.play_pause_button);
 				button.setImageResource(R.drawable.play);
 				s.setState(Song.PAUSED);
 				adapter.notifyDataSetChanged();
 			}
-			
+
 			@Override
 			public void onLoading(Song s) {
 				s.setState(Song.LOADING);
@@ -104,10 +103,10 @@ public class MainActivity extends Activity {
 
 			@Override
 			public void onPlay(Song s) {
-				ImageView button = (ImageView)findViewById(R.id.play_pause_button);
+				ImageView button = (ImageView) findViewById(R.id.play_pause_button);
 				button.setImageResource(R.drawable.pause);
 				s.setState(Song.PLAYING);
-				songIndex = COUNT*(s.getPage()-1)+s.getIndex();
+				songIndex = COUNT * (s.getPage() - 1) + s.getIndex();
 				adapter.notifyDataSetChanged();
 			}
 
@@ -116,68 +115,70 @@ public class MainActivity extends Activity {
 				s.setState(Song.IDLE);
 				adapter.notifyDataSetChanged();
 			}
-			
-			@Override 
+
+			@Override
 			public void onError(Song s) {
 				Toast.makeText(c, "Song unavilable", Toast.LENGTH_SHORT).show();
-				//adapter.removeSong(s);
+				// adapter.removeSong(s);
 			}
-			
+
 			@Override
 			public void onSongUpdate(int position, int duration) {
-				int minutes = duration/1000/60;
-				int seconds = duration/1000 - (60*minutes);
-				int currentMinutes = position/1000/60;
-				int currentSeconds = position/1000 - (60*currentMinutes);
-				SeekBar seek = (SeekBar)findViewById(R.id.seek_bar);
-				int progress = (int)(position * seek.getMax() / duration);
+				int minutes = duration / 1000 / 60;
+				int seconds = duration / 1000 - (60 * minutes);
+				int currentMinutes = position / 1000 / 60;
+				int currentSeconds = position / 1000 - (60 * currentMinutes);
+				SeekBar seek = (SeekBar) findViewById(R.id.seek_bar);
+				int progress = (int) (position * seek.getMax() / duration);
 				seek.setProgress(progress);
 				TextView currentTime = (TextView) findViewById(R.id.current_time);
-				currentTime.setText(String.format("%d:%02d", currentMinutes, currentSeconds));
+				currentTime.setText(String.format("%d:%02d", currentMinutes,
+						currentSeconds));
 				TextView totalTime = (TextView) findViewById(R.id.total_time);
 				totalTime.setText(String.format("%d:%02d", minutes, seconds));
 			}
-			
+
 		});
-		
+
 		adapter = new MyAdapter(this.getApplicationContext());
 		gridView.setAdapter(adapter); // add grid view adapter
 		gridView.setOnScrollListener(new OnScrollListener() {
-			
+
 			@Override
-			public void onScrollStateChanged(AbsListView view, int scrollState) {				
+			public void onScrollStateChanged(AbsListView view, int scrollState) {
 			}
 
 			@Override
 			public void onScroll(AbsListView view, int firstVisibleItem,
 					int visibleItemCount, int totalItemCount) {
 				int lastVisible = firstVisibleItem + visibleItemCount;
-				if(visibleItemCount > 0 && lastVisible >= totalItemCount) {
+				if (visibleItemCount > 0 && lastVisible >= totalItemCount) {
 					loadSongs();
 				}
-			} 
-			
+			}
+
 		});
-		
-		SeekBar seek = (SeekBar)findViewById(R.id.seek_bar);
-		seek.setOnSeekBarChangeListener(new OnSeekBarChangeListener(){
+
+		SeekBar seek = (SeekBar) findViewById(R.id.seek_bar);
+		seek.setOnSeekBarChangeListener(new OnSeekBarChangeListener() {
 
 			@Override
 			public void onProgressChanged(SeekBar seekBar, int progress,
-					boolean fromUser) {				
+					boolean fromUser) {
 			}
 
 			@Override
-			public void onStartTrackingTouch(SeekBar seekBar) {				
+			public void onStartTrackingTouch(SeekBar seekBar) {
 			}
 
 			@Override
 			public void onStopTrackingTouch(SeekBar seekBar) {
-				songController.seek(seekBar.getProgress()*1f/seekBar.getMax());
+				songController.seek(seekBar.getProgress() * 1f
+						/ seekBar.getMax());
 			}
-			
+
 		});
-		
+
 	}
 
 	/**
@@ -301,7 +302,7 @@ public class MainActivity extends Activity {
 	 *            - the previous button view
 	 */
 	public void onPreviousClicked(View v) {
-		songIndex = Math.max(0, songIndex-1);
+		songIndex = Math.max(0, songIndex - 1);
 		songController.toggle((Song) adapter.getItem(songIndex));
 	}
 
@@ -323,13 +324,13 @@ public class MainActivity extends Activity {
 	 *            - the next button view
 	 */
 	public void onNextClicked(View v) {
-		if(songIndex >= adapter.getCount()-1) {
+		if (songIndex >= adapter.getCount() - 1) {
 			loadSongs();
 			autoPlay = true;
 		} else {
 			songIndex++;
 			songController.toggle((Song) adapter.getItem(songIndex));
-			Log.d("next", "play:"+songIndex);
+			Log.d("next", "play:" + songIndex);
 		}
 	}
 
@@ -343,15 +344,16 @@ public class MainActivity extends Activity {
 		Toast.makeText(this.getApplicationContext(), "You clicked share",
 				Toast.LENGTH_SHORT).show();
 	}
-	
+
 	/**
 	 * callback for clicking drawer bottom menu button
 	 * 
-	 * @param v - drawer icon view
+	 * @param v
+	 *            - drawer icon view
 	 */
 	public void onDrawerClicked(View v) {
 		View seek = findViewById(R.id.seek_bar_container);
-		if(seek.getVisibility() == View.VISIBLE) {
+		if (seek.getVisibility() == View.VISIBLE) {
 			seek.setVisibility(View.GONE);
 		} else {
 			seek.setVisibility(View.VISIBLE);
@@ -361,7 +363,8 @@ public class MainActivity extends Activity {
 	/**
 	 * callback for clicking bookmark header in left-side menu
 	 * 
-	 * @param v - bookmark header view
+	 * @param v
+	 *            - bookmark header view
 	 */
 	public void onBookmarksListClicked(View v) {
 		// TODO::fix this mock implementation
@@ -384,7 +387,8 @@ public class MainActivity extends Activity {
 	/**
 	 * callback for clicking genre header in left-side menu
 	 * 
-	 * @param v - genre header view
+	 * @param v
+	 *            - genre header view
 	 */
 	public void onGenresListClicked(View v) {
 		// TODO::fix this mock implementation
@@ -418,14 +422,14 @@ public class MainActivity extends Activity {
 
 			@Override
 			protected void onPostExecute(ArrayList<Song> songs) {
-				if(songs != null) {
-					for (Song s: songs)
-					{
+				if (songs != null) {
+					for (Song s : songs) {
 						adapter.addSong(s);
 					}
-					if(songs.size() > 0) page++;
+					if (songs.size() > 0)
+						page++;
 				}
-				if(autoPlay) {
+				if (autoPlay) {
 					onNextClicked(null);
 					autoPlay = false;
 				}
@@ -433,19 +437,20 @@ public class MainActivity extends Activity {
 		};
 		task.execute();
 	}
-	
+
 	@Override
 	public void onBackPressed() {
 		SongController.getInstance().destroy();
 		super.onBackPressed();
 	}
-	
+
 	public boolean dispatchTouchEvent(MotionEvent e) {
-		if(e.getRawY() > findViewById(R.id.gridview).getTop() &&
-				e.getRawY() < findViewById(R.id.gridview).getBottom()) {
-			if(pullListener.onTouch(null, e)) return true;
+		if (e.getRawY() > findViewById(R.id.gridview).getTop()
+				&& e.getRawY() < findViewById(R.id.gridview).getBottom()) {
+			if (pullListener.onTouch(null, e))
+				return true;
 		}
 		return super.dispatchTouchEvent(e);
-		
+
 	}
 }

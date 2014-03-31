@@ -1,271 +1,270 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout
-    xmlns:android="http://schemas.android.com/apk/res/android"
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:id="@+id/main_screen"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:orientation="horizontal"
     android:animateLayoutChanges="true"
-    >
+    android:orientation="horizontal" >
+
     <LinearLayout
-   	    android:id="@+id/leftmenu"
-   	    android:layout_width="200dp"
-   	    android:layout_height="match_parent"
-   	   	android:background="#000000"
-   	   	android:orientation="vertical"
-   	   	android:visibility="gone"
-   	   	android:animateLayoutChanges="true"
-   	   	>
-   	   	<TextView
-   	   	    android:id="@+id/bookmark_menu_text"
-   	   	    android:textColor="#ffffff"
-   	   	    android:textSize="15sp"
-   	   	    android:text="@string/bookmarks"
-   	   	    android:layout_width="match_parent"
-   	   	    android:layout_height="50dp"
-   	   	    android:gravity="center"
-   	   	    android:onClick="onBookmarksListClicked"
-   	   	    android:clickable="true"
-   	   	    />
-   	   	<View 
-   	   	    android:id="@+id/bookmark_list"
-   	   	    android:layout_width="match_parent"
-   	   	    android:layout_height="2dp"
-   	   	    android:background="#222222"
-   	   	    />
-   	   	<TextView
-   	   	    android:id="@+id/genre_menu_text"
-   	   	    android:textColor="#ffffff"
-   	   	    android:textSize="15sp"
-   	   	    android:text="@string/genres"
-   	   	    android:layout_width="match_parent"
-   	   	    android:layout_height="50dp"
-   	   	    android:gravity="center"
-   	   	    android:onClick="onGenresListClicked"
-   	   	    android:clickable="true"
-   	   	    />
-   	   	<View 
-   	   	    android:id="@+id/genre_list"
-   	   	    android:layout_width="match_parent"
-   	   	    android:layout_height="2dp"
-   	   	    android:background="#222222"
-   	   	    />
-        </LinearLayout>
+        android:id="@+id/leftmenu"
+        android:layout_width="200dp"
+        android:layout_height="match_parent"
+        android:animateLayoutChanges="true"
+        android:background="#000000"
+        android:orientation="vertical"
+        android:visibility="gone" >
+
+        <TextView
+            android:id="@+id/bookmark_menu_text"
+            android:layout_width="match_parent"
+            android:layout_height="50dp"
+            android:clickable="true"
+            android:gravity="center"
+            android:onClick="onBookmarksListClicked"
+            android:text="@string/bookmarks"
+            android:textColor="#ffffff"
+            android:textSize="15sp" />
+
+        <View
+            android:id="@+id/bookmark_list"
+            android:layout_width="match_parent"
+            android:layout_height="2dp"
+            android:background="#222222" />
+
+        <TextView
+            android:id="@+id/genre_menu_text"
+            android:layout_width="match_parent"
+            android:layout_height="50dp"
+            android:clickable="true"
+            android:gravity="center"
+            android:onClick="onGenresListClicked"
+            android:text="@string/genres"
+            android:textColor="#ffffff"
+            android:textSize="15sp" />
+
+        <View
+            android:id="@+id/genre_list"
+            android:layout_width="match_parent"
+            android:layout_height="2dp"
+            android:background="#222222" />
+    </LinearLayout>
+
     <LinearLayout
         android:id="@+id/right_menu"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:orientation="vertical"
         android:animateLayoutChanges="true"
-        >
-   	   	<LinearLayout
-	   	    android:id="@+id/top_menu"
-	   	    android:layout_width="match_parent"
-			android:layout_height="50dp"
-			android:orientation="horizontal"
-	   	    android:background="#000000"
-	   	    android:animateLayoutChanges="true"
-	   	    >
-	   	    <LinearLayout
-	   	        android:id="@+id/top_menu_1"
-	   	        android:layout_width="match_parent"
-	   	        android:layout_height="match_parent"
-	   	        android:orientation="horizontal"
-				android:background="#000000"
-	   	        android:animateLayoutChanges="true"
-	   	        >
-		   	    <ImageView 
-		   	        android:id="@+id/menu_button"
-		   	        android:layout_width="50dp"
-		   	        android:layout_height="match_parent"
-		   	        android:padding="5dp"
-		   	        android:src="@drawable/rage"
-		   	        android:onClick="onMenuClicked"
-		   	        android:contentDescription="@string/menu_button"
-		   	        />
-		   	    <TextView
-		   	        android:id="@+id/title"
-		   	        android:layout_width="0dp"
-		   	        android:layout_height="match_parent"
-		   	        android:layout_weight="8"
-		   	        android:textColor="#ffffff"
-		   	        android:textSize="25sp"
-		   	        android:text="@string/app_name"
-		   	        android:gravity="center" 
-		   	        />
-		   	    <ImageView 
-		   	        android:id="@+id/search_button"	
-		   	        android:layout_width="50dp"
-		   	        android:layout_height="match_parent"
-		   	        android:src="@drawable/search"
-		   	        android:onClick="onSearchClicked"
-		   	        android:contentDescription="@string/open_search_button"
-		   	        />   	    
-		   	</LinearLayout>
-	   	    <LinearLayout 
-	   	        android:id="@+id/top_menu_2"
-	   	        android:layout_width="match_parent"
-	   	        android:layout_height="match_parent"
-	   	        android:orientation="horizontal"
-	   	       	android:visibility="gone"	  
-	       		android:background="#000000"
-	   	       	android:animateLayoutChanges="true"     		        
-	   	        >
-		   	    <LinearLayout
-		   	        android:id="@+id/search_menu"
-		   	        android:layout_width="0dp"
-		   	        android:layout_height="match_parent"
-		   	        android:layout_marginTop="5dp"
-		   	       	android:layout_marginLeft="5dp"
-		   	      	android:layout_marginBottom="5dp"
-		   	        android:orientation="horizontal"
-		   	        android:layout_weight="1"
-		   	        android:animateLayoutChanges="true"
-		   	        android:background="#000000"
-			   	    >
-			   	    <EditText
-			   	        android:id="@+id/search_text_edit"
-			   	        android:layout_width="0dp"
-			   	        android:layout_height="match_parent"
-			   	        android:layout_weight="1"
-			   	        android:inputType="text"
-			   	        android:background="@drawable/rounded"
-			   	        />
-			   	    <ImageView
-			   	        android:id="@+id/commit_search"
-			   	        android:layout_width="50dp"
-			   	        android:layout_height="match_parent"
-			   	        android:src="@drawable/search_black"
-			   	        android:onClick="onCommitSearchClicked"
-			   	        android:contentDescription="@string/commit_search_button"
-			   	        android:background="@drawable/rounded"
-			   	        android:layout_marginLeft="2dp"
-			   	        />
-		   	    </LinearLayout>
-		   	    <ImageView 
-		   	        android:id="@+id/cancel_search"
-		   	        android:layout_width="50dp"
-		   	        android:layout_height="match_parent"
-		   	        android:src="@drawable/cancel"
-		   	        android:onClick="onCancelSearchClicked"
-		   	        android:padding="10dp"
-		   	       	android:contentDescription="@string/cancel_search_button"
-		   	       	/>
-   	    	</LinearLayout>
-   		</LinearLayout>
-	   	<GridView
-	        android:id="@+id/gridview"
-	        android:layout_width="match_parent"
-	        android:layout_height="0dp"
-	        android:verticalSpacing="0dp"
-	        android:horizontalSpacing="0dp"
-	        android:stretchMode="columnWidth"
-	        android:numColumns="2" 
-	        android:layout_weight="1"
-	        android:animateLayoutChanges="true"
-	      	/>
-	   	<LinearLayout
-	   	    android:id="@+id/bottommenu"
-	   	    android:layout_width="match_parent"
-	   	    android:layout_height="50dp"
-	   	    android:background="#000000"
-	   	    android:animateLayoutChanges="true"
-	   	    >
-	   		<ImageView
-	   		    android:id="@+id/previous_button"
-	   		    android:layout_width="0dp"
-	   		    android:layout_height="match_parent"
-	   		    android:layout_weight="1"
-	   		    android:contentDescription="@string/previous_button"
-	   		    android:onClick="onPreviousClicked"
-	   		    android:src="@drawable/previous" 
-	   		    android:padding = "10dp"
-	   		    />
-	   	    <ImageView
-	   	        android:id="@+id/bookmark_button"
-	   	        android:src="@drawable/bookmark"
-	   	        android:layout_width="0dp"
-	   	        android:layout_height="match_parent"
-	   	        android:layout_weight="1"
-	   	        android:onClick="onBookmarkClicked"
-	   	        android:contentDescription="@string/bookmark_button"
-	   	        android:padding = "10dp"
-	   	        />    
-   	        <ImageView
-   	            android:id="@+id/play_pause_button"
-   	            android:src="@drawable/play"
-   	            android:layout_width="0dp"
-	   	        android:layout_height="match_parent"
-	   	        android:layout_weight="1"
-	   	        android:onClick="onPlayPauseClicked"
-	   	        android:contentDescription="@string/play_pause_button"
-	   	        android:padding = "10dp"
-   	            />
-   	        <ImageView
-   	            android:id="@+id/next_button"
-   	            android:src="@drawable/next"
-   	            android:layout_width="0dp"
-	   	        android:layout_height="match_parent"
-	   	        android:layout_weight="1"
-	   	        android:onClick="onNextClicked"
-	   	        android:contentDescription="@string/next_button"
-	   	        android:padding = "10dp"
-   	            />
-   	        <ImageView
-   	            android:id="@+id/share_button"
-   	            android:src="@drawable/share"
-   	            android:layout_width="0dp"
-	   	        android:layout_height="match_parent"
-	   	        android:layout_weight="1"
-	   	        android:onClick="onShareClicked"
-	   	        android:contentDescription="@string/share_button"
-	   	        android:padding = "10dp"
-   	            />
-   	        <ImageView
-   	            android:id="@+id/options_button"
-   	            android:src="@drawable/ic_drawer"
-   	            android:layout_width="0dp"
-	   	        android:layout_height="match_parent"
-	   	        android:layout_weight="1"
-	   	        android:onClick="onDrawerClicked"
-	   	        android:contentDescription="@string/options_button"
-	   	        android:padding = "12dp"
-   	            />
- 	    </LinearLayout>
- 	    <RelativeLayout 
- 	        android:id="@+id/seek_bar_container"
- 	        android:layout_width="match_parent"
- 	        android:layout_height="50dp"
-   	        android:contentDescription="@string/seek_bar"
-   	        android:visibility="gone"
-   	        style="@+style/SeekBarAppTheme"
-   	        >
-   	        <TextView
-   	            android:id="@+id/current_time"
-   	            android:layout_width="wrap_content"
-   	            android:layout_height="wrap_content"
-   	            android:layout_alignParentLeft="true"
-   	            android:textColor="#ffffffff"
-   	            android:textSize="12sp"
-   	            /> 
-  	       	<SeekBar 
-	 	        android:id="@+id/seek_bar"
-	 	        android:layout_width="match_parent"
-	 	        android:layout_height="wrap_content"
-	   	        android:contentDescription="@string/seek_bar"
-	   	        android:progress="0"
-	   	        android:max="1000"
-	   	        style="@+style/SeekBarAppTheme"
-	   	        android:layout_centerInParent="true"
- 	        	/>
-  	       	<TextView
-   	            android:id="@+id/total_time"
-   	            android:layout_width="wrap_content"
-   	            android:layout_height="wrap_content"
-   	            android:layout_alignParentRight="true"
-   	            android:textColor="#ffffff"
-   	            android:textSize="12sp"
-   	            />
-		</RelativeLayout>
-   	</LinearLayout>
+        android:orientation="vertical" >
+
+        <LinearLayout
+            android:id="@+id/top_menu"
+            android:layout_width="match_parent"
+            android:layout_height="50dp"
+            android:animateLayoutChanges="true"
+            android:background="#000000"
+            android:orientation="horizontal" >
+
+            <LinearLayout
+                android:id="@+id/top_menu_1"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:animateLayoutChanges="true"
+                android:background="#000000"
+                android:orientation="horizontal" >
+
+                <ImageView
+                    android:id="@+id/menu_button"
+                    android:layout_width="50dp"
+                    android:layout_height="match_parent"
+                    android:contentDescription="@string/menu_button"
+                    android:onClick="onMenuClicked"
+                    android:padding="5dp"
+                    android:src="@drawable/rage" />
+
+                <TextView
+                    android:id="@+id/title"
+                    android:layout_width="0dp"
+                    android:layout_height="match_parent"
+                    android:layout_weight="8"
+                    android:gravity="center"
+                    android:text="@string/app_name"
+                    android:textColor="#ffffff"
+                    android:textSize="25sp" />
+
+                <ImageView
+                    android:id="@+id/search_button"
+                    android:layout_width="50dp"
+                    android:layout_height="match_parent"
+                    android:contentDescription="@string/open_search_button"
+                    android:onClick="onSearchClicked"
+                    android:src="@drawable/search" />
+            </LinearLayout>
+
+            <LinearLayout
+                android:id="@+id/top_menu_2"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:animateLayoutChanges="true"
+                android:background="#000000"
+                android:orientation="horizontal"
+                android:visibility="gone" >
+
+                <LinearLayout
+                    android:id="@+id/search_menu"
+                    android:layout_width="0dp"
+                    android:layout_height="match_parent"
+                    android:layout_marginBottom="5dp"
+                    android:layout_marginLeft="5dp"
+                    android:layout_marginTop="5dp"
+                    android:layout_weight="1"
+                    android:animateLayoutChanges="true"
+                    android:background="#000000"
+                    android:orientation="horizontal" >
+
+                    <EditText
+                        android:id="@+id/search_text_edit"
+                        android:layout_width="0dp"
+                        android:layout_height="match_parent"
+                        android:layout_weight="1"
+                        android:background="@drawable/rounded"
+                        android:inputType="text" />
+
+                    <ImageView
+                        android:id="@+id/commit_search"
+                        android:layout_width="50dp"
+                        android:layout_height="match_parent"
+                        android:layout_marginLeft="2dp"
+                        android:background="@drawable/rounded"
+                        android:contentDescription="@string/commit_search_button"
+                        android:onClick="onCommitSearchClicked"
+                        android:src="@drawable/search_black" />
+                </LinearLayout>
+
+                <ImageView
+                    android:id="@+id/cancel_search"
+                    android:layout_width="50dp"
+                    android:layout_height="match_parent"
+                    android:contentDescription="@string/cancel_search_button"
+                    android:onClick="onCancelSearchClicked"
+                    android:padding="10dp"
+                    android:src="@drawable/cancel" />
+            </LinearLayout>
+        </LinearLayout>
+
+        <GridView
+            android:id="@+id/gridview"
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:layout_weight="1"
+            android:animateLayoutChanges="true"
+            android:horizontalSpacing="0dp"
+            android:numColumns="2"
+            android:stretchMode="columnWidth"
+            android:verticalSpacing="0dp" />
+
+        <LinearLayout
+            android:id="@+id/bottommenu"
+            android:layout_width="match_parent"
+            android:layout_height="50dp"
+            android:animateLayoutChanges="true"
+            android:background="#000000" >
+
+            <ImageView
+                android:id="@+id/previous_button"
+                android:layout_width="0dp"
+                android:layout_height="match_parent"
+                android:layout_weight="1"
+                android:contentDescription="@string/previous_button"
+                android:onClick="onPreviousClicked"
+                android:padding="10dp"
+                android:src="@drawable/previous" />
+
+            <ImageView
+                android:id="@+id/bookmark_button"
+                android:layout_width="0dp"
+                android:layout_height="match_parent"
+                android:layout_weight="1"
+                android:contentDescription="@string/bookmark_button"
+                android:onClick="onBookmarkClicked"
+                android:padding="10dp"
+                android:src="@drawable/bookmark" />
+
+            <ImageView
+                android:id="@+id/play_pause_button"
+                android:layout_width="0dp"
+                android:layout_height="match_parent"
+                android:layout_weight="1"
+                android:contentDescription="@string/play_pause_button"
+                android:onClick="onPlayPauseClicked"
+                android:padding="10dp"
+                android:src="@drawable/play" />
+
+            <ImageView
+                android:id="@+id/next_button"
+                android:layout_width="0dp"
+                android:layout_height="match_parent"
+                android:layout_weight="1"
+                android:contentDescription="@string/next_button"
+                android:onClick="onNextClicked"
+                android:padding="10dp"
+                android:src="@drawable/next" />
+
+            <ImageView
+                android:id="@+id/share_button"
+                android:layout_width="0dp"
+                android:layout_height="match_parent"
+                android:layout_weight="1"
+                android:contentDescription="@string/share_button"
+                android:onClick="onShareClicked"
+                android:padding="10dp"
+                android:src="@drawable/share" />
+
+            <ImageView
+                android:id="@+id/options_button"
+                android:layout_width="0dp"
+                android:layout_height="match_parent"
+                android:layout_weight="1"
+                android:contentDescription="@string/options_button"
+                android:onClick="onDrawerClicked"
+                android:padding="12dp"
+                android:src="@drawable/ic_drawer" />
+        </LinearLayout>
+
+        <RelativeLayout
+            android:id="@+id/seek_bar_container"
+            style="@+style/SeekBarAppTheme"
+            android:layout_width="match_parent"
+            android:layout_height="50dp"
+            android:contentDescription="@string/seek_bar"
+            android:visibility="gone" >
+
+            <TextView
+                android:id="@+id/current_time"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignParentLeft="true"
+                android:textColor="#ffffffff"
+                android:textSize="12sp" />
+
+            <SeekBar
+                android:id="@+id/seek_bar"
+                style="@+style/SeekBarAppTheme"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_centerInParent="true"
+                android:contentDescription="@string/seek_bar"
+                android:max="1000"
+                android:progress="0" />
+
+            <TextView
+                android:id="@+id/total_time"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignParentRight="true"
+                android:textColor="#ffffff"
+                android:textSize="12sp" />
+        </RelativeLayout>
+    </LinearLayout>
+
 </LinearLayout>
