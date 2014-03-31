@@ -20,11 +20,11 @@ public class JSONUtil {
 	 * @param posts JSONArray
 	 * @return ArrayList<Song> list of songs parsed
 	 */
-	public static ArrayList<Song> parsePosts(JSONArray posts) {
+	public static ArrayList<Song> parsePosts(JSONArray posts, int page) {
 		ArrayList<Song> songs = new ArrayList<Song>();
 		for(int i=0; i<posts.length(); i++) {
 			try {
-				Song s = JSONUtil.parsePost(posts.getJSONObject(i));
+				Song s = JSONUtil.parsePost(posts.getJSONObject(i), page, i);
 				if(s != null) songs.add(s);
 			} catch (JSONException e) {
 				e.printStackTrace();
@@ -39,7 +39,7 @@ public class JSONUtil {
 	 * @return a Song object represented by the post
 	 * @throws JSONException
 	 */
-	public static Song parsePost(JSONObject post) throws JSONException {		
+	public static Song parsePost(JSONObject post, int page, int index) throws JSONException {		
 		long id = post.getInt("id");
 		String temp = StringEscapeUtils.unescapeHtml4(post.getString("title"));
 		String title = parseTitle(temp);
@@ -49,7 +49,7 @@ public class JSONUtil {
 		Log.d("post", String.format("title:%s\nartist:%s\nurl:%s\nthumbnail:%s\n", 
 				title, artist, url, thumbnail));
 		if(title == null || artist == null || url == null || thumbnail == null) return null;
-		return new Song(id, title, artist, url, thumbnail);
+		return new Song(id, title, artist, url, thumbnail, page, index);
 	}
 
     

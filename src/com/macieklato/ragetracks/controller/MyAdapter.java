@@ -134,5 +134,10 @@ public class MyAdapter extends BaseAdapter {
 		items.remove(s);
 		notifyDataSetChanged();
 	}
+	
+	public int getMaxSongIndex() { 
+		Song s = items.get(items.size()-1);
+		return MainActivity.COUNT * (s.getPage()-1) + s.getIndex(); 
+	}
 
 }

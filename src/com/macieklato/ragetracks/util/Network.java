@@ -75,11 +75,12 @@ public class Network {
 	 * @param count - number of songs to load meta-data about
 	 * @return JSONArray containing the song meta-data
 	 */
-	public static JSONArray load(int count) {
+	public static JSONArray load(int count, int page) {
 		List<NameValuePair> data = new ArrayList<NameValuePair>();
 		data.add(new BasicNameValuePair(JSON, "1"));
 		data.add(new BasicNameValuePair(COUNT, ""+count));
 		data.add(new BasicNameValuePair(INCLUDE, INCLUDE_ALL));
+		data.add(new BasicNameValuePair(PAGE, ""+page));
 		
 		HttpResponse resp = get(HOST, data);
 		try {

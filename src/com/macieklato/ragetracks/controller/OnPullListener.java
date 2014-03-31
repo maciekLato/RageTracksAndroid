@@ -13,8 +13,8 @@ public abstract class OnPullListener implements OnTouchListener{
 	private float epsilonY;
 	
 	public OnPullListener(Context c){
-		epsilonX = c.getResources().getDisplayMetrics().xdpi/4f;
-		epsilonY = c.getResources().getDisplayMetrics().ydpi/4f;
+		epsilonX = c.getResources().getDisplayMetrics().xdpi/2f;
+		epsilonY = c.getResources().getDisplayMetrics().ydpi/2f;
 	}
 	
 	@Override

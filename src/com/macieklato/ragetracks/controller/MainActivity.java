@@ -6,9 +6,12 @@ import android.app.Activity;
 import android.content.Context;
 import android.os.AsyncTask;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.MotionEvent;
 import android.view.View;
 import android.view.inputmethod.InputMethodManager;
+import android.widget.AbsListView;
+import android.widget.AbsListView.OnScrollListener;
 import android.widget.FrameLayout;
 import android.widget.FrameLayout.LayoutParams;
 import android.widget.GridView;
@@ -27,22 +30,26 @@ import com.macieklato.ragetracks.util.Network;
 public class MainActivity extends Activity {
 
 	//constant variables
-	public static final int COUNT = 50;
-
+	public static final int COUNT = 10;
+	
 	// controllers
 	private MyAdapter adapter;
 	private OnPullListener pullListener;
 	private SongController songController = SongController.getInstance();
-
+	private GridView gridView;
+	
+	//instance vairables
+	private int songIndex = -1;
+	private int page = 1;
+	private boolean autoPlay = false;
+	
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.activity_main); // set view
+		gridView = (GridView) findViewById(R.id.gridview);
 		setListeners(); // initialize state
-		GridView gridView = (GridView) findViewById(R.id.gridview);
-		adapter = new MyAdapter(this.getApplicationContext());
-		gridView.setAdapter(adapter); // add grid view adapter
-		loadPosts(COUNT);
+		loadSongs();
 	}
 
 	/**
@@ -99,6 +106,7 @@ public class MainActivity extends Activity {
 				ImageView button = (ImageView)findViewById(R.id.play_pause_button);
 				button.setImageResource(R.drawable.pause);
 				s.setState(Song.PLAYING);
+				songIndex = COUNT*(s.getPage()-1)+s.getIndex();
 				adapter.notifyDataSetChanged();
 			}
 
@@ -111,10 +119,29 @@ public class MainActivity extends Activity {
 			@Override 
 			public void onError(Song s) {
 				Toast.makeText(c, "Song unavilable", Toast.LENGTH_SHORT).show();
-				adapter.removeSong(s);
+				//adapter.removeSong(s);
 			}
 			
 		});
+		
+		adapter = new MyAdapter(this.getApplicationContext());
+		gridView.setAdapter(adapter); // add grid view adapter
+		gridView.setOnScrollListener(new OnScrollListener() {
+
+			@Override
+			public void onScrollStateChanged(AbsListView view, int scrollState) {				
+			}
+
+			@Override
+			public void onScroll(AbsListView view, int firstVisibleItem,
+					int visibleItemCount, int totalItemCount) {
+				if(visibleItemCount > 0 && firstVisibleItem + visibleItemCount >= totalItemCount) {
+					loadSongs();
+				}
+			} 
+			
+		});
+		
 	}
 
 	/**
@@ -238,8 +265,8 @@ public class MainActivity extends Activity {
 	 *            - the previous button view
 	 */
 	public void onPreviousClicked(View v) {
-		Toast.makeText(this.getApplicationContext(), "You clicked previous",
-				Toast.LENGTH_SHORT).show();
+		songIndex = Math.max(0, songIndex-1);
+		songController.toggle((Song) adapter.getItem(songIndex));
 	}
 
 	/**
@@ -260,8 +287,14 @@ public class MainActivity extends Activity {
 	 *            - the next button view
 	 */
 	public void onNextClicked(View v) {
-		Toast.makeText(this.getApplicationContext(), "You clicked next",
-				Toast.LENGTH_SHORT).show();
+		if(songIndex >= adapter.getCount()-1) {
+			loadSongs();
+			autoPlay = true;
+		} else {
+			songIndex++;
+			songController.toggle((Song) adapter.getItem(songIndex));
+			Log.d("next", "play:"+songIndex);
+		}
 	}
 
 	/**
@@ -328,18 +361,25 @@ public class MainActivity extends Activity {
 	 * 
 	 * @param count
 	 */
-	public void loadPosts(final int count) {
+	public void loadSongs() {
 		AsyncTask<Void, Void, ArrayList<Song>> task = new AsyncTask<Void, Void, ArrayList<Song>>() {
 			@Override
 			protected ArrayList<Song> doInBackground(Void... params) {
-				return JSONUtil.parsePosts(Network.load(count));
+				return JSONUtil.parsePosts(Network.load(COUNT, page), page);
 			}
 
 			@Override
 			protected void onPostExecute(ArrayList<Song> songs) {
-				for (Song s: songs)
-				{
-					adapter.addSong(s);
+				if(songs != null) {
+					for (Song s: songs)
+					{
+						adapter.addSong(s);
+					}
+					if(songs.size() > 0) page++;
+				}
+				if(autoPlay) {
+					onNextClicked(null);
+					autoPlay = false;
 				}
 			}
 		};

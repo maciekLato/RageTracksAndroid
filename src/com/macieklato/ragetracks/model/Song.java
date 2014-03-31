@@ -11,6 +11,8 @@ public class Song {
 	private String artist;
 	private String streamUrl;
 	private String thumbnailURL;
+	private int page;
+	private int index;
 	private long id;
 	private int state;
 	
@@ -19,13 +21,15 @@ public class Song {
 		setState(IDLE);
 	}
 	
-	public Song(long id, String title, String artist, String streamUrl, String thumbnail) {
+	public Song(long id, String title, String artist, String streamUrl, String thumbnail, int page, int index) {
 		setId(id);
 		setTitle(title);
 		setArtist(artist);
 		setStreamUrl(streamUrl);
 		setThumbnailURL(thumbnail);
 		setState(IDLE);
+		setPage(page);
+		setIndex(index);
 	}
 	
 	public void setId(long id) {
@@ -51,6 +55,14 @@ public class Song {
 	public void setState(int state) {
 		this.state = state;
 	}
+	
+	public void setPage(int page) {
+		this.page = page;
+	}
+	
+	public void setIndex(int index) {
+		this.index = index;
+	}
 
 	public long getId() {
 		return this.id;
@@ -74,6 +86,14 @@ public class Song {
 	
 	public int getState() {
 		return state;
+	}
+	
+	public int getPage() {
+		return page;
+	}
+	
+	public int getIndex() {
+		return index;
 	}
 	
 	public boolean isIdle() {
