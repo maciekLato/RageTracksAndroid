@@ -2,7 +2,7 @@
 <resources>
 
     <string name="app_name">RageTracks</string>
-    <string name="app_id"></string>
+    <string name="app_id">335361286551039</string>
     <string name="nowplaying">Now Playing</string>
     <string name="bookmarks">Bookmarks</string>
     <string name="genres">Genres</string>
@@ -18,5 +18,7 @@
     <string name="menu_button">Menu button</string>
     <string name="options_button">Options button</string>
     <string name="seek_bar">Seek bar</string>
+    <string name="fb_log_in_text">Log In</string>
+    <string name="fb_log_out_text">Log Out</string>
 
 </resources>

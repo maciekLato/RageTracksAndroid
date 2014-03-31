@@ -167,5 +167,9 @@ public class SongController {
 	public void addStateListener(SongStateChangeListener listener) {
 		listeners.add(listener);
 	}
+	
+	public int getState() {
+		return state;
+	}
 
 }

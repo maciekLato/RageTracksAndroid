@@ -2,10 +2,12 @@ package com.macieklato.ragetracks.controller;
 
 import java.util.ArrayList;
 
-import android.app.Activity;
+import org.json.JSONArray;
+
 import android.content.Context;
 import android.os.AsyncTask;
 import android.os.Bundle;
+import android.support.v4.app.FragmentActivity;
 import android.util.Log;
 import android.view.MotionEvent;
 import android.view.View;
@@ -29,8 +31,9 @@ import com.macieklato.ragetracks.model.SongController;
 import com.macieklato.ragetracks.model.SongStateChangeListener;
 import com.macieklato.ragetracks.util.JSONUtil;
 import com.macieklato.ragetracks.util.Network;
+import com.macieklato.ragetracks.widget.LoginFragment;
 
-public class MainActivity extends Activity {
+public class MainActivity extends FragmentActivity {
 
 	// constant variables
 	public static final int COUNT = 10;
@@ -40,6 +43,7 @@ public class MainActivity extends Activity {
 	private OnPullListener pullListener;
 	private SongController songController = SongController.getInstance();
 	private GridView gridView;
+	private LoginFragment loginButton;
 
 	// instance vairables
 	private int songIndex = -1;
@@ -53,6 +57,20 @@ public class MainActivity extends Activity {
 		gridView = (GridView) findViewById(R.id.gridview);
 		setListeners(); // initialize state
 		loadSongs();
+		
+		if (savedInstanceState == null) {
+	        // Add the fragment on initial activity setup
+	        loginButton = new LoginFragment();
+	        getSupportFragmentManager()
+	        .beginTransaction()
+	        .add(R.id.login_container, loginButton)
+	        .commit();
+	    } else {
+	        // Or set the fragment from restored state info
+	    	loginButton = (LoginFragment) getSupportFragmentManager()
+	        .findFragmentById(R.id.login_container);
+	    }
+	    
 	}
 
 	/**
@@ -414,10 +432,13 @@ public class MainActivity extends Activity {
 	 * @param count
 	 */
 	public void loadSongs() {
+		final Context c = this.getApplicationContext();
 		AsyncTask<Void, Void, ArrayList<Song>> task = new AsyncTask<Void, Void, ArrayList<Song>>() {
 			@Override
 			protected ArrayList<Song> doInBackground(Void... params) {
-				return JSONUtil.parsePosts(Network.load(COUNT, page), page);
+				JSONArray posts = Network.load(COUNT, page);
+				if(posts == null) return null;
+				return JSONUtil.parsePosts(posts, page);
 			}
 
 			@Override
@@ -428,6 +449,8 @@ public class MainActivity extends Activity {
 					}
 					if (songs.size() > 0)
 						page++;
+				} else {
+					Toast.makeText(c, "Poor network connection, try turning on wifi", Toast.LENGTH_SHORT).show();
 				}
 				if (autoPlay) {
 					onNextClicked(null);
