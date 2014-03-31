@@ -18,11 +18,11 @@
 
         <LinearLayout
             android:id="@+id/login_container"
-		    android:layout_width="match_parent"
-		    android:layout_height="50dp"
-		    android:orientation="vertical"
-		    android:animateLayoutChanges="true"
-            />
+            android:layout_width="match_parent"
+            android:layout_height="50dp"
+            android:animateLayoutChanges="true"
+            android:orientation="vertical" />
+
         <TextView
             android:id="@+id/bookmark_menu_text"
             android:layout_width="match_parent"
@@ -179,16 +179,6 @@
             android:background="#000000" >
 
             <ImageView
-                android:id="@+id/previous_button"
-                android:layout_width="0dp"
-                android:layout_height="match_parent"
-                android:layout_weight="1"
-                android:contentDescription="@string/previous_button"
-                android:onClick="onPreviousClicked"
-                android:padding="10dp"
-                android:src="@drawable/previous" />
-
-            <ImageView
                 android:id="@+id/bookmark_button"
                 android:layout_width="0dp"
                 android:layout_height="match_parent"
@@ -197,6 +187,16 @@
                 android:onClick="onBookmarkClicked"
                 android:padding="10dp"
                 android:src="@drawable/bookmark" />
+
+            <ImageView
+                android:id="@+id/previous_button"
+                android:layout_width="0dp"
+                android:layout_height="match_parent"
+                android:layout_weight="1"
+                android:contentDescription="@string/previous_button"
+                android:onClick="onPreviousClicked"
+                android:padding="10dp"
+                android:src="@drawable/previous" />
 
             <ImageView
                 android:id="@+id/play_pause_button"
@@ -242,9 +242,9 @@
         <RelativeLayout
             android:id="@+id/seek_bar_container"
             style="@+style/SeekBarAppTheme"
-            android:animateLayoutChanges="true"
             android:layout_width="match_parent"
             android:layout_height="50dp"
+            android:animateLayoutChanges="true"
             android:contentDescription="@string/seek_bar"
             android:visibility="gone" >
 
@@ -259,10 +259,10 @@
             <SeekBar
                 android:id="@+id/seek_bar"
                 style="@+style/SeekBarAppTheme"
-                android:animateLayoutChanges="true"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_centerInParent="true"
+                android:animateLayoutChanges="true"
                 android:contentDescription="@string/seek_bar"
                 android:max="1000"
                 android:progress="0" />
