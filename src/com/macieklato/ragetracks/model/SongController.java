@@ -6,6 +6,8 @@ import android.media.AudioManager;
 import android.media.MediaPlayer;
 import android.media.MediaPlayer.OnErrorListener;
 import android.media.MediaPlayer.OnPreparedListener;
+import android.os.Handler;
+import android.util.Log;
 
 public class SongController {
 
@@ -13,6 +15,7 @@ public class SongController {
 	public static final int PLAYING = 0;
 	public static final int PAUSED = 1;
 	public static final int LOADING = 2;
+	public static final int UPDATE_DELAY = 1000;
 
 	//static variables
 	private static SongController singleton = new SongController();
@@ -22,6 +25,8 @@ public class SongController {
 	private int state = UNINITIALIZED;
 	private Song song;
 	private ArrayList<SongStateChangeListener> listeners;
+	private Handler h;
+	private Runnable updateRunnable;
 	
 	//private methods
 	private SongController(){
@@ -43,6 +48,24 @@ public class SongController {
 		media.setAudioStreamType(AudioManager.STREAM_MUSIC);
 		
 		listeners = new ArrayList<SongStateChangeListener>();
+		
+		h = new Handler();
+		updateRunnable = new Runnable() {
+			@Override
+			public void run() {
+				update();
+				h.postDelayed(updateRunnable, UPDATE_DELAY);
+			}
+		};
+		h.post(updateRunnable);
+	}
+	
+	private void update() {
+		if(song != null && media.isPlaying()) {
+			for(SongStateChangeListener listener: listeners) {
+				listener.onSongUpdate(media.getCurrentPosition(), media.getDuration());
+			}
+		}
 	}
 	
 	private void play() {
@@ -110,16 +133,25 @@ public class SongController {
 		else if (state == PAUSED) play();
 	}
 	
-	public void seek(int msec) {
+	public void seek(float percent) {
 		if(state == PLAYING || state == PAUSED) {
-			media.seekTo(msec);
+			int seek = (int)(media.getDuration()*percent);
+			int minutes = media.getDuration()/1000/60;
+			int seconds = media.getDuration()/1000-(60*minutes);
+			int seekMinutes = seek/1000/60;
+			int seekSeconds = seek/1000-(60*seekMinutes);
+			Log.d("media", "seek "+seekMinutes+":"+seekSeconds+" / "+minutes+":"+seconds);
+			media.seekTo(seek);
 		}
 	}
 	
 	public void destroy() {
-		media.pause();
+		if(media.isPlaying()) {
+			media.pause();
+		}
 		media.stop();
 		media.release();
+		h.removeCallbacks(updateRunnable);
 	}
 	
 	public Song getSong() {
@@ -129,5 +161,6 @@ public class SongController {
 	public void addStateListener(SongStateChangeListener listener) {
 		listeners.add(listener);
 	}
+	
 
 }

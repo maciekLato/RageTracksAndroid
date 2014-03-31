@@ -13,6 +13,7 @@ import android.view.View.OnClickListener;
 import android.view.ViewGroup;
 import android.view.animation.Animation;
 import android.widget.BaseAdapter;
+import android.widget.ProgressBar;
 import android.widget.TextView;
 
 import com.android.volley.RequestQueue;
@@ -74,12 +75,14 @@ public class MyAdapter extends BaseAdapter {
 			v.setTag(R.id.artist, v.findViewById(R.id.artist));
 			v.setTag(R.id.title, v.findViewById(R.id.title));
 			v.setTag(R.id.overlay, v.findViewById(R.id.overlay));
+			v.setTag(R.id.progressBar, v.findViewById(R.id.progressBar));
 		}
 		
 		SquareNetworkImageView picture = (SquareNetworkImageView) v.getTag(R.id.picture);
 		SquareImageView overlay = (SquareImageView) v.getTag(R.id.overlay);
 		final TextView artist = (TextView) v.getTag(R.id.artist);
 		final TextView title = (TextView) v.getTag(R.id.title);
+		ProgressBar progressBar = (ProgressBar) v.getTag(R.id.progressBar);
 		
 		v.setOnClickListener(new OnClickListener(){
 			public void onClick(View v) {
@@ -100,20 +103,24 @@ public class MyAdapter extends BaseAdapter {
 		title.setMarqueeRepeatLimit(Animation.INFINITE);
 		
 		if(song.isIdle()) {
+			progressBar.setVisibility(View.GONE);
 			overlay.setVisibility(View.GONE);
 			artist.setSelected(false);
 			title.setSelected(false);
 		} else if(song.isPlaying()) {
+			progressBar.setVisibility(View.GONE);
 			overlay.setVisibility(View.VISIBLE);
 			overlay.setImageResource(R.drawable.pause);
 			if(!artist.isSelected()) artist.setSelected(true);
 			if(!title.isSelected()) title.setSelected(true);
 		} else if(song.isPaused()) {
+			progressBar.setVisibility(View.GONE);
 			overlay.setVisibility(View.VISIBLE);
 			overlay.setImageResource(R.drawable.play);
 		}	else if(song.isLoading()) {
+			overlay.setImageBitmap(null);
 			overlay.setVisibility(View.VISIBLE);
-			//overlay.setImageResource(R.drawable.loading);
+			progressBar.setVisibility(View.VISIBLE);
 		}
 		
 		picture.setImageUrl(song.getThumbnailURL(), mImageLoader);

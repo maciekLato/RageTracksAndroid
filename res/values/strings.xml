@@ -15,4 +15,6 @@
     <string name="cancel_search_button">Cancel search button</string>
     <string name="open_search_button">Open search button</string>
     <string name="menu_button">Menu button</string>
+    <string name="options_button">Options button</string>
+    <string name="seek_bar">Seek bar</string>
 </resources>

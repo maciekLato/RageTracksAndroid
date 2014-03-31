@@ -71,7 +71,7 @@
 	   	        android:layout_width="match_parent"
 	   	        android:layout_height="match_parent"
 	   	        android:orientation="horizontal"
-	   	        android:background="#000000"
+				android:background="#000000"
 	   	        android:animateLayoutChanges="true"
 	   	        >
 		   	    <ImageView 
@@ -108,7 +108,8 @@
 	   	        android:layout_height="match_parent"
 	   	        android:orientation="horizontal"
 	   	       	android:visibility="gone"	  
-	   	       	android:animateLayoutChanges="true" 	        	   	        
+	       		android:background="#000000"
+	   	       	android:animateLayoutChanges="true"     		        
 	   	        >
 		   	    <LinearLayout
 		   	        android:id="@+id/search_menu"
@@ -120,6 +121,7 @@
 		   	        android:orientation="horizontal"
 		   	        android:layout_weight="1"
 		   	        android:animateLayoutChanges="true"
+		   	        android:background="#000000"
 			   	    >
 			   	    <EditText
 			   	        android:id="@+id/search_text_edit"
@@ -215,6 +217,52 @@
 	   	        android:onClick="onShareClicked"
 	   	        android:contentDescription="@string/share_button"
    	            />
+   	        <ImageView
+   	            android:id="@+id/options_button"
+   	            android:src="@drawable/ic_drawer"
+   	            android:layout_width="0dp"
+	   	        android:layout_height="match_parent"
+	   	        android:layout_weight="1"
+	   	        android:onClick="onDrawerClicked"
+	   	        android:contentDescription="@string/options_button"
+	   	        android:paddingTop="8dp"
+	   	       	android:paddingBottom="8dp"
+   	            />
  	    </LinearLayout>
+ 	    <RelativeLayout 
+ 	        android:id="@+id/seek_bar_container"
+ 	        android:layout_width="match_parent"
+ 	        android:layout_height="50dp"
+   	        android:contentDescription="@string/seek_bar"
+   	        android:visibility="gone"
+   	        style="@+style/SeekBarAppTheme"
+   	        >
+   	        <TextView
+   	            android:id="@+id/current_time"
+   	            android:layout_width="wrap_content"
+   	            android:layout_height="wrap_content"
+   	            android:layout_alignParentLeft="true"
+   	            android:textColor="#ffffffff"
+   	            android:textSize="12sp"
+   	            /> 
+  	       	<SeekBar 
+	 	        android:id="@+id/seek_bar"
+	 	        android:layout_width="match_parent"
+	 	        android:layout_height="wrap_content"
+	   	        android:contentDescription="@string/seek_bar"
+	   	        android:progress="0"
+	   	        android:max="1000"
+	   	        style="@+style/SeekBarAppTheme"
+	   	        android:layout_centerInParent="true"
+ 	        	/>
+  	       	<TextView
+   	            android:id="@+id/total_time"
+   	            android:layout_width="wrap_content"
+   	            android:layout_height="wrap_content"
+   	            android:layout_alignParentRight="true"
+   	            android:textColor="#ffffff"
+   	            android:textSize="12sp"
+   	            />
+		</RelativeLayout>
    	</LinearLayout>
 </LinearLayout>

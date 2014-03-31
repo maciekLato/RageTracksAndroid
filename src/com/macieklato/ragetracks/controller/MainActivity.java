@@ -17,6 +17,9 @@ import android.widget.FrameLayout.LayoutParams;
 import android.widget.GridView;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
+import android.widget.SeekBar;
+import android.widget.TextView;
+import android.widget.SeekBar.OnSeekBarChangeListener;
 import android.widget.Toast;
 
 import com.macieklato.ragetracks.R;
@@ -30,7 +33,7 @@ import com.macieklato.ragetracks.util.Network;
 public class MainActivity extends Activity {
 
 	//constant variables
-	public static final int COUNT = 5;
+	public static final int COUNT = 10;
 	
 	// controllers
 	private MyAdapter adapter;
@@ -122,12 +125,27 @@ public class MainActivity extends Activity {
 				//adapter.removeSong(s);
 			}
 			
+			@Override
+			public void onSongUpdate(int position, int duration) {
+				int minutes = duration/1000/60;
+				int seconds = duration/1000 - (60*minutes);
+				int currentMinutes = position/1000/60;
+				int currentSeconds = position/1000 - (60*currentMinutes);
+				SeekBar seek = (SeekBar)findViewById(R.id.seek_bar);
+				int progress = (int)(position * seek.getMax() / duration);
+				seek.setProgress(progress);
+				TextView currentTime = (TextView) findViewById(R.id.current_time);
+				currentTime.setText(String.format("%d:%02d", currentMinutes, currentSeconds));
+				TextView totalTime = (TextView) findViewById(R.id.total_time);
+				totalTime.setText(String.format("%d:%02d", minutes, seconds));
+			}
+			
 		});
 		
 		adapter = new MyAdapter(this.getApplicationContext());
 		gridView.setAdapter(adapter); // add grid view adapter
 		gridView.setOnScrollListener(new OnScrollListener() {
-
+			
 			@Override
 			public void onScrollStateChanged(AbsListView view, int scrollState) {				
 			}
@@ -135,10 +153,30 @@ public class MainActivity extends Activity {
 			@Override
 			public void onScroll(AbsListView view, int firstVisibleItem,
 					int visibleItemCount, int totalItemCount) {
-				if(visibleItemCount > 0 && firstVisibleItem + visibleItemCount >= totalItemCount) {
+				int lastVisible = firstVisibleItem + visibleItemCount;
+				if(visibleItemCount > 0 && lastVisible >= totalItemCount) {
 					loadSongs();
 				}
 			} 
+			
+		});
+		
+		SeekBar seek = (SeekBar)findViewById(R.id.seek_bar);
+		seek.setOnSeekBarChangeListener(new OnSeekBarChangeListener(){
+
+			@Override
+			public void onProgressChanged(SeekBar seekBar, int progress,
+					boolean fromUser) {				
+			}
+
+			@Override
+			public void onStartTrackingTouch(SeekBar seekBar) {				
+			}
+
+			@Override
+			public void onStopTrackingTouch(SeekBar seekBar) {
+				songController.seek(seekBar.getProgress()*1f/seekBar.getMax());
+			}
 			
 		});
 		
@@ -307,12 +345,25 @@ public class MainActivity extends Activity {
 		Toast.makeText(this.getApplicationContext(), "You clicked share",
 				Toast.LENGTH_SHORT).show();
 	}
+	
+	/**
+	 * callback for clicking drawer bottom menu button
+	 * 
+	 * @param v - drawer icon view
+	 */
+	public void onDrawerClicked(View v) {
+		View seek = findViewById(R.id.seek_bar_container);
+		if(seek.getVisibility() == View.VISIBLE) {
+			seek.setVisibility(View.GONE);
+		} else {
+			seek.setVisibility(View.VISIBLE);
+		}
+	}
 
 	/**
 	 * callback for clicking bookmark header in left-side menu
 	 * 
-	 * @param v
-	 *            - bookmark header view
+	 * @param v - bookmark header view
 	 */
 	public void onBookmarksListClicked(View v) {
 		// TODO::fix this mock implementation
@@ -335,8 +386,7 @@ public class MainActivity extends Activity {
 	/**
 	 * callback for clicking genre header in left-side menu
 	 * 
-	 * @param v
-	 *            - genre header view
+	 * @param v - genre header view
 	 */
 	public void onGenresListClicked(View v) {
 		// TODO::fix this mock implementation
@@ -393,7 +443,11 @@ public class MainActivity extends Activity {
 	}
 	
 	public boolean dispatchTouchEvent(MotionEvent e) {
-		if(pullListener.onTouch(null, e)) return true;
+		if(e.getRawY() > findViewById(R.id.gridview).getTop() &&
+				e.getRawY() < findViewById(R.id.gridview).getBottom()) {
+			if(pullListener.onTouch(null, e)) return true;
+		}
 		return super.dispatchTouchEvent(e);
+		
 	}
 }
