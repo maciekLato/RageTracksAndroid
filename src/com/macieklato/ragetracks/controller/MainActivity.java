@@ -65,14 +65,12 @@ public class MainActivity extends Activity {
 			@Override
 			public void onBottomToTop() {
 				findViewById(R.id.top_menu).setVisibility(View.GONE);
-				// findViewById(R.id.nowplaying).setVisibility(View.GONE);
 				findViewById(R.id.bottommenu).setVisibility(View.GONE);
 			}
 
 			@Override
 			public void onTopToBottom() {
 				findViewById(R.id.top_menu).setVisibility(View.VISIBLE);
-				// findViewById(R.id.nowplaying).setVisibility(View.VISIBLE);
 				findViewById(R.id.bottommenu).setVisibility(View.VISIBLE);
 			}
 

@@ -171,7 +171,6 @@
 	   	    android:background="#000000"
 	   	    android:animateLayoutChanges="true"
 	   	    >
-
 	   		<ImageView
 	   		    android:id="@+id/previous_button"
 	   		    android:layout_width="0dp"
@@ -179,8 +178,9 @@
 	   		    android:layout_weight="1"
 	   		    android:contentDescription="@string/previous_button"
 	   		    android:onClick="onPreviousClicked"
-	   		    android:src="@drawable/previous" />
-
+	   		    android:src="@drawable/previous" 
+	   		    android:padding = "10dp"
+	   		    />
 	   	    <ImageView
 	   	        android:id="@+id/bookmark_button"
 	   	        android:src="@drawable/bookmark"
@@ -189,6 +189,7 @@
 	   	        android:layout_weight="1"
 	   	        android:onClick="onBookmarkClicked"
 	   	        android:contentDescription="@string/bookmark_button"
+	   	        android:padding = "10dp"
 	   	        />    
    	        <ImageView
    	            android:id="@+id/play_pause_button"
@@ -198,6 +199,7 @@
 	   	        android:layout_weight="1"
 	   	        android:onClick="onPlayPauseClicked"
 	   	        android:contentDescription="@string/play_pause_button"
+	   	        android:padding = "10dp"
    	            />
    	        <ImageView
    	            android:id="@+id/next_button"
@@ -207,6 +209,7 @@
 	   	        android:layout_weight="1"
 	   	        android:onClick="onNextClicked"
 	   	        android:contentDescription="@string/next_button"
+	   	        android:padding = "10dp"
    	            />
    	        <ImageView
    	            android:id="@+id/share_button"
@@ -216,6 +219,7 @@
 	   	        android:layout_weight="1"
 	   	        android:onClick="onShareClicked"
 	   	        android:contentDescription="@string/share_button"
+	   	        android:padding = "10dp"
    	            />
    	        <ImageView
    	            android:id="@+id/options_button"
@@ -225,8 +229,7 @@
 	   	        android:layout_weight="1"
 	   	        android:onClick="onDrawerClicked"
 	   	        android:contentDescription="@string/options_button"
-	   	        android:paddingTop="8dp"
-	   	       	android:paddingBottom="8dp"
+	   	        android:padding = "12dp"
    	            />
  	    </LinearLayout>
  	    <RelativeLayout 
