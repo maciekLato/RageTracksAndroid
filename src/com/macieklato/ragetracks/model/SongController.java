@@ -78,7 +78,7 @@ public class SongController {
 	}
 
 	private void stop() {
-		if (media.isPlaying()) {
+		if (state != LOADING && media.isPlaying()) {
 			media.stop();
 		}
 		media.reset();

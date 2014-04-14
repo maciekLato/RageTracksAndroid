@@ -4,8 +4,6 @@ import java.util.ArrayList;
 import java.util.List;
 
 import android.content.Context;
-import android.graphics.Bitmap;
-import android.support.v4.util.LruCache;
 import android.text.TextUtils;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -16,9 +14,6 @@ import android.widget.BaseAdapter;
 import android.widget.ProgressBar;
 import android.widget.TextView;
 
-import com.android.volley.RequestQueue;
-import com.android.volley.toolbox.ImageLoader;
-import com.android.volley.toolbox.Volley;
 import com.macieklato.ragetracks.R;
 import com.macieklato.ragetracks.model.Song;
 import com.macieklato.ragetracks.model.SongController;
@@ -26,27 +21,12 @@ import com.macieklato.ragetracks.widget.SquareImageView;
 import com.macieklato.ragetracks.widget.SquareNetworkImageView;
 
 public class MyAdapter extends BaseAdapter {
-	private RequestQueue queue;
-	private ImageLoader mImageLoader;
 
 	private List<Song> items = new ArrayList<Song>();
 	private LayoutInflater inflater;
 
 	public MyAdapter(Context context) {
 		inflater = LayoutInflater.from(context);
-		queue = Volley.newRequestQueue(context);
-		mImageLoader = new ImageLoader(queue, new ImageLoader.ImageCache() {
-			private final LruCache<String, Bitmap> mCache = new LruCache<String, Bitmap>(
-					20);
-
-			public void putBitmap(String url, Bitmap bitmap) {
-				mCache.put(url, bitmap);
-			}
-
-			public Bitmap getBitmap(String url) {
-				return mCache.get(url);
-			}
-		});
 	}
 
 	@Override
@@ -126,7 +106,7 @@ public class MyAdapter extends BaseAdapter {
 			progressBar.setVisibility(View.VISIBLE);
 		}
 
-		picture.setImageUrl(song.getThumbnailUrl(), mImageLoader);
+		picture.setImageUrl(song.getThumbnailUrl(), ApplicationController.getInstance().getImageLoader());
 		picture.setDefaultImageResId(R.drawable.default_cover);
 		artist.setText(song.getArtist());
 		title.setText(song.getTitle());

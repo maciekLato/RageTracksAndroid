@@ -1,16 +1,19 @@
 package com.macieklato.ragetracks.controller;
 
 import java.util.ArrayList;
+import java.util.List;
 import java.util.Map;
 
+import org.apache.http.NameValuePair;
+import org.apache.http.client.utils.URLEncodedUtils;
+import org.apache.http.message.BasicNameValuePair;
 import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
 
 import android.content.Context;
-import android.graphics.Bitmap;
-import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.v4.app.FragmentActivity;
-import android.support.v4.util.LruCache;
 import android.util.Log;
 import android.view.MotionEvent;
 import android.view.View;
@@ -27,9 +30,11 @@ import android.widget.TextView;
 import android.widget.SeekBar.OnSeekBarChangeListener;
 import android.widget.Toast;
 
-import com.android.volley.RequestQueue;
-import com.android.volley.toolbox.ImageLoader;
-import com.android.volley.toolbox.Volley;
+import com.android.volley.Response.ErrorListener;
+import com.android.volley.Response.Listener;
+import com.android.volley.VolleyError;
+import com.android.volley.toolbox.JsonArrayRequest;
+import com.android.volley.toolbox.JsonObjectRequest;
 import com.macieklato.ragetracks.R;
 import com.macieklato.ragetracks.R.id;
 import com.macieklato.ragetracks.model.Song;
@@ -56,9 +61,6 @@ public class MainActivity extends FragmentActivity {
 	private int songIndex = -1;
 	private int page = 1;
 	private boolean autoPlay = false;
-	
-	private RequestQueue queue;
-	private ImageLoader mImageLoader;
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -78,20 +80,6 @@ public class MainActivity extends FragmentActivity {
 			facebook = (FacebookFragment) getSupportFragmentManager()
 					.findFragmentById(R.id.login_container);
 		}
-		
-		queue = Volley.newRequestQueue(this.getApplicationContext());
-		mImageLoader = new ImageLoader(queue, new ImageLoader.ImageCache() {
-			private final LruCache<String, Bitmap> mCache = new LruCache<String, Bitmap>(
-					20);
-
-			public void putBitmap(String url, Bitmap bitmap) {
-				mCache.put(url, bitmap);
-			}
-
-			public Bitmap getBitmap(String url) {
-				return mCache.get(url);
-			}
-		});
 	}
 
 	/**
@@ -147,7 +135,8 @@ public class MainActivity extends FragmentActivity {
 				s.setState(Song.PLAYING);
 				songIndex = COUNT * (s.getPage() - 1) + s.getIndex();
 				WaveformSeekBar seekBar = (WaveformSeekBar) findViewById(R.id.seek_bar);
-				seekBar.setWaveformUrl(s.getWaveformUrl(), mImageLoader);
+				seekBar.setWaveformUrl(s.getWaveformUrl(),
+						ApplicationController.getInstance().getImageLoader());
 				adapter.notifyDataSetChanged();
 			}
 
@@ -170,7 +159,7 @@ public class MainActivity extends FragmentActivity {
 				int currentMinutes = position / 1000 / 60;
 				int currentSeconds = position / 1000 - (60 * currentMinutes);
 				WaveformSeekBar seek = (WaveformSeekBar) findViewById(R.id.seek_bar);
-				int progress = (int) ((float)position * seek.getMax() / duration);
+				int progress = (int) ((float) position * seek.getMax() / duration);
 				seek.setProgress(progress);
 				TextView currentTime = (TextView) findViewById(R.id.current_time);
 				currentTime.setText(String.format("%d:%02d", currentMinutes,
@@ -214,8 +203,7 @@ public class MainActivity extends FragmentActivity {
 
 			@Override
 			public void onStopTrackingTouch(SeekBar seekBar) {
-				songController.seek(seek.getProgress() * 1f
-						/ seek.getMax());
+				songController.seek(seek.getProgress() * 1f / seek.getMax());
 			}
 
 		});
@@ -457,19 +445,12 @@ public class MainActivity extends FragmentActivity {
 	 * @param count
 	 */
 	public void loadSongs() {
-		final Context c = this.getApplicationContext();
-		AsyncTask<Void, Void, ArrayList<Song>> task = new AsyncTask<Void, Void, ArrayList<Song>>() {
+		Listener<JSONObject> onResponse = new Listener<JSONObject>() {
 			@Override
-			protected ArrayList<Song> doInBackground(Void... params) {
-				JSONArray posts = Network.getPosts(COUNT, page);
-				if (posts == null)
-					return null;
-				return JSONUtil.parsePosts(posts, page);
-			}
-
-			@Override
-			protected void onPostExecute(ArrayList<Song> songs) {
-				if (songs != null) {
+			public void onResponse(JSONObject obj) {
+				try {
+					JSONArray arr = obj.getJSONArray(Network.POSTS);
+					ArrayList<Song> songs = JSONUtil.parsePosts(arr, page);
 					ArrayList<String> tracks = new ArrayList<String>();
 					for (Song s : songs) {
 						adapter.addSong(s);
@@ -478,18 +459,39 @@ public class MainActivity extends FragmentActivity {
 					getWaveformUrls(songs, tracks);
 					if (songs.size() > 0)
 						page++;
-				} else {
-					Toast.makeText(c,
-							"Poor network connection, try turning on wifi",
-							Toast.LENGTH_SHORT).show();
-				}
-				if (autoPlay) {
-					onNextClicked(null);
-					autoPlay = false;
+					if (autoPlay) {
+						onNextClicked(null);
+						autoPlay = false;
+					}
+				} catch (JSONException e) {
+					e.printStackTrace();
 				}
 			}
 		};
-		task.execute();
+
+		ErrorListener onError = new ErrorListener() {
+			@Override
+			public void onErrorResponse(VolleyError e) {
+				e.printStackTrace();
+				Toast.makeText(getApplicationContext(),
+						"Poor network connection, try turning on wifi",
+						Toast.LENGTH_SHORT).show();
+			}
+
+		};
+
+		List<NameValuePair> data = new ArrayList<NameValuePair>();
+		data.add(new BasicNameValuePair(Network.JSON, "1"));
+		data.add(new BasicNameValuePair(Network.COUNT, "" + COUNT));
+		data.add(new BasicNameValuePair(Network.INCLUDE, Network.INCLUDE_ALL));
+		data.add(new BasicNameValuePair(Network.PAGE, "" + page));
+		String url = Network.HOST;
+		url += "?";
+		url += URLEncodedUtils.format(data, "utf-8");
+
+		JsonObjectRequest req = new JsonObjectRequest(url, null, onResponse,
+				onError);
+		ApplicationController.getInstance().getRequestQueue().add(req);
 	}
 
 	@Override
@@ -499,6 +501,9 @@ public class MainActivity extends FragmentActivity {
 	}
 
 	public boolean dispatchTouchEvent(MotionEvent e) {
+		if(songIndex < 0) {
+			loadSongs();
+		}
 		if (e.getRawY() > findViewById(R.id.gridview).getTop()
 				&& e.getRawY() < findViewById(R.id.gridview).getBottom()) {
 			if (pullListener.onTouch(null, e))
@@ -510,23 +515,37 @@ public class MainActivity extends FragmentActivity {
 
 	private void getWaveformUrls(final ArrayList<Song> songs,
 			final ArrayList<String> tracks) {
-		AsyncTask<Void, Void, Map<String, String>> task = new AsyncTask<Void, Void, Map<String, String>>() {
-			@Override
-			protected Map<String, String> doInBackground(Void... params) {
-				JSONArray data = Network.getTrackData(tracks);
-				if (data == null)
-					return null;
-				return JSONUtil.parseWaveformUrls(data);
-			}
 
+		Listener<JSONArray> onResponse = new Listener<JSONArray>() {
 			@Override
-			protected void onPostExecute(Map<String, String> map) {
+			public void onResponse(JSONArray arg0) {
+				Map<String, String> map = JSONUtil.parseWaveformUrls(arg0);
 				for (Song s : songs) {
 					String url = map.get(s.getTrack());
 					s.setWaveformUrl(url);
 				}
 			}
 		};
-		task.execute();
+
+		ErrorListener onError = new ErrorListener() {
+			@Override
+			public void onErrorResponse(VolleyError e) {
+				e.printStackTrace();
+			}
+
+		};
+
+		String ids = tracks.toString();
+		List<NameValuePair> data = new ArrayList<NameValuePair>();
+		data.add(new BasicNameValuePair(Network.TRACK_IDS, ids.substring(1,
+				ids.length() - 1)));
+		data.add(new BasicNameValuePair(Network.CLIENT_ID_ARG,
+				Network.CLIENT_ID));
+		String url = Network.SOUND_CLOUD_TRACKS;
+		url += "?";
+		url += URLEncodedUtils.format(data, "utf-8");
+
+		JsonArrayRequest req = new JsonArrayRequest(url, onResponse, onError);
+		ApplicationController.getInstance().getRequestQueue().add(req);
 	}
 }

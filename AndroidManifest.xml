@@ -15,6 +15,7 @@
         android:targetPackage="com.macieklato.ragetracks" />
 
     <application
+        android:name="com.macieklato.ragetracks.controller.ApplicationController"
         android:allowBackup="true"
         android:icon="@drawable/rage"
         android:label="@string/app_name"
