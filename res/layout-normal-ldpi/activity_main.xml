@@ -241,38 +241,34 @@
 
         <RelativeLayout
             android:id="@+id/seek_bar_container"
-            style="@+style/SeekBarAppTheme"
             android:layout_width="match_parent"
             android:layout_height="50dp"
             android:animateLayoutChanges="true"
             android:contentDescription="@string/seek_bar"
+            android:orientation="horizontal"
             android:visibility="gone" >
+
+            <com.macieklato.ragetracks.widget.WaveformSeekBar
+                android:id="@+id/seek_bar"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:animateLayoutChanges="true"
+                android:contentDescription="@string/seek_bar" />
 
             <TextView
                 android:id="@+id/current_time"
+                style="@style/OverlayText"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_alignParentLeft="true"
-                android:textColor="#ffffffff"
                 android:textSize="14sp" />
-
-            <SeekBar
-                android:id="@+id/seek_bar"
-                style="@+style/SeekBarAppTheme"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_centerInParent="true"
-                android:animateLayoutChanges="true"
-                android:contentDescription="@string/seek_bar"
-                android:max="1000"
-                android:progress="0" />
 
             <TextView
                 android:id="@+id/total_time"
+                style="@style/OverlayText"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_alignParentRight="true"
-                android:textColor="#ffffff"
                 android:textSize="14sp" />
         </RelativeLayout>
     </LinearLayout>

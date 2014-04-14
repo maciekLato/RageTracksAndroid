@@ -1,6 +1,8 @@
 package com.macieklato.ragetracks.util;
 
 import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Map;
 
 import org.apache.commons.lang3.StringEscapeUtils;
 import org.json.JSONArray;
@@ -47,20 +49,25 @@ public class JSONUtil {
 	public static Song parsePost(JSONObject post, int page, int index)
 			throws JSONException {
 		long id = post.getInt("id");
-		String rageTracksUrl = StringEscapeUtils.unescapeHtml4(post.getString("url"));
+		String rageTracksUrl = StringEscapeUtils.unescapeHtml4(post
+				.getString("url"));
 		String temp = StringEscapeUtils.unescapeHtml4(post.getString("title"));
 		String title = parseTitle(temp);
 		String artist = parseArtist(temp);
-		String url = parseContent(post.getString("content"));
+		String track = parseTrack(post.getString("content"));
+		String url = String.format(
+				"http://api.soundcloud.com/tracks/%s/stream?client_id=%s",
+				track, Network.CLIENT_ID);
 		String thumbnail = parseAttachments(post.getJSONArray("attachments"));
 		Log.d("post", String.format(
 				"title:%s\nartist:%s\nurl:%s\nthumbnail:%s\n", title, artist,
 				url, thumbnail));
 		if (rageTracksUrl == null || url == null || thumbnail == null)
 			return null;
-		return new Song(id, rageTracksUrl, title, artist, url, thumbnail, page, index);
+		return new Song(id, rageTracksUrl, title, artist, url, thumbnail, page,
+				index, track);
 	}
-	
+
 	/**
 	 * parses the artist out of a string
 	 * 
@@ -97,7 +104,7 @@ public class JSONUtil {
 	 * @param content
 	 * @return String representing the streaming url
 	 */
-	public static String parseContent(String content) {
+	public static String parseTrack(String content) {
 		if (content == null)
 			return null;
 		Log.d("parse", "content:" + content);
@@ -105,10 +112,7 @@ public class JSONUtil {
 		int end = content.indexOf("&", start);
 		if (end < 0 || start < 7 || end < start)
 			return null;
-		String track = content.substring(start, end);
-		return String.format(
-				"http://api.soundcloud.com/tracks/%s/stream?client_id=%s",
-				track, Network.CLIENT_ID);
+		return content.substring(start, end);
 	}
 
 	/**
@@ -129,6 +133,25 @@ public class JSONUtil {
 			e.printStackTrace();
 			return null;
 		}
+	}
+
+	public static Map<String, String> parseWaveformUrls(JSONArray arr) {
+		Map<String, String> map = new HashMap<String, String>();
+		for (int i = 0; i < arr.length(); i++) {
+			try {
+				JSONObject obj = arr.getJSONObject(i);
+				parseWaveformUrl(map, obj);
+			} catch (JSONException e) {
+				e.printStackTrace();
+			}
+		}
+		return map;
+	}
+
+	private static void parseWaveformUrl(Map<String, String> map, JSONObject obj) throws JSONException {
+		String key = ""+obj.getInt("id");
+		String value = obj.getString("waveform_url");
+		map.put(key, value);
 	}
 
 }

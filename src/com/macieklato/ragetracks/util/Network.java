@@ -19,9 +19,10 @@ import org.json.JSONObject;
 import android.util.Log;
 
 public class Network {
-
+	
 	// host
 	public static final String HOST = "http://ragetracks.com/";
+	public static final String SOUND_CLOUD_TRACKS = "http://api.soundcloud.com/tracks.json";
 
 	// parts
 	public static final String JSON = "json";
@@ -29,6 +30,8 @@ public class Network {
 	public static final String INCLUDE = "include";
 	public static final String PAGE = "page";
 	public static final String CUSTOM_FIELDS = "custom_fields";
+	public static final String CLIENT_ID_ARG = "client_id";
+	public static final String TRACK_IDS = "ids";
 
 	// values
 	public static final String FIELD_POSTTHUMB = "PostThumb";
@@ -44,6 +47,7 @@ public class Network {
 
 	// authorization
 	public static final String CLIENT_ID = "7622aa84a50c9f7609e2f7ed8bc85e81";
+	
 
 	/**
 	 * Makes a request to the server
@@ -82,7 +86,7 @@ public class Network {
 	 *            - number of songs to load meta-data about
 	 * @return JSONArray containing the song meta-data
 	 */
-	public static JSONArray load(int count, int page) {
+	public static JSONArray getPosts(int count, int page) {
 		List<NameValuePair> data = new ArrayList<NameValuePair>();
 		data.add(new BasicNameValuePair(JSON, "1"));
 		data.add(new BasicNameValuePair(COUNT, "" + count));
@@ -95,6 +99,25 @@ public class Network {
 			Log.d("get", str);
 			JSONObject obj = new JSONObject(str);
 			return obj.getJSONArray(POSTS);
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+
+		return null;
+	}
+	
+	public static JSONArray getTrackData(List<String> tracks) {
+		List<NameValuePair> data = new ArrayList<NameValuePair>();
+		String ids = tracks.toString();
+		data.add(new BasicNameValuePair(TRACK_IDS, ids.substring(1, ids.length()-1)));
+		data.add(new BasicNameValuePair(CLIENT_ID_ARG, CLIENT_ID));
+
+		HttpResponse resp = get(SOUND_CLOUD_TRACKS, data);
+		try {
+			String str = EntityUtils.toString(resp.getEntity());
+			Log.d("get", str);
+			JSONArray arr = new JSONArray(str);
+			return arr;
 		} catch (Exception e) {
 			e.printStackTrace();
 		}

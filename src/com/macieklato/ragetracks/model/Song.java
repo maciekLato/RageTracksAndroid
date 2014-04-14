@@ -8,9 +8,11 @@ public class Song {
 
 	private String title;
 	private String artist;
+	private String track;
 	private String streamUrl;
 	private String thumbnailUrl;
 	private String rageTracksUrl;
+	private String waveformUrl;
 	private int page;
 	private int index;
 	private long id;
@@ -22,7 +24,7 @@ public class Song {
 	}
 
 	public Song(long id, String rageTracksUrl, String title, String artist, String streamUrl,
-			String thumbnail, int page, int index) {
+			String thumbnail, int page, int index, String track) {
 		setId(id);
 		setRageTracksUrl(rageTracksUrl);
 		setTitle(title);
@@ -32,6 +34,7 @@ public class Song {
 		setState(IDLE);
 		setPage(page);
 		setIndex(index);
+		setTrack(track);
 	}
 
 	public void setId(long id) {
@@ -69,6 +72,14 @@ public class Song {
 	public void setIndex(int index) {
 		this.index = index;
 	}
+	
+	public void setTrack(String track) {
+		this.track = track;
+	}
+	
+	public void setWaveformUrl(String url) {
+		this.waveformUrl = url;
+	}
 
 	public long getId() {
 		return this.id;
@@ -105,6 +116,14 @@ public class Song {
 	public int getIndex() {
 		return index;
 	}
+	
+	public String getTrack() {
+		return track;
+	}
+	
+	public String getWaveformUrl() {
+		return this.waveformUrl;
+	}
 
 	public boolean isIdle() {
 		return state == IDLE;
@@ -124,7 +143,7 @@ public class Song {
 
 	public boolean equals(Object obj) {
 		if (obj instanceof Song) {
-			return this.streamUrl.equals(((Song) obj).streamUrl);
+			return this.track.equals(((Song) obj).track);
 		}
 		return false;
 	}

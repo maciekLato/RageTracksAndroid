@@ -1,13 +1,16 @@
 package com.macieklato.ragetracks.controller;
 
 import java.util.ArrayList;
+import java.util.Map;
 
 import org.json.JSONArray;
 
 import android.content.Context;
+import android.graphics.Bitmap;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.v4.app.FragmentActivity;
+import android.support.v4.util.LruCache;
 import android.util.Log;
 import android.view.MotionEvent;
 import android.view.View;
@@ -24,6 +27,9 @@ import android.widget.TextView;
 import android.widget.SeekBar.OnSeekBarChangeListener;
 import android.widget.Toast;
 
+import com.android.volley.RequestQueue;
+import com.android.volley.toolbox.ImageLoader;
+import com.android.volley.toolbox.Volley;
 import com.macieklato.ragetracks.R;
 import com.macieklato.ragetracks.R.id;
 import com.macieklato.ragetracks.model.Song;
@@ -32,6 +38,7 @@ import com.macieklato.ragetracks.model.SongStateChangeListener;
 import com.macieklato.ragetracks.util.JSONUtil;
 import com.macieklato.ragetracks.util.Network;
 import com.macieklato.ragetracks.widget.FacebookFragment;
+import com.macieklato.ragetracks.widget.WaveformSeekBar;
 
 public class MainActivity extends FragmentActivity {
 
@@ -49,6 +56,9 @@ public class MainActivity extends FragmentActivity {
 	private int songIndex = -1;
 	private int page = 1;
 	private boolean autoPlay = false;
+	
+	private RequestQueue queue;
+	private ImageLoader mImageLoader;
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -68,7 +78,20 @@ public class MainActivity extends FragmentActivity {
 			facebook = (FacebookFragment) getSupportFragmentManager()
 					.findFragmentById(R.id.login_container);
 		}
+		
+		queue = Volley.newRequestQueue(this.getApplicationContext());
+		mImageLoader = new ImageLoader(queue, new ImageLoader.ImageCache() {
+			private final LruCache<String, Bitmap> mCache = new LruCache<String, Bitmap>(
+					20);
 
+			public void putBitmap(String url, Bitmap bitmap) {
+				mCache.put(url, bitmap);
+			}
+
+			public Bitmap getBitmap(String url) {
+				return mCache.get(url);
+			}
+		});
 	}
 
 	/**
@@ -123,6 +146,8 @@ public class MainActivity extends FragmentActivity {
 				button.setImageResource(R.drawable.pause);
 				s.setState(Song.PLAYING);
 				songIndex = COUNT * (s.getPage() - 1) + s.getIndex();
+				WaveformSeekBar seekBar = (WaveformSeekBar) findViewById(R.id.seek_bar);
+				seekBar.setWaveformUrl(s.getWaveformUrl(), mImageLoader);
 				adapter.notifyDataSetChanged();
 			}
 
@@ -144,8 +169,8 @@ public class MainActivity extends FragmentActivity {
 				int seconds = duration / 1000 - (60 * minutes);
 				int currentMinutes = position / 1000 / 60;
 				int currentSeconds = position / 1000 - (60 * currentMinutes);
-				SeekBar seek = (SeekBar) findViewById(R.id.seek_bar);
-				int progress = (int) (position * seek.getMax() / duration);
+				WaveformSeekBar seek = (WaveformSeekBar) findViewById(R.id.seek_bar);
+				int progress = (int) ((float)position * seek.getMax() / duration);
 				seek.setProgress(progress);
 				TextView currentTime = (TextView) findViewById(R.id.current_time);
 				currentTime.setText(String.format("%d:%02d", currentMinutes,
@@ -175,7 +200,7 @@ public class MainActivity extends FragmentActivity {
 
 		});
 
-		SeekBar seek = (SeekBar) findViewById(R.id.seek_bar);
+		final WaveformSeekBar seek = (WaveformSeekBar) findViewById(R.id.seek_bar);
 		seek.setOnSeekBarChangeListener(new OnSeekBarChangeListener() {
 
 			@Override
@@ -189,8 +214,8 @@ public class MainActivity extends FragmentActivity {
 
 			@Override
 			public void onStopTrackingTouch(SeekBar seekBar) {
-				songController.seek(seekBar.getProgress() * 1f
-						/ seekBar.getMax());
+				songController.seek(seek.getProgress() * 1f
+						/ seek.getMax());
 			}
 
 		});
@@ -436,7 +461,7 @@ public class MainActivity extends FragmentActivity {
 		AsyncTask<Void, Void, ArrayList<Song>> task = new AsyncTask<Void, Void, ArrayList<Song>>() {
 			@Override
 			protected ArrayList<Song> doInBackground(Void... params) {
-				JSONArray posts = Network.load(COUNT, page);
+				JSONArray posts = Network.getPosts(COUNT, page);
 				if (posts == null)
 					return null;
 				return JSONUtil.parsePosts(posts, page);
@@ -445,9 +470,12 @@ public class MainActivity extends FragmentActivity {
 			@Override
 			protected void onPostExecute(ArrayList<Song> songs) {
 				if (songs != null) {
+					ArrayList<String> tracks = new ArrayList<String>();
 					for (Song s : songs) {
 						adapter.addSong(s);
+						tracks.add(s.getTrack());
 					}
+					getWaveformUrls(songs, tracks);
 					if (songs.size() > 0)
 						page++;
 				} else {
@@ -478,5 +506,27 @@ public class MainActivity extends FragmentActivity {
 		}
 		return super.dispatchTouchEvent(e);
 
+	}
+
+	private void getWaveformUrls(final ArrayList<Song> songs,
+			final ArrayList<String> tracks) {
+		AsyncTask<Void, Void, Map<String, String>> task = new AsyncTask<Void, Void, Map<String, String>>() {
+			@Override
+			protected Map<String, String> doInBackground(Void... params) {
+				JSONArray data = Network.getTrackData(tracks);
+				if (data == null)
+					return null;
+				return JSONUtil.parseWaveformUrls(data);
+			}
+
+			@Override
+			protected void onPostExecute(Map<String, String> map) {
+				for (Song s : songs) {
+					String url = map.get(s.getTrack());
+					s.setWaveformUrl(url);
+				}
+			}
+		};
+		task.execute();
 	}
 }
