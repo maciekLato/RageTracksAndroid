@@ -1,9 +1,11 @@
 package com.macieklato.ragetracks.util;
 
 public class Network {
-	
+
 	// host
 	public static final String HOST = "http://ragetracks.com/";
+	public static final String CATEGORY = "category/";
+	public static final String CATEGORY_IDX = "api/get_category_index/";
 	public static final String SOUND_CLOUD_TRACKS = "http://api.soundcloud.com/tracks.json";
 
 	// parts
@@ -27,6 +29,7 @@ public class Network {
 
 	// return values
 	public static final String POSTS = "posts";
+	public static final String CATEGORIES = "categories";
 
 	// authorization
 	public static final String CLIENT_ID = "7622aa84a50c9f7609e2f7ed8bc85e81";

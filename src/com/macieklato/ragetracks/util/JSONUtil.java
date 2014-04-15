@@ -11,6 +11,7 @@ import org.json.JSONObject;
 
 import android.util.Log;
 
+import com.macieklato.ragetracks.model.Category;
 import com.macieklato.ragetracks.model.Song;
 
 public class JSONUtil {
@@ -148,10 +149,27 @@ public class JSONUtil {
 		return map;
 	}
 
-	private static void parseWaveformUrl(Map<String, String> map, JSONObject obj) throws JSONException {
-		String key = ""+obj.getInt("id");
+	private static void parseWaveformUrl(Map<String, String> map, JSONObject obj)
+			throws JSONException {
+		String key = "" + obj.getInt("id");
 		String value = obj.getString("waveform_url");
 		map.put(key, value);
+	}
+
+	public static ArrayList<Category> parseCategories(JSONArray arr) {
+		ArrayList<Category> cats = new ArrayList<Category>();
+		cats.add(new Category("All", ""));
+		for (int i = 0; i < arr.length(); i++) {
+			try {
+				JSONObject obj = arr.getJSONObject(i);
+				String slug = obj.getString("slug");
+				String title = obj.getString("title");
+				cats.add(new Category(title, slug));
+			} catch (JSONException e) {
+				e.printStackTrace();
+			}
+		}
+		return cats;
 	}
 
 }

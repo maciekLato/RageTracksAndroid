@@ -6,25 +6,24 @@ public class Song {
 	public static final int PAUSED = 2;
 	public static final int LOADING = 3;
 
-	private String title;
-	private String artist;
-	private String track;
-	private String streamUrl;
-	private String thumbnailUrl;
-	private String rageTracksUrl;
-	private String waveformUrl;
-	private int page;
-	private int index;
-	private long id;
-	private int state;
+	private String title = "";
+	private String artist = "";
+	private String track = "";
+	private String streamUrl = "";
+	private String thumbnailUrl = "";
+	private String rageTracksUrl = "";
+	private String waveformUrl = "";
+	private int page = -1;
+	private int index = -1;
+	private long id = -1;
+	private int state = IDLE;
 
 	public Song() {
-		setThumbnailUrl(null);
-		setState(IDLE);
 	}
 
-	public Song(long id, String rageTracksUrl, String title, String artist, String streamUrl,
-			String thumbnail, int page, int index, String track) {
+	public Song(long id, String rageTracksUrl, String title, String artist,
+			String streamUrl, String thumbnail, int page, int index,
+			String track) {
 		setId(id);
 		setRageTracksUrl(rageTracksUrl);
 		setTitle(title);
@@ -40,7 +39,7 @@ public class Song {
 	public void setId(long id) {
 		this.id = id;
 	}
-	
+
 	public void setRageTracksUrl(String url) {
 		this.rageTracksUrl = url;
 	}
@@ -72,11 +71,11 @@ public class Song {
 	public void setIndex(int index) {
 		this.index = index;
 	}
-	
+
 	public void setTrack(String track) {
 		this.track = track;
 	}
-	
+
 	public void setWaveformUrl(String url) {
 		this.waveformUrl = url;
 	}
@@ -84,7 +83,7 @@ public class Song {
 	public long getId() {
 		return this.id;
 	}
-	
+
 	public String getRageTracksUrl() {
 		return this.rageTracksUrl;
 	}
@@ -116,11 +115,11 @@ public class Song {
 	public int getIndex() {
 		return index;
 	}
-	
+
 	public String getTrack() {
 		return track;
 	}
-	
+
 	public String getWaveformUrl() {
 		return this.waveformUrl;
 	}

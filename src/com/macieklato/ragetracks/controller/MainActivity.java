@@ -15,8 +15,10 @@ import android.content.Context;
 import android.os.Bundle;
 import android.support.v4.app.FragmentActivity;
 import android.util.Log;
+import android.view.LayoutInflater;
 import android.view.MotionEvent;
 import android.view.View;
+import android.view.View.OnClickListener;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.AbsListView;
 import android.widget.AbsListView.OnScrollListener;
@@ -38,6 +40,7 @@ import com.android.volley.toolbox.JsonArrayRequest;
 import com.android.volley.toolbox.JsonObjectRequest;
 import com.macieklato.ragetracks.R;
 import com.macieklato.ragetracks.R.id;
+import com.macieklato.ragetracks.model.Category;
 import com.macieklato.ragetracks.model.Song;
 import com.macieklato.ragetracks.model.SongController;
 import com.macieklato.ragetracks.model.SongStateChangeListener;
@@ -63,6 +66,8 @@ public class MainActivity extends FragmentActivity {
 	private int page = 1;
 	private boolean autoPlay = false;
 	private String searchText = "";
+	private String category = "";
+	private boolean loading = false;
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -70,6 +75,7 @@ public class MainActivity extends FragmentActivity {
 		setContentView(R.layout.activity_main); // set view
 		gridView = (GridView) findViewById(R.id.gridview);
 		setListeners(); // initialize state
+		loadCategories();
 		loadSongs();
 
 		if (savedInstanceState == null) {
@@ -91,25 +97,31 @@ public class MainActivity extends FragmentActivity {
 		// set the pull events for the menu hider
 		pullListener = new OnPullListener(this.getApplicationContext()) {
 			@Override
-			public void onBottomToTop() {
-				findViewById(R.id.top_menu).setVisibility(View.GONE);
-				findViewById(R.id.bottommenu).setVisibility(View.GONE);
+			public void onBottomToTop(float x, float y) {
+				if (contains(findViewById(R.id.gridview), x, y)) {
+					findViewById(R.id.top_menu).setVisibility(View.GONE);
+				}
 			}
 
 			@Override
-			public void onTopToBottom() {
-				findViewById(R.id.top_menu).setVisibility(View.VISIBLE);
-				findViewById(R.id.bottommenu).setVisibility(View.VISIBLE);
+			public void onTopToBottom(float x, float y) {
+				if (contains(findViewById(R.id.gridview), x, y)) {
+					findViewById(R.id.top_menu).setVisibility(View.VISIBLE);
+				}
 			}
 
 			@Override
-			public void onLeftToRight() {
-				showMenu();
+			public void onLeftToRight(float x, float y) {
+				if (!contains(findViewById(R.id.seek_bar), x, y)) {
+					showMenu();
+				}
 			}
 
 			@Override
-			public void onRightToLeft() {
-				hideMenu();
+			public void onRightToLeft(float x, float y) {
+				if (!contains(findViewById(R.id.seek_bar), x, y)) {
+					hideMenu();
+				}
 			}
 		};
 
@@ -139,6 +151,7 @@ public class MainActivity extends FragmentActivity {
 				WaveformSeekBar seekBar = (WaveformSeekBar) findViewById(R.id.seek_bar);
 				seekBar.setWaveformUrl(s.getWaveformUrl(),
 						ApplicationController.getInstance().getImageLoader());
+				Log.d("waveform", s.getWaveformUrl());
 				adapter.notifyDataSetChanged();
 			}
 
@@ -184,7 +197,8 @@ public class MainActivity extends FragmentActivity {
 			public void onScroll(AbsListView view, int firstVisibleItem,
 					int visibleItemCount, int totalItemCount) {
 				int lastVisible = firstVisibleItem + visibleItemCount;
-				if (visibleItemCount > 0 && lastVisible >= totalItemCount) {
+				if (!loading && visibleItemCount > 0
+						&& lastVisible >= totalItemCount-COUNT) {
 					loadSongs();
 				}
 			}
@@ -290,7 +304,7 @@ public class MainActivity extends FragmentActivity {
 	 */
 	public void onCommitSearchClicked(View v) {
 		EditText userInput = (EditText) findViewById(R.id.search_text_edit);
-		searchText = userInput.getText().toString().toLowerCase();
+		searchText = userInput.getText().toString();
 		reset();
 		closeKeyboard();
 	}
@@ -403,21 +417,22 @@ public class MainActivity extends FragmentActivity {
 	 *            - bookmark header view
 	 */
 	public void onBookmarksListClicked(View v) {
-		// TODO::fix this mock implementation
-		View v2 = findViewById(id.bookmark_list);
-		float ydpi = this.getResources().getDisplayMetrics().ydpi;
-		int collapsedHeight = (int) (2f * ydpi / 160f);
-		LinearLayout.LayoutParams p = (LinearLayout.LayoutParams) v2
-				.getLayoutParams();
-		if (v2.getHeight() > collapsedHeight) {
-			p.height = collapsedHeight;
-			v2.setLayoutParams(p);
+		if (findViewById(id.bookmark_scroller).getVisibility() == View.VISIBLE) {
+			closeBookmarks();
 		} else {
-			p.height = (int) (150 * ydpi / 160f);
-			v2.setLayoutParams(p);
+			openBookmarks();
 		}
-		Toast.makeText(this.getApplicationContext(),
-				"You clicked toggle bookmarks", Toast.LENGTH_SHORT).show();
+	}
+
+	private void closeBookmarks() {
+		findViewById(R.id.bookmark_scroller).setVisibility(View.GONE);
+		findViewById(R.id.bookmark_menu_text).setBackgroundColor(0xff000000);
+	}
+
+	private void openBookmarks() {
+		findViewById(R.id.bookmark_scroller).setVisibility(View.VISIBLE);
+		findViewById(R.id.bookmark_menu_text).setBackgroundColor(0xff222222);
+		closeGenres();
 	}
 
 	/**
@@ -427,21 +442,22 @@ public class MainActivity extends FragmentActivity {
 	 *            - genre header view
 	 */
 	public void onGenresListClicked(View v) {
-		// TODO::fix this mock implementation
-		View v2 = findViewById(id.genre_list);
-		float ydpi = this.getResources().getDisplayMetrics().ydpi;
-		int collapsedHeight = (int) (2f * ydpi / 160f);
-		LinearLayout.LayoutParams p = (LinearLayout.LayoutParams) v2
-				.getLayoutParams();
-		if (v2.getHeight() > collapsedHeight) {
-			p.height = collapsedHeight;
-			v2.setLayoutParams(p);
+		if (findViewById(id.genre_scroller).getVisibility() == View.VISIBLE) {
+			closeGenres();
 		} else {
-			p.height = (int) (150 * ydpi / 160f);
-			v2.setLayoutParams(p);
+			openGenres();
 		}
-		Toast.makeText(this.getApplicationContext(),
-				"You clicked toggle genres", Toast.LENGTH_SHORT).show();
+	}
+
+	private void closeGenres() {
+		findViewById(R.id.genre_scroller).setVisibility(View.GONE);
+		findViewById(R.id.genre_menu_text).setBackgroundColor(0xff000000);
+	}
+
+	private void openGenres() {
+		findViewById(R.id.genre_scroller).setVisibility(View.VISIBLE);
+		findViewById(R.id.genre_menu_text).setBackgroundColor(0xff222222);
+		closeBookmarks();
 	}
 
 	/**
@@ -450,6 +466,9 @@ public class MainActivity extends FragmentActivity {
 	 * @param count
 	 */
 	public void loadSongs() {
+		if (loading)
+			return;
+		setLoading(true);
 		Listener<JSONObject> onResponse = new Listener<JSONObject>() {
 			@Override
 			public void onResponse(JSONObject obj) {
@@ -471,6 +490,7 @@ public class MainActivity extends FragmentActivity {
 				} catch (JSONException e) {
 					e.printStackTrace();
 				}
+				setLoading(false);
 			}
 		};
 
@@ -481,6 +501,7 @@ public class MainActivity extends FragmentActivity {
 				Toast.makeText(getApplicationContext(),
 						"Poor network connection, try turning on wifi",
 						Toast.LENGTH_SHORT).show();
+				setLoading(false);
 			}
 
 		};
@@ -493,8 +514,12 @@ public class MainActivity extends FragmentActivity {
 		data.add(new BasicNameValuePair(Network.SEARCH, "" + searchText));
 
 		String url = Network.HOST;
+		if (category.length() > 0)
+			url += Network.CATEGORY + category;
 		url += "?";
 		url += URLEncodedUtils.format(data, "utf-8");
+
+		Log.d("load", url);
 
 		JsonObjectRequest req = new JsonObjectRequest(url, null, onResponse,
 				onError);
@@ -508,16 +533,23 @@ public class MainActivity extends FragmentActivity {
 	}
 
 	public boolean dispatchTouchEvent(MotionEvent e) {
-		if (songIndex < 0) {
+		if (adapter.getCount() <= 0) {
 			loadSongs();
 		}
-		if (e.getRawY() > findViewById(R.id.gridview).getTop()
-				&& e.getRawY() < findViewById(R.id.gridview).getBottom()) {
-			if (pullListener.onTouch(null, e))
-				return true;
-		}
+		if (pullListener.onTouch(null, e))
+			return true;
 		return super.dispatchTouchEvent(e);
 
+	}
+
+	private static boolean contains(View v, float x, float y) {
+		int l[] = new int[2];
+		v.getLocationOnScreen(l);
+		if (x < l[0] || x > l[0] + v.getWidth() || y < l[1]
+				|| y > l[1] + v.getHeight()) {
+			return false;
+		}
+		return true;
 	}
 
 	private void getWaveformUrls(final ArrayList<Song> songs,
@@ -554,6 +586,60 @@ public class MainActivity extends FragmentActivity {
 
 		JsonArrayRequest req = new JsonArrayRequest(url, onResponse, onError);
 		ApplicationController.getInstance().getRequestQueue().add(req);
+	}
+
+	private void loadCategories() {
+		Listener<JSONObject> onResponse = new Listener<JSONObject>() {
+			@Override
+			public void onResponse(JSONObject obj) {
+				try {
+					JSONArray arr = obj.getJSONArray(Network.CATEGORIES);
+					ArrayList<Category> categories = JSONUtil
+							.parseCategories(arr);
+					LayoutInflater inflater = LayoutInflater
+							.from(getApplicationContext());
+					LinearLayout genreList = (LinearLayout) findViewById(R.id.genre_list);
+					for (Category cat : categories) {
+						final String slug = cat.getSlug();
+						View v = inflater.inflate(R.layout.genre, null, false);
+						TextView genre = (TextView) v.findViewById(R.id.genre);
+						genre.setText(cat.getName());
+						genre.setOnClickListener(new OnClickListener() {
+							public void onClick(View v) {
+								category = slug;
+								reset();
+							}
+						});
+						genreList.addView(v);
+					}
+				} catch (JSONException e) {
+					e.printStackTrace();
+				}
+			}
+		};
+
+		ErrorListener onError = new ErrorListener() {
+			@Override
+			public void onErrorResponse(VolleyError e) {
+				e.printStackTrace();
+			}
+
+		};
+
+		String url = Network.HOST + Network.CATEGORY_IDX;
+
+		JsonObjectRequest req = new JsonObjectRequest(url, null, onResponse,
+				onError);
+		ApplicationController.getInstance().getRequestQueue().add(req);
+	}
+
+	private void setLoading(boolean loading) {
+		this.loading = loading;
+		if (loading) {
+			findViewById(R.id.mainLoadingIcon).setVisibility(View.VISIBLE);
+		} else {
+			findViewById(R.id.mainLoadingIcon).setVisibility(View.GONE);
+		}
 	}
 
 	private void reset() {

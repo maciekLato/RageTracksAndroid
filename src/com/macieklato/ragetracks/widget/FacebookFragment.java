@@ -112,8 +112,7 @@ public class FacebookFragment extends Fragment {
 				FacebookDialog.ShareDialogFeature.SHARE_DIALOG)) {
 			// Publish the post using the Share Dialog
 			FacebookDialog shareDialog = new FacebookDialog.ShareDialogBuilder(
-					getActivity())
-					.setLink(s.getRageTracksUrl())
+					getActivity()).setLink(s.getRageTracksUrl())
 					.setPicture(s.getThumbnailUrl())
 					.setCaption(s.getArtist() + " - " + s.getTitle()).build();
 			uiHelper.trackPendingDialogCall(shareDialog.present());

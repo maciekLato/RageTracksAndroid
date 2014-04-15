@@ -36,6 +36,8 @@ public class MyAdapter extends BaseAdapter {
 
 	@Override
 	public Object getItem(int i) {
+		if (i < 0 || i >= items.size())
+			return null;
 		return items.get(i);
 	}
 
@@ -106,7 +108,8 @@ public class MyAdapter extends BaseAdapter {
 			progressBar.setVisibility(View.VISIBLE);
 		}
 
-		picture.setImageUrl(song.getThumbnailUrl(), ApplicationController.getInstance().getImageLoader());
+		picture.setImageUrl(song.getThumbnailUrl(), ApplicationController
+				.getInstance().getImageLoader());
 		picture.setDefaultImageResId(R.drawable.default_cover);
 		artist.setText(song.getArtist());
 		title.setText(song.getTitle());
@@ -129,9 +132,10 @@ public class MyAdapter extends BaseAdapter {
 		Song s = items.get(items.size() - 1);
 		return MainActivity.COUNT * (s.getPage() - 1) + s.getIndex();
 	}
-	
+
 	public void reset() {
 		items = new ArrayList<Song>();
+		notifyDataSetChanged();
 	}
 
 }

@@ -34,39 +34,42 @@ public abstract class OnPullListener implements OnTouchListener {
 	}
 
 	public boolean checkPull(float ex, float ey) {
-		return checkHorizontal(ex) || checkVertical(ey);
+		if (!checkHorizontal(ex, ey)) {
+			return checkVertical(ex, ey);
+		}
+		return true;
 	}
 
-	public boolean checkHorizontal(float x2) {
+	public boolean checkHorizontal(float x2, float y2) {
 		if (Math.abs(x - x2) > epsilonX) {
 			if (x2 > x)
-				onLeftToRight();
+				onLeftToRight(x2, y2);
 			else
-				onRightToLeft();
+				onRightToLeft(x2, y2);
 			x = x2;
 			return true;
 		}
 		return false;
 	}
 
-	public boolean checkVertical(float y2) {
+	public boolean checkVertical(float x2, float y2) {
 		if (Math.abs(y - y2) > epsilonY) {
 			if (y2 > y)
-				onTopToBottom();
+				onTopToBottom(x2, y2);
 			else
-				onBottomToTop();
+				onBottomToTop(x2, y2);
 			y = y2;
 			return true;
 		}
 		return false;
 	}
 
-	public abstract void onTopToBottom();
+	public abstract void onTopToBottom(float x, float y);
 
-	public abstract void onBottomToTop();
+	public abstract void onBottomToTop(float x, float y);
 
-	public abstract void onLeftToRight();
+	public abstract void onLeftToRight(float x, float y);
 
-	public abstract void onRightToLeft();
+	public abstract void onRightToLeft(float x, float y);
 
 }

@@ -73,7 +73,8 @@ public class SongController {
 		media.start();
 		state = PLAYING;
 		for (SongStateChangeListener listener : listeners) {
-			listener.onPlay(song);
+			if (song != null)
+				listener.onPlay(song);
 		}
 	}
 
@@ -84,7 +85,8 @@ public class SongController {
 		media.reset();
 		if (song != null) {
 			for (SongStateChangeListener listener : listeners) {
-				listener.onStop(song);
+				if (song != null)
+					listener.onStop(song);
 			}
 		}
 		state = UNINITIALIZED;
@@ -94,7 +96,8 @@ public class SongController {
 		media.pause();
 		state = PAUSED;
 		for (SongStateChangeListener listener : listeners) {
-			listener.onPause(song);
+			if (song != null)
+				listener.onPause(song);
 		}
 	}
 
@@ -151,10 +154,6 @@ public class SongController {
 	}
 
 	public void destroy() {
-		if (media.isPlaying()) {
-			media.pause();
-		}
-		media.stop();
 		media.release();
 		h.removeCallbacks(updateRunnable);
 	}
@@ -166,13 +165,13 @@ public class SongController {
 	public void addStateListener(SongStateChangeListener listener) {
 		listeners.add(listener);
 	}
-	
+
 	public int getState() {
 		return state;
 	}
-	
+
 	public void reset() {
-		if(state == PLAYING) {
+		if (state == PLAYING) {
 			pause();
 		}
 		song = null;
