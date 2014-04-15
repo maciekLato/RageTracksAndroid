@@ -14,6 +14,7 @@ public class Network {
 	public static final String CUSTOM_FIELDS = "custom_fields";
 	public static final String CLIENT_ID_ARG = "client_id";
 	public static final String TRACK_IDS = "ids";
+	public static final String SEARCH = "s";
 
 	// values
 	public static final String FIELD_POSTTHUMB = "PostThumb";

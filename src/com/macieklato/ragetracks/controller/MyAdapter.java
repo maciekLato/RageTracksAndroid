@@ -129,5 +129,9 @@ public class MyAdapter extends BaseAdapter {
 		Song s = items.get(items.size() - 1);
 		return MainActivity.COUNT * (s.getPage() - 1) + s.getIndex();
 	}
+	
+	public void reset() {
+		items = new ArrayList<Song>();
+	}
 
 }

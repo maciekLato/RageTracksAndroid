@@ -20,6 +20,7 @@ import android.view.View;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.AbsListView;
 import android.widget.AbsListView.OnScrollListener;
+import android.widget.EditText;
 import android.widget.FrameLayout;
 import android.widget.FrameLayout.LayoutParams;
 import android.widget.GridView;
@@ -61,6 +62,7 @@ public class MainActivity extends FragmentActivity {
 	private int songIndex = -1;
 	private int page = 1;
 	private boolean autoPlay = false;
+	private String searchText = "";
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -287,8 +289,9 @@ public class MainActivity extends FragmentActivity {
 	 *            - commit search image view
 	 */
 	public void onCommitSearchClicked(View v) {
-		Toast.makeText(this.getApplicationContext(),
-				"You clicked commit search", Toast.LENGTH_SHORT).show();
+		EditText userInput = (EditText) findViewById(R.id.search_text_edit);
+		searchText = userInput.getText().toString();
+		reset();
 		closeKeyboard();
 	}
 
@@ -299,10 +302,8 @@ public class MainActivity extends FragmentActivity {
 	 *            - cancel search image view
 	 */
 	public void onCancelSearchClicked(View v) {
-		Toast.makeText(this.getApplicationContext(),
-				"You clicked cancel search", Toast.LENGTH_SHORT).show();
-		findViewById(R.id.top_menu_1).setVisibility(View.VISIBLE);
-		findViewById(R.id.top_menu_2).setVisibility(View.GONE);
+		searchText = "";
+		reset();
 		closeKeyboard();
 	}
 
@@ -485,6 +486,8 @@ public class MainActivity extends FragmentActivity {
 		data.add(new BasicNameValuePair(Network.COUNT, "" + COUNT));
 		data.add(new BasicNameValuePair(Network.INCLUDE, Network.INCLUDE_ALL));
 		data.add(new BasicNameValuePair(Network.PAGE, "" + page));
+		data.add(new BasicNameValuePair(Network.SEARCH, "" + searchText));
+
 		String url = Network.HOST;
 		url += "?";
 		url += URLEncodedUtils.format(data, "utf-8");
@@ -547,5 +550,14 @@ public class MainActivity extends FragmentActivity {
 
 		JsonArrayRequest req = new JsonArrayRequest(url, onResponse, onError);
 		ApplicationController.getInstance().getRequestQueue().add(req);
+	}
+	
+	private void reset() {
+		songIndex = 0;
+		page = 1;
+		autoPlay = false;
+		SongController.getInstance().reset();
+		adapter.reset();
+		loadSongs();
 	}
 }

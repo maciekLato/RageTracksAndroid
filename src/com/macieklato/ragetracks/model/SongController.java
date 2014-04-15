@@ -100,12 +100,14 @@ public class SongController {
 
 	private void loadSong(Song s) {
 		stop();
-		state = LOADING;
 		song = s;
 		try {
 			media.setDataSource(song.getStreamUrl());
+			state = LOADING;
 		} catch (Exception e) {
 			e.printStackTrace();
+			state = UNINITIALIZED;
+			song = null;
 		}
 		for (SongStateChangeListener listener : listeners) {
 			listener.onLoading(song);
@@ -121,10 +123,7 @@ public class SongController {
 	public void toggle(Song s) {
 		if (state != LOADING) {
 			if (s == song) {
-				if (state == PLAYING)
-					pause();
-				else
-					play();
+				toggle();
 			} else {
 				loadSong(s);
 			}
@@ -170,6 +169,13 @@ public class SongController {
 	
 	public int getState() {
 		return state;
+	}
+	
+	public void reset() {
+		if(state == PLAYING) {
+			pause();
+		}
+		song = null;
 	}
 
 }
