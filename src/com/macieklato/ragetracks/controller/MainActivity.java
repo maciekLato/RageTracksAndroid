@@ -290,7 +290,7 @@ public class MainActivity extends FragmentActivity {
 	 */
 	public void onCommitSearchClicked(View v) {
 		EditText userInput = (EditText) findViewById(R.id.search_text_edit);
-		searchText = userInput.getText().toString();
+		searchText = userInput.getText().toString().toLowerCase();
 		reset();
 		closeKeyboard();
 	}
@@ -508,7 +508,7 @@ public class MainActivity extends FragmentActivity {
 	}
 
 	public boolean dispatchTouchEvent(MotionEvent e) {
-		if(songIndex < 0) {
+		if (songIndex < 0) {
 			loadSongs();
 		}
 		if (e.getRawY() > findViewById(R.id.gridview).getTop()
@@ -555,7 +555,7 @@ public class MainActivity extends FragmentActivity {
 		JsonArrayRequest req = new JsonArrayRequest(url, onResponse, onError);
 		ApplicationController.getInstance().getRequestQueue().add(req);
 	}
-	
+
 	private void reset() {
 		songIndex = 0;
 		page = 1;
