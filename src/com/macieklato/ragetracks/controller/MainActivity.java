@@ -303,6 +303,10 @@ public class MainActivity extends FragmentActivity {
 	 */
 	public void onCancelSearchClicked(View v) {
 		searchText = "";
+		EditText userInput = (EditText) findViewById(R.id.search_text_edit);
+		userInput.setText("");
+		findViewById(R.id.top_menu_1).setVisibility(View.VISIBLE);
+		findViewById(R.id.top_menu_2).setVisibility(View.GONE);
 		reset();
 		closeKeyboard();
 	}
