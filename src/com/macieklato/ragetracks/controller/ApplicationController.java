@@ -15,6 +15,7 @@ public class ApplicationController extends Application {
 	 */
 	private RequestQueue mRequestQueue;
 	private ImageLoader mImageLoader;
+	private String TAG = "RageTracks";
 
 	/**
 	 * A singleton instance of the application class for easy access in other
@@ -70,7 +71,6 @@ public class ApplicationController extends Application {
 						}
 					});
 		}
-
 		return mImageLoader;
 	}
 

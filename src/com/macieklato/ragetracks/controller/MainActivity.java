@@ -11,10 +11,21 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import android.annotation.TargetApi;
+import android.app.PendingIntent;
+import android.content.ComponentName;
 import android.content.Context;
+import android.content.Intent;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
+import android.media.MediaMetadataRetriever;
+import android.media.RemoteControlClient;
+import android.media.RemoteControlClient.MetadataEditor;
+import android.os.Build;
 import android.os.Bundle;
 import android.support.v4.app.FragmentActivity;
 import android.util.Log;
+import android.view.KeyEvent;
 import android.view.LayoutInflater;
 import android.view.MotionEvent;
 import android.view.View;
@@ -38,12 +49,15 @@ import com.android.volley.Response.Listener;
 import com.android.volley.VolleyError;
 import com.android.volley.toolbox.JsonArrayRequest;
 import com.android.volley.toolbox.JsonObjectRequest;
+import com.android.volley.toolbox.ImageLoader.ImageContainer;
+import com.android.volley.toolbox.ImageLoader.ImageListener;
 import com.macieklato.ragetracks.R;
 import com.macieklato.ragetracks.R.id;
+import com.macieklato.ragetracks.listener.OnPullListener;
+import com.macieklato.ragetracks.listener.SongStateChangeListener;
 import com.macieklato.ragetracks.model.Category;
 import com.macieklato.ragetracks.model.Song;
-import com.macieklato.ragetracks.model.SongController;
-import com.macieklato.ragetracks.model.SongStateChangeListener;
+import com.macieklato.ragetracks.receiver.RemoteControlBroadcastReceiver;
 import com.macieklato.ragetracks.util.JSONUtil;
 import com.macieklato.ragetracks.util.Network;
 import com.macieklato.ragetracks.widget.FacebookFragment;
@@ -69,6 +83,10 @@ public class MainActivity extends FragmentActivity {
 	private String category = "";
 	private boolean loading = false;
 
+	// remote variables
+	private RemoteControlClient remoteControlClient;
+	private ComponentName remoteComponentName;
+
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
@@ -77,6 +95,7 @@ public class MainActivity extends FragmentActivity {
 		setListeners(); // initialize state
 		loadCategories();
 		loadSongs();
+		loadRemotes();
 
 		if (savedInstanceState == null) {
 			// Add the fragment on initial activity setup
@@ -87,6 +106,49 @@ public class MainActivity extends FragmentActivity {
 			// Or set the fragment from restored state info
 			facebook = (FacebookFragment) getSupportFragmentManager()
 					.findFragmentById(R.id.login_container);
+		}
+	}
+
+	@Override
+	public void onNewIntent(Intent intent) {
+
+		KeyEvent key = (KeyEvent) intent
+				.getParcelableExtra(Intent.EXTRA_KEY_EVENT);
+		switch (key.getKeyCode()) {
+		case KeyEvent.KEYCODE_HEADSETHOOK:
+		case KeyEvent.KEYCODE_MEDIA_PLAY_PAUSE:
+			songController.toggle();
+			break;
+		case KeyEvent.KEYCODE_MEDIA_PLAY:
+			if (songController.getState() == SongController.PAUSED) {
+				songController.toggle();
+			}
+			break;
+		case KeyEvent.KEYCODE_MEDIA_PAUSE:
+			if (songController.getState() == SongController.PLAYING) {
+				songController.toggle();
+			}
+			break;
+		case KeyEvent.KEYCODE_MEDIA_STOP:
+			songController.stop();
+			break;
+		case KeyEvent.KEYCODE_MEDIA_NEXT:
+			onNextClicked(null);
+			break;
+		case KeyEvent.KEYCODE_MEDIA_PREVIOUS:
+			onPreviousClicked(null);
+			break;
+		default:
+			return;
+		}
+	}
+
+	private void loadRemotes() {
+
+		if (supportsRemoteControlClient()) {
+			remoteComponentName = new ComponentName(ApplicationController
+					.getInstance().getPackageName(),
+					new RemoteControlBroadcastReceiver().ComponentName);
 		}
 	}
 
@@ -129,20 +191,33 @@ public class MainActivity extends FragmentActivity {
 		songController.addStateListener(new SongStateChangeListener() {
 
 			@Override
+			@TargetApi(Build.VERSION_CODES.ICE_CREAM_SANDWICH)
 			public void onPause(Song s) {
 				ImageView button = (ImageView) findViewById(R.id.play_pause_button);
 				button.setImageResource(R.drawable.play);
 				s.setState(Song.PAUSED);
 				adapter.notifyDataSetChanged();
+				if (supportsRemoteControlClient()) {
+					remoteControlClient
+							.setPlaybackState(RemoteControlClient.PLAYSTATE_PAUSED);
+				}
 			}
 
 			@Override
+			@TargetApi(Build.VERSION_CODES.ICE_CREAM_SANDWICH)
 			public void onLoading(Song s) {
 				s.setState(Song.LOADING);
 				adapter.notifyDataSetChanged();
+				if (supportsRemoteControlClient()) {
+					registerRemoteClient();
+					remoteControlClient
+							.setPlaybackState(RemoteControlClient.PLAYSTATE_BUFFERING);
+					updateMetadata(s);
+				}
 			}
 
 			@Override
+			@TargetApi(Build.VERSION_CODES.ICE_CREAM_SANDWICH)
 			public void onPlay(Song s) {
 				ImageView button = (ImageView) findViewById(R.id.play_pause_button);
 				button.setImageResource(R.drawable.pause);
@@ -153,16 +228,35 @@ public class MainActivity extends FragmentActivity {
 						ApplicationController.getInstance().getImageLoader());
 				Log.d("waveform", s.getWaveformUrl());
 				adapter.notifyDataSetChanged();
+
+				// Update remote client now that we are playing
+				if (supportsRemoteControlClient()) {
+					registerRemoteClient();
+					remoteControlClient
+							.setPlaybackState(RemoteControlClient.PLAYSTATE_PLAYING);
+				}
 			}
 
 			@Override
+			@TargetApi(Build.VERSION_CODES.ICE_CREAM_SANDWICH)
 			public void onStop(Song s) {
 				s.setState(Song.IDLE);
 				adapter.notifyDataSetChanged();
+				if (supportsRemoteControlClient()) {
+					if (remoteControlClient != null)
+						remoteControlClient
+								.setPlaybackState(RemoteControlClient.PLAYSTATE_STOPPED);
+				}
 			}
 
 			@Override
+			@TargetApi(Build.VERSION_CODES.ICE_CREAM_SANDWICH)
 			public void onError(Song s) {
+				if (supportsRemoteControlClient()) {
+					if (remoteControlClient != null)
+						remoteControlClient
+								.setPlaybackState(RemoteControlClient.PLAYSTATE_ERROR);
+				}
 				Toast.makeText(c, "Song unavilable", Toast.LENGTH_SHORT).show();
 				// adapter.removeSong(s);
 			}
@@ -198,7 +292,7 @@ public class MainActivity extends FragmentActivity {
 					int visibleItemCount, int totalItemCount) {
 				int lastVisible = firstVisibleItem + visibleItemCount;
 				if (!loading && visibleItemCount > 0
-						&& lastVisible >= totalItemCount-COUNT) {
+						&& lastVisible >= totalItemCount - COUNT) {
 					loadSongs();
 				}
 			}
@@ -528,7 +622,6 @@ public class MainActivity extends FragmentActivity {
 
 	@Override
 	public void onBackPressed() {
-		SongController.getInstance().destroy();
 		super.onBackPressed();
 	}
 
@@ -649,5 +742,107 @@ public class MainActivity extends FragmentActivity {
 		SongController.getInstance().reset();
 		adapter.reset();
 		loadSongs();
+	}
+
+	@TargetApi(Build.VERSION_CODES.ICE_CREAM_SANDWICH)
+	private void registerRemoteClient() {
+		if (!supportsRemoteControlClient())
+			return;
+
+		if (remoteControlClient == null) {
+			songController.getAudioManager().registerMediaButtonEventReceiver(
+					remoteComponentName);
+
+			Intent mediaButtonIntent = new Intent(Intent.ACTION_MEDIA_BUTTON);
+			mediaButtonIntent.setComponent(remoteComponentName);
+			PendingIntent mediaPendingIntent = PendingIntent
+					.getBroadcast(ApplicationController.getInstance()
+							.getApplicationContext(), 0, mediaButtonIntent, 0);
+			remoteControlClient = new RemoteControlClient(mediaPendingIntent);
+			songController.getAudioManager().registerRemoteControlClient(
+					remoteControlClient);
+		}
+
+		// add transport control flags we can to handle
+		remoteControlClient
+				.setTransportControlFlags(RemoteControlClient.FLAG_KEY_MEDIA_PLAY
+						| RemoteControlClient.FLAG_KEY_MEDIA_PAUSE
+						| RemoteControlClient.FLAG_KEY_MEDIA_PLAY_PAUSE
+						| RemoteControlClient.FLAG_KEY_MEDIA_STOP
+						| RemoteControlClient.FLAG_KEY_MEDIA_PREVIOUS
+						| RemoteControlClient.FLAG_KEY_MEDIA_NEXT);
+	}
+
+	// / Unregisters the remote client from the audio manger
+	@TargetApi(Build.VERSION_CODES.ICE_CREAM_SANDWICH)
+	private void unregisterRemoteClient() {
+		if (!supportsRemoteControlClient())
+			return;
+		songController.getAudioManager().unregisterMediaButtonEventReceiver(
+				remoteComponentName);
+		songController.getAudioManager().unregisterRemoteControlClient(
+				remoteControlClient);
+		remoteControlClient = null;
+	}
+
+	// / Updates the metadata on the lock screen
+	@TargetApi(Build.VERSION_CODES.ICE_CREAM_SANDWICH)
+	private void updateMetadata(final Song song) {
+		if (!supportsRemoteControlClient())
+			return;
+		if (remoteControlClient == null)
+			return;
+		setMetadata(song, null);
+		ApplicationController.getInstance().getImageLoader()
+				.get(song.getThumbnailUrl(), new ImageListener() {
+					@Override
+					public void onErrorResponse(VolleyError arg0) {
+						arg0.printStackTrace();
+					}
+
+					@Override
+					public void onResponse(ImageContainer arg0, boolean arg1) {
+						if (song.equals(songController.getSong())) {
+							setMetadata(song, arg0.getBitmap());
+						}
+					}
+				});
+
+	}
+
+	@TargetApi(Build.VERSION_CODES.ICE_CREAM_SANDWICH)
+	private void setMetadata(Song song, Bitmap bmp) {
+		if (!supportsRemoteControlClient())
+			return;
+		if (remoteControlClient == null)
+			return;
+
+		if (bmp == null) {
+			bmp = BitmapFactory.decodeResource(ApplicationController
+					.getInstance().getApplicationContext().getResources(),
+					R.drawable.default_cover);
+		}
+		MetadataEditor metadataEditor = remoteControlClient.editMetadata(true);
+		metadataEditor.putString(MediaMetadataRetriever.METADATA_KEY_ARTIST,
+				song.getArtist());
+		metadataEditor.putString(
+				MediaMetadataRetriever.METADATA_KEY_ALBUMARTIST,
+				song.getArtist());
+		metadataEditor.putString(MediaMetadataRetriever.METADATA_KEY_ALBUM,
+				song.getTitle());
+		metadataEditor.putString(MediaMetadataRetriever.METADATA_KEY_TITLE,
+				song.getTitle());
+		metadataEditor.putBitmap(MetadataEditor.BITMAP_KEY_ARTWORK, bmp);
+		metadataEditor.apply();
+	}
+
+	private boolean supportsRemoteControlClient() {
+		return Build.VERSION.SDK_INT >= Build.VERSION_CODES.ICE_CREAM_SANDWICH;
+	}
+
+	public void onDestroy() {
+		super.onDestroy();
+		songController.destroy();
+		unregisterRemoteClient();
 	}
 }

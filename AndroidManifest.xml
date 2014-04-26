@@ -5,10 +5,11 @@
     android:versionName="1.0" >
 
     <uses-sdk
-        android:minSdkVersion="10"
+        android:minSdkVersion="8"
         android:targetSdkVersion="19" />
 
     <uses-permission android:name="android.permission.INTERNET" />
+    <uses-permission android:name="android.permission.WAKE_LOCK" />
 
     <instrumentation
         android:name="android.test.InstrumentationTestRunner"
@@ -19,16 +20,29 @@
         android:allowBackup="true"
         android:icon="@drawable/rage"
         android:label="@string/app_name"
+        android:showOnLockScreen="true"
         android:theme="@android:style/Theme.NoTitleBar.Fullscreen" >
         <activity
-            android:name="com.macieklato.ragetracks.controller.MainActivity"
-            android:label="@string/app_name" >
+            android:name=".controller.MainActivity"
+            android:label="@string/app_name"
+            android:launchMode="singleTask" >
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
+
+        <receiver android:name=".receiver.MusicBroadcastReceiver" >
+            <intent-filter>
+                <action android:name="android.media.AUDIO_BECOMING_NOISY" />
+            </intent-filter>
+        </receiver>
+        <receiver android:name=".receiver.RemoteControlBroadcastReceiver" >
+            <intent-filter>
+                <action android:name="android.intent.action.MEDIA_BUTTON" />
+            </intent-filter>
+        </receiver>
 
         <meta-data
             android:name="com.facebook.sdk.ApplicationId"

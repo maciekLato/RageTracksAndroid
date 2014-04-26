@@ -16,7 +16,6 @@ import android.widget.TextView;
 
 import com.macieklato.ragetracks.R;
 import com.macieklato.ragetracks.model.Song;
-import com.macieklato.ragetracks.model.SongController;
 import com.macieklato.ragetracks.widget.SquareImageView;
 import com.macieklato.ragetracks.widget.SquareNetworkImageView;
 

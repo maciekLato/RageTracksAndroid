@@ -1,4 +1,6 @@
-package com.macieklato.ragetracks.model;
+package com.macieklato.ragetracks.listener;
+
+import com.macieklato.ragetracks.model.Song;
 
 public interface SongStateChangeListener {
 	public void onPlay(Song s);
