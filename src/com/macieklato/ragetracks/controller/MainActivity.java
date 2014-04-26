@@ -143,6 +143,7 @@ public class MainActivity extends FragmentActivity {
 		}
 	}
 
+	@TargetApi(Build.VERSION_CODES.ICE_CREAM_SANDWICH)
 	private void loadRemotes() {
 
 		if (supportsRemoteControlClient()) {
@@ -367,8 +368,6 @@ public class MainActivity extends FragmentActivity {
 	 *            - the menu button view
 	 */
 	public void onMenuClicked(View v) {
-		Toast.makeText(this.getApplicationContext(), "You clicked menu",
-				Toast.LENGTH_SHORT).show();
 		View v2 = findViewById(R.id.leftmenu);
 		if (v2.getVisibility() == View.VISIBLE) {
 			hideMenu();
@@ -384,8 +383,6 @@ public class MainActivity extends FragmentActivity {
 	 *            - the search button view
 	 */
 	public void onSearchClicked(View v) {
-		Toast.makeText(this.getApplicationContext(), "You clicked search",
-				Toast.LENGTH_SHORT).show();
 		findViewById(R.id.top_menu_1).setVisibility(View.GONE);
 		findViewById(R.id.top_menu_2).setVisibility(View.VISIBLE);
 	}
@@ -410,20 +407,24 @@ public class MainActivity extends FragmentActivity {
 	 *            - cancel search image view
 	 */
 	public void onCancelSearchClicked(View v) {
-		searchText = "";
-		EditText userInput = (EditText) findViewById(R.id.search_text_edit);
-		userInput.setText("");
-		findViewById(R.id.top_menu_1).setVisibility(View.VISIBLE);
-		findViewById(R.id.top_menu_2).setVisibility(View.GONE);
-		reset();
+		if (searchText.length() > 0) {
+			searchText = "";
+			EditText userInput = (EditText) findViewById(R.id.search_text_edit);
+			userInput.setText("");
+			findViewById(R.id.top_menu_1).setVisibility(View.VISIBLE);
+			findViewById(R.id.top_menu_2).setVisibility(View.GONE);
+			reset();
+		}
 		closeKeyboard();
 	}
 
 	private void closeKeyboard() {
 		InputMethodManager inputManager = (InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE);
-		inputManager.hideSoftInputFromWindow(
-				getCurrentFocus().getWindowToken(),
-				InputMethodManager.HIDE_NOT_ALWAYS);
+		View v = getCurrentFocus();
+		if (v != null) {
+			inputManager.hideSoftInputFromWindow(v.getWindowToken(),
+					InputMethodManager.HIDE_NOT_ALWAYS);
+		}
 	}
 
 	/**
@@ -605,11 +606,12 @@ public class MainActivity extends FragmentActivity {
 		data.add(new BasicNameValuePair(Network.COUNT, "" + COUNT));
 		data.add(new BasicNameValuePair(Network.INCLUDE, Network.INCLUDE_ALL));
 		data.add(new BasicNameValuePair(Network.PAGE, "" + page));
-		data.add(new BasicNameValuePair(Network.SEARCH, "" + searchText));
+		if (searchText.length() > 0)
+			data.add(new BasicNameValuePair(Network.SEARCH, "" + searchText));
 
 		String url = Network.HOST;
 		if (category.length() > 0)
-			url += Network.CATEGORY + category;
+			url += Network.CATEGORY + category + "/";
 		url += "?";
 		url += URLEncodedUtils.format(data, "utf-8");
 
