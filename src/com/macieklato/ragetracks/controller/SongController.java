@@ -168,8 +168,11 @@ public class SongController implements OnAudioFocusChangeListener {
 	}
 
 	public void seek(float percent) {
+		seekTo( (int) (player.getDuration() * percent) );
+	}
+	
+	public void seekTo(int seek) {
 		if (state == PLAYING || state == PAUSED) {
-			int seek = (int) (player.getDuration() * percent);
 			int minutes = player.getDuration() / 1000 / 60;
 			int seconds = player.getDuration() / 1000 - (60 * minutes);
 			int seekMinutes = seek / 1000 / 60;
@@ -178,6 +181,10 @@ public class SongController implements OnAudioFocusChangeListener {
 					+ minutes + ":" + seconds);
 			player.seekTo(seek);
 		}
+	}
+	
+	public int getPosition() {
+		return player.getCurrentPosition();
 	}
 
 	public void destroy() {
@@ -203,10 +210,9 @@ public class SongController implements OnAudioFocusChangeListener {
 	}
 
 	public void reset() {
-		if (state == PLAYING) {
-			pause();
-		}
-		song = null;
+		stop();
+		//song = null;
+		releaseWifiLock();
 	}
 
 	public void onAudioFocusChange(int focusChange) {
@@ -222,7 +228,7 @@ public class SongController implements OnAudioFocusChangeListener {
 			player.setVolume(1.0f, 1.0f);// Turn it up!
 			break;
 		case AudioManager.AUDIOFOCUS_LOSS:
-			stop();
+			reset();
 			break;
 		case AudioManager.AUDIOFOCUS_LOSS_TRANSIENT:
 			pause();

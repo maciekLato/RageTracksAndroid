@@ -122,14 +122,14 @@ public class JSONUtil {
 	 * @param attachments
 	 * @return String representing the thumbnail url for the song
 	 * @throws JSONException
-	 *             if attachments->images->medium->url is not in the json array
+	 *             if attachments->images->large->url is not in the json array
 	 */
 	public static String parseAttachments(JSONArray attachments) {
 		try {
 			if (attachments == null)
 				return null;
 			return attachments.getJSONObject(0).getJSONObject("images")
-					.getJSONObject("thumbnail").getString("url");
+					.getJSONObject("large").getString("url");
 		} catch (JSONException e) {
 			e.printStackTrace();
 			return null;

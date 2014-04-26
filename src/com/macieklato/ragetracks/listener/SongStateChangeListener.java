@@ -10,7 +10,7 @@ public interface SongStateChangeListener {
 	public void onPause(Song s);
 
 	public void onStop(Song s);
-
+	
 	public void onError(Song s);
 
 	public void onSongUpdate(int position, int duration);

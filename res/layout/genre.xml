@@ -11,8 +11,8 @@
         android:layout_height="match_parent"
         android:background="@drawable/clickable"
         android:clickable="true"
-        android:padding="5dp"
+        android:padding="10dp"
         android:textColor="#ffffff"
-        android:textSize="12sp" />
+        android:textSize="16sp" />
 
 </FrameLayout>

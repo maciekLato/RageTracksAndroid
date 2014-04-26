@@ -246,7 +246,7 @@ public class MainActivity extends FragmentActivity {
 				if (supportsRemoteControlClient()) {
 					if (remoteControlClient != null)
 						remoteControlClient
-								.setPlaybackState(RemoteControlClient.PLAYSTATE_STOPPED);
+								.setPlaybackState(RemoteControlClient.PLAYSTATE_PAUSED);
 				}
 			}
 
@@ -746,7 +746,7 @@ public class MainActivity extends FragmentActivity {
 		loadSongs();
 	}
 
-	@TargetApi(Build.VERSION_CODES.ICE_CREAM_SANDWICH)
+	@TargetApi(Build.VERSION_CODES.JELLY_BEAN_MR2)
 	private void registerRemoteClient() {
 		if (!supportsRemoteControlClient())
 			return;
