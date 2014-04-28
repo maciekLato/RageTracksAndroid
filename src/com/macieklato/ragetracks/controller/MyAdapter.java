@@ -1,8 +1,5 @@
 package com.macieklato.ragetracks.controller;
 
-import java.util.ArrayList;
-import java.util.List;
-
 import android.content.Context;
 import android.text.TextUtils;
 import android.view.LayoutInflater;
@@ -16,12 +13,12 @@ import android.widget.TextView;
 
 import com.macieklato.ragetracks.R;
 import com.macieklato.ragetracks.model.Song;
+import com.macieklato.ragetracks.service.StreamingBackgroundService;
 import com.macieklato.ragetracks.widget.SquareImageView;
 import com.macieklato.ragetracks.widget.SquareNetworkImageView;
 
 public class MyAdapter extends BaseAdapter {
 
-	private List<Song> items = new ArrayList<Song>();
 	private LayoutInflater inflater;
 
 	public MyAdapter(Context context) {
@@ -30,19 +27,20 @@ public class MyAdapter extends BaseAdapter {
 
 	@Override
 	public int getCount() {
-		return items.size();
+		return SongController.getInstance().getNumSongs();
 	}
 
 	@Override
 	public Object getItem(int i) {
-		if (i < 0 || i >= items.size())
-			return null;
-		return items.get(i);
+		return SongController.getInstance().getSongAt(i);
 	}
 
 	@Override
 	public long getItemId(int i) {
-		return items.get(i).getId();
+		Song song = SongController.getInstance().getSongAt(i);
+		if (song != null)
+			return song.getId();
+		return -1;
 	}
 
 	@Override
@@ -68,7 +66,18 @@ public class MyAdapter extends BaseAdapter {
 
 		v.setOnClickListener(new OnClickListener() {
 			public void onClick(View v) {
-				SongController.getInstance().toggle(song);
+				switch (song.getState()) {
+				case Song.LOADING:
+					break;
+				case Song.IDLE:
+					ApplicationController.getInstance().sendCommand(
+							StreamingBackgroundService.ACTION_LOAD,
+							song.getId());
+					break;
+				default:
+					ApplicationController.getInstance().sendCommand(
+							StreamingBackgroundService.ACTION_TOGGLE_PLAYBACK);
+				}
 			}
 		});
 
@@ -116,25 +125,4 @@ public class MyAdapter extends BaseAdapter {
 
 		return v;
 	}
-
-	public void addSong(Song s) {
-		items.add(s);
-		notifyDataSetChanged();
-	}
-
-	public void removeSong(Song s) {
-		items.remove(s);
-		notifyDataSetChanged();
-	}
-
-	public int getMaxSongIndex() {
-		Song s = items.get(items.size() - 1);
-		return MainActivity.COUNT * (s.getPage() - 1) + s.getIndex();
-	}
-
-	public void reset() {
-		items = new ArrayList<Song>();
-		notifyDataSetChanged();
-	}
-
 }

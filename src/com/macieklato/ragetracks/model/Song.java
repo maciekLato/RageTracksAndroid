@@ -13,8 +13,6 @@ public class Song {
 	private String thumbnailUrl = "";
 	private String rageTracksUrl = "";
 	private String waveformUrl = "";
-	private int page = -1;
-	private int index = -1;
 	private long id = -1;
 	private int state = IDLE;
 
@@ -22,8 +20,7 @@ public class Song {
 	}
 
 	public Song(long id, String rageTracksUrl, String title, String artist,
-			String streamUrl, String thumbnail, int page, int index,
-			String track) {
+			String streamUrl, String thumbnail, String track) {
 		setId(id);
 		setRageTracksUrl(rageTracksUrl);
 		setTitle(title);
@@ -31,8 +28,6 @@ public class Song {
 		setStreamUrl(streamUrl);
 		setThumbnailUrl(thumbnail);
 		setState(IDLE);
-		setPage(page);
-		setIndex(index);
 		setTrack(track);
 	}
 
@@ -62,14 +57,6 @@ public class Song {
 
 	public void setState(int state) {
 		this.state = state;
-	}
-
-	public void setPage(int page) {
-		this.page = page;
-	}
-
-	public void setIndex(int index) {
-		this.index = index;
 	}
 
 	public void setTrack(String track) {
@@ -106,14 +93,6 @@ public class Song {
 
 	public int getState() {
 		return state;
-	}
-
-	public int getPage() {
-		return page;
-	}
-
-	public int getIndex() {
-		return index;
 	}
 
 	public String getTrack() {

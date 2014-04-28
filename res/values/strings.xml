@@ -14,11 +14,13 @@
     <string name="previous_button">Cancel</string>
     <string name="commit_search_button">Commit search button</string>
     <string name="cancel_search_button">Cancel search button</string>
+    <string name="cancel_button">Cancel button</string>
     <string name="open_search_button">Open search button</string>
     <string name="menu_button">Menu button</string>
     <string name="options_button">Options button</string>
     <string name="seek_bar">Seek bar</string>
     <string name="fb_log_in_text">Log In</string>
     <string name="fb_log_out_text">Log Out</string>
+    <string name="album_cover">Album Cover</string>
 
 </resources>

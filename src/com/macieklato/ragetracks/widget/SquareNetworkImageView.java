@@ -22,7 +22,7 @@ public class SquareNetworkImageView extends NetworkImageView {
 	@Override
 	protected void onMeasure(int widthMeasureSpec, int heightMeasureSpec) {
 		super.onMeasure(widthMeasureSpec, heightMeasureSpec);
-		setMeasuredDimension(getMeasuredWidth(), getMeasuredWidth()); // Snap to
-																		// width
+		int size = Math.min(getMeasuredWidth(), getMeasuredWidth());
+		setMeasuredDimension(size, size); // Snap to min dimension
 	}
 }

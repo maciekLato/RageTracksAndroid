@@ -65,8 +65,7 @@ public class JSONUtil {
 				url, thumbnail));
 		if (rageTracksUrl == null || url == null || thumbnail == null)
 			return null;
-		return new Song(id, rageTracksUrl, title, artist, url, thumbnail, page,
-				index, track);
+		return new Song(id, rageTracksUrl, title, artist, url, thumbnail, track);
 	}
 
 	/**
