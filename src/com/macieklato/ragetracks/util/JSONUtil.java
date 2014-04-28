@@ -130,20 +130,17 @@ public class JSONUtil {
 		try {
 			if (attachments == null)
 				return null;
-			if (!StreamingBackgroundService.supportsRemoteControlClient()) {
+			if (!StreamingBackgroundService.supportsRemoteControlClient())
 				return attachments.getJSONObject(0).getJSONObject("images")
 						.getJSONObject("thumbnail").getString("url");
-			} else {
-				int density = ApplicationController.getInstance()
-						.getResources().getDisplayMetrics().densityDpi;
-				if (density > DisplayMetrics.DENSITY_HIGH) {
-					return attachments.getJSONObject(0).getJSONObject("images")
-							.getJSONObject("large").getString("url");
-				} else {
-					return attachments.getJSONObject(0).getJSONObject("images")
-							.getJSONObject("medium").getString("url");
-				}
-			}
+			int density = ApplicationController.getInstance().getResources()
+					.getDisplayMetrics().densityDpi;
+			if (density > DisplayMetrics.DENSITY_HIGH)
+				return attachments.getJSONObject(0).getJSONObject("images")
+						.getJSONObject("large").getString("url");
+			return attachments.getJSONObject(0).getJSONObject("images")
+					.getJSONObject("medium").getString("url");
+
 		} catch (JSONException e) {
 			e.printStackTrace();
 			return null;
