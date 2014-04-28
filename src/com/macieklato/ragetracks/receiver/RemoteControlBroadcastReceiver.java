@@ -19,7 +19,7 @@ public class RemoteControlBroadcastReceiver extends BroadcastReceiver {
 	public void onReceive(Context context, Intent intent) {
 		Log.d(TAG, "onReceive");
 
-		if (intent.getAction() != Intent.ACTION_MEDIA_BUTTON)
+		if (!intent.getAction().equals(Intent.ACTION_MEDIA_BUTTON))
 			return;
 
 		// The event will fire twice, up and down.

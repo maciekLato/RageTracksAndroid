@@ -1,9 +1,9 @@
 package com.macieklato.ragetracks.widget;
 
-import com.android.volley.toolbox.NetworkImageView;
-
 import android.content.Context;
 import android.util.AttributeSet;
+
+import com.android.volley.toolbox.NetworkImageView;
 
 public class SquareNetworkImageView extends NetworkImageView {
 	public SquareNetworkImageView(Context context) {

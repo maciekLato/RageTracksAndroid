@@ -1,8 +1,5 @@
 package com.macieklato.ragetracks.widget;
 
-import com.android.volley.toolbox.ImageLoader;
-import com.android.volley.toolbox.NetworkImageView;
-
 import android.content.Context;
 import android.graphics.Color;
 import android.util.AttributeSet;
@@ -11,6 +8,9 @@ import android.view.View;
 import android.widget.ImageView.ScaleType;
 import android.widget.RelativeLayout;
 import android.widget.SeekBar.OnSeekBarChangeListener;
+
+import com.android.volley.toolbox.ImageLoader;
+import com.android.volley.toolbox.NetworkImageView;
 
 public class WaveformSeekBar extends RelativeLayout {
 

@@ -16,14 +16,17 @@ public class UpdateBroadcastReceiver extends BroadcastReceiver {
 	public String ComponentName = UpdateBroadcastReceiver.class.getName();
 
 	public void onReceive(Context context, Intent intent) {
-		Log.d(TAG, "onReceive");
+		Log.d(TAG, "onReceive: " + intent.getAction());
 
-		if (intent.getAction() != StreamingBackgroundService.ACTION_UPDATE
-				&& intent.getAction() != ApplicationController.ACTION_UPDATE)
+		if (!intent.getAction()
+				.equals(StreamingBackgroundService.ACTION_UPDATE)
+				&& !intent.getAction().equals(
+						ApplicationController.ACTION_UPDATE))
 			return;
-
+		
 		intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
 		intent.setClass(context, MainActivity.class);
 		context.startActivity(intent);
+
 	}
 }

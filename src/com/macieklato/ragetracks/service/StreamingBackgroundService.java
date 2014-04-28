@@ -1,14 +1,15 @@
 package com.macieklato.ragetracks.service;
 
 import android.annotation.TargetApi;
-import android.app.Notification;
 import android.app.PendingIntent;
 import android.app.Service;
 import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
+import android.content.res.Resources;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.graphics.BitmapFactory.Options;
 import android.media.AudioManager;
 import android.media.AudioManager.OnAudioFocusChangeListener;
 import android.media.MediaMetadataRetriever;
@@ -22,12 +23,15 @@ import android.os.Build;
 import android.os.Handler;
 import android.os.IBinder;
 import android.os.PowerManager;
+import android.support.v4.app.NotificationCompat;
+import android.support.v4.app.TaskStackBuilder;
 import android.util.Log;
 import android.widget.RemoteViews;
 
 import com.android.volley.Response.Listener;
 import com.macieklato.ragetracks.R;
 import com.macieklato.ragetracks.controller.ApplicationController;
+import com.macieklato.ragetracks.controller.MainActivity;
 import com.macieklato.ragetracks.controller.SongController;
 import com.macieklato.ragetracks.model.Song;
 import com.macieklato.ragetracks.receiver.RemoteControlBroadcastReceiver;
@@ -38,15 +42,15 @@ public class StreamingBackgroundService extends Service implements
 	public final String TAG = "StreamingBackgroundService";
 
 	// Extras
-	public final static String EXTRA_SONG_ID = "extra.SONG_ID";
+	public final static String EXTRA_SONG_ID = "com.macieklato.ragetracks.extra.SONG_ID";
 	public final static long DEFAULT_SONG_ID = -1;
-	public final static String EXTRA_ABSOLUTE_POSITION = "extra.ABS_POSITION";
-	public final static String EXTRA_RELATIVE_POSITION = "extra.REL_POSITION";
+	public final static String EXTRA_ABSOLUTE_POSITION = "com.macieklato.ragetracks.extra.ABS_POSITION";
+	public final static String EXTRA_RELATIVE_POSITION = "com.macieklato.ragetracks.extra.REL_POSITION";
 	public final static int DEFAULT_POSITION = -1;
-	public final static String EXTRA_DURATION = "extra.DURATION";
+	public final static String EXTRA_DURATION = "com.macieklato.ragetracks.extra.DURATION";
 
 	// Actions
-	public final static String EXTRA_ACTION = "extra.ACTION";
+	public final static String EXTRA_ACTION = "com.macieklato.ragetracks.extra.ACTION";
 	public final static int DEFAULT_ACTION = -1;
 	public final static int ACTION_PLAY = 0;
 	public final static int ACTION_LOAD = 1;
@@ -59,8 +63,8 @@ public class StreamingBackgroundService extends Service implements
 	public final static int ACTION_KILL = 8;
 
 	// Updates
-	public final static String ACTION_UPDATE = "com.example.mediastreamer.action.UPDATE";
-	public final static String EXTRA_UPDATE = "com.example.mediastreamer.extra.UPDATE";
+	public final static String ACTION_UPDATE = "com.macieklato.ragetracks.action.UPDATE";
+	public final static String EXTRA_UPDATE = "com.macieklato.ragetracks.extra.UPDATE";
 	public final static int UPDATE_PLAY = 0;
 	public final static int UPDATE_PAUSE = 1;
 	public final static int UPDATE_STOP = 2;
@@ -76,13 +80,11 @@ public class StreamingBackgroundService extends Service implements
 	private RemoteControlClient remoteControlClient;
 	private ComponentName remoteComponentName;
 	private Song song;
-	private Notification notification;
-	private RemoteViews remoteViews;
 	private Handler h;
 	private Runnable update;
 	private boolean init;
 
-	private final int NOTIFICATION_ID = 1;
+	private final int NOTIFICATION_ID = 101293;
 
 	public void onCreate() {
 		super.onCreate();
@@ -364,11 +366,25 @@ public class StreamingBackgroundService extends Service implements
 	@TargetApi(Build.VERSION_CODES.HONEYCOMB)
 	private void startForeground(Bitmap bmp) {
 		Log.d(TAG, "startForeground");
-		if (notification == null) {
-			notification = new Notification();
-			notification.icon = R.drawable.rage;
 
-			remoteViews = new RemoteViews(getPackageName(), R.layout.widget);
+		NotificationCompat.Builder mNotifyBuilder = new NotificationCompat.Builder(
+				this).setSmallIcon(R.drawable.rage)
+				.setContentTitle(song.getTitle())
+				.setContentText(song.getArtist());
+
+		Intent resultIntent = new Intent(this, MainActivity.class);
+		TaskStackBuilder stackBuilder = TaskStackBuilder.create(this);
+		stackBuilder.addParentStack(MainActivity.class);
+		stackBuilder.addNextIntent(resultIntent);
+		PendingIntent resultPendingIntent = stackBuilder.getPendingIntent(1,
+				PendingIntent.FLAG_UPDATE_CURRENT);
+		mNotifyBuilder.setContentIntent(resultPendingIntent);
+
+		if (supportsCustomNotification()) {
+			RemoteViews remoteViews = new RemoteViews(getPackageName(),
+					R.layout.widget);
+			remoteViews.setTextViewText(R.id.remote_artist, song.getArtist());
+			remoteViews.setTextViewText(R.id.remote_title, song.getTitle());
 
 			Intent nextIntent = new Intent(getApplicationContext(),
 					StreamingBackgroundService.class);
@@ -406,30 +422,43 @@ public class StreamingBackgroundService extends Service implements
 			remoteViews.setOnClickPendingIntent(R.id.remote_cancel_button,
 					cancelPendingIntent);
 
-			notification.contentView = remoteViews;
-		}
+			mNotifyBuilder.setContent(remoteViews);
 
-		if (song != null) {
-			notification.tickerText = String.format("%s - %s", song.getTitle(),
-					song.getArtist());
-			remoteViews.setTextViewText(R.id.remote_artist, song.getArtist());
-			remoteViews.setTextViewText(R.id.remote_title, song.getTitle());
 			if (bmp == null) {
-				remoteViews.setImageViewResource(R.id.remote_picture,
+				bmp = BitmapFactory.decodeResource(getResources(),
 						R.drawable.default_cover);
+
+				Resources res = getResources();
+				final int size = res
+						.getDimensionPixelSize(android.R.dimen.notification_large_icon_height);
+
+				Options opts = new Options();
+				opts.outHeight = size;
+				opts.outWidth = size;
+
+				bmp = BitmapFactory.decodeResource(getResources(),
+						R.drawable.default_cover, opts);
+				mNotifyBuilder.setLargeIcon(bmp);
+
 				ApplicationController.getInstance().getBitmap(
 						song.getThumbnailUrl(), new Listener<Bitmap>() {
+
 							@Override
 							public void onResponse(Bitmap bmp) {
-								startForeground(bmp);
+								Bitmap img = Bitmap.createScaledBitmap(bmp,
+										size, size, true);
+								bmp.recycle();
+								startForeground(img);
 							}
 						});
+
 			} else {
-				remoteViews.setImageViewBitmap(R.id.remote_picture, bmp);
+				mNotifyBuilder.setLargeIcon(bmp);
 			}
 		}
 
-		startForeground(NOTIFICATION_ID, notification);
+		startForeground(NOTIFICATION_ID, mNotifyBuilder.build());
+
 	}
 
 	@TargetApi(Build.VERSION_CODES.ICE_CREAM_SANDWICH)
@@ -444,7 +473,7 @@ public class StreamingBackgroundService extends Service implements
 			remoteControlClient
 					.setPlaybackState(RemoteControlClient.PLAYSTATE_PAUSED);
 		}
-
+		stopForeground(false);
 		stopUpdateLooper();
 	}
 
@@ -460,6 +489,7 @@ public class StreamingBackgroundService extends Service implements
 					remoteControlClient
 							.setPlaybackState(RemoteControlClient.PLAYSTATE_STOPPED);
 			}
+			stopForeground(false);
 		}
 		stopUpdateLooper();
 	}
@@ -521,6 +551,7 @@ public class StreamingBackgroundService extends Service implements
 		reset();
 		player.release();
 		ApplicationController.getInstance().destroy();
+		stopForeground(true);
 	}
 
 	public void onAudioFocusChange(int focusChange) {
@@ -548,6 +579,10 @@ public class StreamingBackgroundService extends Service implements
 	public boolean supportsRemoteControlClient() {
 		Log.d(TAG, "supportsRemoteControlClient");
 		return Build.VERSION.SDK_INT >= Build.VERSION_CODES.ICE_CREAM_SANDWICH;
+	}
+
+	public boolean supportsCustomNotification() {
+		return Build.VERSION.SDK_INT >= Build.VERSION_CODES.HONEYCOMB;
 	}
 
 	private void sendUpdate(int update) {

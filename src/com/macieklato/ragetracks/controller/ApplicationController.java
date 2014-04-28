@@ -42,8 +42,8 @@ public class ApplicationController extends Application {
 	public static final String REQUEST_TAG = "RageTracks";
 
 	// Updates
-	public static final String ACTION_UPDATE = "action.APP_UPDATE";
-	public static final String EXTRA_UPDATE = "extra.APP_UPDATE";
+	public static final String ACTION_UPDATE = "com.macieklato.ragetracks.action.APP_UPDATE";
+	public static final String EXTRA_UPDATE = "com.macieklato.ragetracks.extra.APP_UPDATE";
 	public static final int UPDATE_LOADING_SONGS = 0;
 	public static final int UPDATE_FINISH_LOADING_SONGS = 1;
 	public static final int UPDATE_ERROR_LOADING_SONGS = 2;

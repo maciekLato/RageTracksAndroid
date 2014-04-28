@@ -35,7 +35,6 @@ import com.android.volley.Response.Listener;
 import com.android.volley.VolleyError;
 import com.android.volley.toolbox.JsonObjectRequest;
 import com.macieklato.ragetracks.R;
-import com.macieklato.ragetracks.R.id;
 import com.macieklato.ragetracks.listener.OnPullListener;
 import com.macieklato.ragetracks.model.Category;
 import com.macieklato.ragetracks.model.Song;
@@ -106,7 +105,7 @@ public class MainActivity extends FragmentActivity {
 	protected void onNewIntent(Intent intent) {
 		Log.d(TAG, "onNewIntent");
 
-		if (intent.getAction() == ApplicationController.ACTION_UPDATE) {
+		if (intent.getAction().equals(ApplicationController.ACTION_UPDATE)) {
 			int code = intent.getIntExtra(ApplicationController.EXTRA_UPDATE,
 					-1);
 			switch (code) {
@@ -132,36 +131,38 @@ public class MainActivity extends FragmentActivity {
 				finish();
 				break;
 			}
-		}
-
-		long id = intent.getLongExtra(StreamingBackgroundService.EXTRA_SONG_ID,
-				-1);
-		Song s = SongController.getInstance().getSongById(id);
-		switch (intent.getIntExtra(StreamingBackgroundService.EXTRA_UPDATE, -1)) {
-		case StreamingBackgroundService.UPDATE_PLAY:
-			onSongPlay(s);
-			break;
-		case StreamingBackgroundService.UPDATE_PAUSE:
-			onSongPause(s);
-			break;
-		case StreamingBackgroundService.UPDATE_STOP:
-			onSongStop(s);
-			break;
-		case StreamingBackgroundService.UPDATE_LOADING:
-			onSongLoading(s);
-			break;
-		case StreamingBackgroundService.UPDATE_POSITION:
-			int position = intent.getIntExtra(
-					StreamingBackgroundService.EXTRA_ABSOLUTE_POSITION, -1);
-			int duration = intent.getIntExtra(
-					StreamingBackgroundService.EXTRA_DURATION, -1);
-			onPosition(position, duration);
-			break;
-		case StreamingBackgroundService.UPDATE_ERROR:
-			onSongError(s);
-			break;
-		default:
-			break;
+		} else if (intent.getAction().equals(
+				StreamingBackgroundService.ACTION_UPDATE)) {
+			long id = intent.getLongExtra(
+					StreamingBackgroundService.EXTRA_SONG_ID, -1);
+			Song s = SongController.getInstance().getSongById(id);
+			switch (intent.getIntExtra(StreamingBackgroundService.EXTRA_UPDATE,
+					-1)) {
+			case StreamingBackgroundService.UPDATE_PLAY:
+				onSongPlay(s);
+				break;
+			case StreamingBackgroundService.UPDATE_PAUSE:
+				onSongPause(s);
+				break;
+			case StreamingBackgroundService.UPDATE_STOP:
+				onSongStop(s);
+				break;
+			case StreamingBackgroundService.UPDATE_LOADING:
+				onSongLoading(s);
+				break;
+			case StreamingBackgroundService.UPDATE_POSITION:
+				int position = intent.getIntExtra(
+						StreamingBackgroundService.EXTRA_ABSOLUTE_POSITION, -1);
+				int duration = intent.getIntExtra(
+						StreamingBackgroundService.EXTRA_DURATION, -1);
+				onPosition(position, duration);
+				break;
+			case StreamingBackgroundService.UPDATE_ERROR:
+				onSongError(s);
+				break;
+			default:
+				break;
+			}
 		}
 	}
 
@@ -581,7 +582,7 @@ public class MainActivity extends FragmentActivity {
 	public void onBookmarksListClicked(View v) {
 		Log.d(TAG, "onBookmarksListClicked");
 
-		if (findViewById(id.bookmark_scroller).getVisibility() == View.VISIBLE) {
+		if (findViewById(R.id.bookmark_scroller).getVisibility() == View.VISIBLE) {
 			closeBookmarks();
 		} else {
 			openBookmarks();
@@ -612,7 +613,7 @@ public class MainActivity extends FragmentActivity {
 	public void onGenresListClicked(View v) {
 		Log.d(TAG, "onGenresListClicked");
 
-		if (findViewById(id.genre_scroller).getVisibility() == View.VISIBLE) {
+		if (findViewById(R.id.genre_scroller).getVisibility() == View.VISIBLE) {
 			closeGenres();
 		} else {
 			openGenres();
