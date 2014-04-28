@@ -9,10 +9,13 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import android.util.DisplayMetrics;
 import android.util.Log;
 
+import com.macieklato.ragetracks.controller.ApplicationController;
 import com.macieklato.ragetracks.model.Category;
 import com.macieklato.ragetracks.model.Song;
+import com.macieklato.ragetracks.service.StreamingBackgroundService;
 
 public class JSONUtil {
 
@@ -127,8 +130,20 @@ public class JSONUtil {
 		try {
 			if (attachments == null)
 				return null;
-			return attachments.getJSONObject(0).getJSONObject("images")
-					.getJSONObject("large").getString("url");
+			if (!StreamingBackgroundService.supportsRemoteControlClient()) {
+				return attachments.getJSONObject(0).getJSONObject("images")
+						.getJSONObject("thumbnail").getString("url");
+			} else {
+				int density = ApplicationController.getInstance()
+						.getResources().getDisplayMetrics().densityDpi;
+				if (density > DisplayMetrics.DENSITY_HIGH) {
+					return attachments.getJSONObject(0).getJSONObject("images")
+							.getJSONObject("large").getString("url");
+				} else {
+					return attachments.getJSONObject(0).getJSONObject("images")
+							.getJSONObject("medium").getString("url");
+				}
+			}
 		} catch (JSONException e) {
 			e.printStackTrace();
 			return null;

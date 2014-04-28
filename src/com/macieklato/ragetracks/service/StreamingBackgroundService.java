@@ -1,6 +1,7 @@
 package com.macieklato.ragetracks.service;
 
 import android.annotation.TargetApi;
+import android.app.Notification;
 import android.app.PendingIntent;
 import android.app.Service;
 import android.content.ComponentName;
@@ -9,7 +10,6 @@ import android.content.Intent;
 import android.content.res.Resources;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
-import android.graphics.BitmapFactory.Options;
 import android.media.AudioManager;
 import android.media.AudioManager.OnAudioFocusChangeListener;
 import android.media.MediaMetadataRetriever;
@@ -23,7 +23,6 @@ import android.os.Build;
 import android.os.Handler;
 import android.os.IBinder;
 import android.os.PowerManager;
-import android.support.v4.app.NotificationCompat;
 import android.support.v4.app.TaskStackBuilder;
 import android.util.Log;
 import android.widget.RemoteViews;
@@ -83,6 +82,8 @@ public class StreamingBackgroundService extends Service implements
 	private Handler h;
 	private Runnable update;
 	private boolean init;
+	private Notification notification;
+	private RemoteViews remoteViews;
 
 	private final int NOTIFICATION_ID = 101293;
 
@@ -95,6 +96,52 @@ public class StreamingBackgroundService extends Service implements
 		initializeRemote();
 		initializePlayer();
 		initializeUpdate();
+		initializeNotification();
+	}
+
+	private void initializeNotification() {
+		notification = new Notification();
+		notification.icon = R.drawable.rage;
+		if (supportsCustomNotification()) {
+			remoteViews = new RemoteViews(getPackageName(), R.layout.widget);
+
+			Intent nextIntent = new Intent(getApplicationContext(),
+					StreamingBackgroundService.class);
+			nextIntent.putExtra(EXTRA_ACTION, ACTION_NEXT);
+			PendingIntent nextPendingIntent = PendingIntent.getService(
+					getApplicationContext(), 0, nextIntent,
+					PendingIntent.FLAG_UPDATE_CURRENT);
+			remoteViews.setOnClickPendingIntent(R.id.remote_next_button,
+					nextPendingIntent);
+
+			Intent previousIntent = new Intent(getApplicationContext(),
+					StreamingBackgroundService.class);
+			previousIntent.putExtra(EXTRA_ACTION, ACTION_PREVIOUS);
+			PendingIntent previousPendingIntent = PendingIntent.getService(
+					getApplicationContext(), 1, previousIntent,
+					PendingIntent.FLAG_UPDATE_CURRENT);
+			remoteViews.setOnClickPendingIntent(R.id.remote_previous_button,
+					previousPendingIntent);
+
+			Intent toggleIntent = new Intent(getApplicationContext(),
+					StreamingBackgroundService.class);
+			toggleIntent.putExtra(EXTRA_ACTION, ACTION_TOGGLE_PLAYBACK);
+			PendingIntent togglePendingIntent = PendingIntent.getService(
+					getApplicationContext(), 2, toggleIntent,
+					PendingIntent.FLAG_UPDATE_CURRENT);
+			remoteViews.setOnClickPendingIntent(R.id.remote_play_pause_button,
+					togglePendingIntent);
+
+			Intent cancelIntent = new Intent(getApplicationContext(),
+					StreamingBackgroundService.class);
+			cancelIntent.putExtra(EXTRA_ACTION, ACTION_KILL);
+			PendingIntent cancelPendingIntent = PendingIntent.getService(
+					getApplicationContext(), 3, cancelIntent,
+					PendingIntent.FLAG_UPDATE_CURRENT);
+			remoteViews.setOnClickPendingIntent(R.id.remote_cancel_button,
+					cancelPendingIntent);
+			notification.contentView = remoteViews;
+		}
 	}
 
 	private void initializeUpdate() {
@@ -168,7 +215,9 @@ public class StreamingBackgroundService extends Service implements
 					song.getThumbnailUrl(), new Listener<Bitmap>() {
 						@Override
 						public void onResponse(Bitmap bmp) {
-							setMetadata(song, bmp);
+							if (bmp != null) {
+								setMetadata(song, bmp);
+							}
 						}
 					});
 		}
@@ -367,98 +416,50 @@ public class StreamingBackgroundService extends Service implements
 	private void startForeground(Bitmap bmp) {
 		Log.d(TAG, "startForeground");
 
-		NotificationCompat.Builder mNotifyBuilder = new NotificationCompat.Builder(
-				this).setSmallIcon(R.drawable.rage)
-				.setContentTitle(song.getTitle())
-				.setContentText(song.getArtist());
+		if (notification == null || remoteViews == null) {
+			initializeNotification();
+		}
 
-		Intent resultIntent = new Intent(this, MainActivity.class);
-		TaskStackBuilder stackBuilder = TaskStackBuilder.create(this);
-		stackBuilder.addParentStack(MainActivity.class);
-		stackBuilder.addNextIntent(resultIntent);
-		PendingIntent resultPendingIntent = stackBuilder.getPendingIntent(1,
-				PendingIntent.FLAG_UPDATE_CURRENT);
-		mNotifyBuilder.setContentIntent(resultPendingIntent);
-
-		if (supportsCustomNotification()) {
-			RemoteViews remoteViews = new RemoteViews(getPackageName(),
-					R.layout.widget);
+		if (!supportsCustomNotification()) {
+			Intent resultIntent = new Intent(this, MainActivity.class);
+			TaskStackBuilder stackBuilder = TaskStackBuilder.create(this);
+			stackBuilder.addParentStack(MainActivity.class);
+			stackBuilder.addNextIntent(resultIntent);
+			PendingIntent resultPendingIntent = stackBuilder.getPendingIntent(
+					0, PendingIntent.FLAG_UPDATE_CURRENT);
+			notification.setLatestEventInfo(getApplicationContext(),
+					song.getTitle(), song.getArtist(), resultPendingIntent);
+		} else {
 			remoteViews.setTextViewText(R.id.remote_artist, song.getArtist());
 			remoteViews.setTextViewText(R.id.remote_title, song.getTitle());
-
-			Intent nextIntent = new Intent(getApplicationContext(),
-					StreamingBackgroundService.class);
-			nextIntent.putExtra(EXTRA_ACTION, ACTION_NEXT);
-			PendingIntent nextPendingIntent = PendingIntent.getService(
-					getApplicationContext(), 0, nextIntent,
-					PendingIntent.FLAG_UPDATE_CURRENT);
-			remoteViews.setOnClickPendingIntent(R.id.remote_next_button,
-					nextPendingIntent);
-
-			Intent previousIntent = new Intent(getApplicationContext(),
-					StreamingBackgroundService.class);
-			previousIntent.putExtra(EXTRA_ACTION, ACTION_PREVIOUS);
-			PendingIntent previousPendingIntent = PendingIntent.getService(
-					getApplicationContext(), 1, previousIntent,
-					PendingIntent.FLAG_UPDATE_CURRENT);
-			remoteViews.setOnClickPendingIntent(R.id.remote_previous_button,
-					previousPendingIntent);
-
-			Intent toggleIntent = new Intent(getApplicationContext(),
-					StreamingBackgroundService.class);
-			toggleIntent.putExtra(EXTRA_ACTION, ACTION_TOGGLE_PLAYBACK);
-			PendingIntent togglePendingIntent = PendingIntent.getService(
-					getApplicationContext(), 2, toggleIntent,
-					PendingIntent.FLAG_UPDATE_CURRENT);
-			remoteViews.setOnClickPendingIntent(R.id.remote_play_pause_button,
-					togglePendingIntent);
-
-			Intent cancelIntent = new Intent(getApplicationContext(),
-					StreamingBackgroundService.class);
-			cancelIntent.putExtra(EXTRA_ACTION, ACTION_KILL);
-			PendingIntent cancelPendingIntent = PendingIntent.getService(
-					getApplicationContext(), 3, cancelIntent,
-					PendingIntent.FLAG_UPDATE_CURRENT);
-			remoteViews.setOnClickPendingIntent(R.id.remote_cancel_button,
-					cancelPendingIntent);
-
-			mNotifyBuilder.setContent(remoteViews);
-
 			if (bmp == null) {
-				bmp = BitmapFactory.decodeResource(getResources(),
-						R.drawable.default_cover);
-
 				Resources res = getResources();
 				final int size = res
 						.getDimensionPixelSize(android.R.dimen.notification_large_icon_height);
 
-				Options opts = new Options();
-				opts.outHeight = size;
-				opts.outWidth = size;
-
-				bmp = BitmapFactory.decodeResource(getResources(),
-						R.drawable.default_cover, opts);
-				mNotifyBuilder.setLargeIcon(bmp);
+				remoteViews.setImageViewResource(R.id.remote_picture,
+						R.drawable.default_cover);
 
 				ApplicationController.getInstance().getBitmap(
 						song.getThumbnailUrl(), new Listener<Bitmap>() {
 
 							@Override
 							public void onResponse(Bitmap bmp) {
-								Bitmap img = Bitmap.createScaledBitmap(bmp,
-										size, size, true);
-								bmp.recycle();
-								startForeground(img);
+								if (bmp != null) {
+									Bitmap img = Bitmap.createScaledBitmap(bmp,
+											size, size, true);
+									bmp.recycle();
+									startForeground(img);
+								}
 							}
 						});
 
 			} else {
-				mNotifyBuilder.setLargeIcon(bmp);
+				remoteViews.setImageViewBitmap(R.id.remote_picture, bmp);
 			}
 		}
 
-		startForeground(NOTIFICATION_ID, mNotifyBuilder.build());
-
+		startForeground(NOTIFICATION_ID, notification);
 	}
 
 	@TargetApi(Build.VERSION_CODES.ICE_CREAM_SANDWICH)
@@ -473,7 +474,7 @@ public class StreamingBackgroundService extends Service implements
 			remoteControlClient
 					.setPlaybackState(RemoteControlClient.PLAYSTATE_PAUSED);
 		}
-		stopForeground(false);
+		stopForeground(!supportsCustomNotification());
 		stopUpdateLooper();
 	}
 
@@ -576,12 +577,11 @@ public class StreamingBackgroundService extends Service implements
 		}
 	}
 
-	public boolean supportsRemoteControlClient() {
-		Log.d(TAG, "supportsRemoteControlClient");
+	public static boolean supportsRemoteControlClient() {
 		return Build.VERSION.SDK_INT >= Build.VERSION_CODES.ICE_CREAM_SANDWICH;
 	}
 
-	public boolean supportsCustomNotification() {
+	public static boolean supportsCustomNotification() {
 		return Build.VERSION.SDK_INT >= Build.VERSION_CODES.HONEYCOMB;
 	}
 
