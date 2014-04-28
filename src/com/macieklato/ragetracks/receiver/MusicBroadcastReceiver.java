@@ -21,6 +21,7 @@ public class MusicBroadcastReceiver extends BroadcastReceiver {
 			return;
 
 		// signal the service to stop!
-		ApplicationController.getInstance().sendCommand(StreamingBackgroundService.ACTION_STOP);
+		ApplicationController.getInstance().sendCommand(
+				StreamingBackgroundService.ACTION_STOP);
 	}
 }

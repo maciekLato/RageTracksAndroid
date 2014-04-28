@@ -121,7 +121,7 @@ public class Song {
 
 	public boolean equals(Object obj) {
 		if (obj instanceof Song) {
-			return this.track.equals(((Song) obj).track);
+			return this.id == ((Song) obj).id;
 		}
 		return false;
 	}

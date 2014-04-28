@@ -195,12 +195,14 @@ public class ApplicationController extends Application {
 		Log.d(TAG, "sendUpdate");
 		Intent intent = new Intent(ACTION_UPDATE);
 		intent.putExtra(EXTRA_UPDATE, update);
-		intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-		intent.setClass(getApplicationContext(), MainActivity.class);
-		startActivity(intent);
+		sendBroadcast(intent);
 	}
 
-	public synchronized void loadSongs() {
+	public void loadSongs() {
+		loadSongs(COUNT);
+	}
+
+	public synchronized void loadSongs(int count) {
 		Log.d(TAG, "loadSongs");
 		if (loading)
 			return;
@@ -239,7 +241,7 @@ public class ApplicationController extends Application {
 
 		List<NameValuePair> data = new ArrayList<NameValuePair>();
 		data.add(new BasicNameValuePair(Network.JSON, "1"));
-		data.add(new BasicNameValuePair(Network.COUNT, "" + COUNT));
+		data.add(new BasicNameValuePair(Network.COUNT, "" + count));
 		data.add(new BasicNameValuePair(Network.INCLUDE, Network.INCLUDE_ALL));
 		data.add(new BasicNameValuePair(Network.PAGE, "" + page));
 		if (search.length() > 0)
@@ -259,7 +261,7 @@ public class ApplicationController extends Application {
 		getRequestQueue().add(req);
 	}
 
-	private void getWaveformUrls(final ArrayList<Song> songs,
+	public void getWaveformUrls(final ArrayList<Song> songs,
 			final ArrayList<String> tracks) {
 		Log.d(TAG, "getWaveformUrls");
 

@@ -110,11 +110,15 @@ public class SongController {
 		songs.clear();
 	}
 
-	public void setActiveSong(Song s) {		
+	public void setActiveSong(Song s) {
 		songIndex = songs.indexOf(s);
 	}
 
 	public void destroy() {
 		instance = null;
+	}
+
+	public boolean getAutoPlay() {
+		return autoPlay;
 	}
 }
