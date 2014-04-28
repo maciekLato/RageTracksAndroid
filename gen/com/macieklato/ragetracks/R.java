@@ -291,6 +291,7 @@ containing a value of this type.
         public static final int menu_button=0x7f04000f;
         public static final int next_button=0x7f04001c;
         public static final int normal=0x7f040001;
+        public static final int notification=0x7f04003f;
         public static final int options_button=0x7f04001e;
         public static final int overlay=0x7f04003c;
         public static final int picker_subtitle=0x7f040033;
@@ -298,6 +299,13 @@ containing a value of this type.
         public static final int play_pause_button=0x7f04001b;
         public static final int previous_button=0x7f04001a;
         public static final int progressBar=0x7f04003d;
+        public static final int remote_artist=0x7f040042;
+        public static final int remote_cancel_button=0x7f040046;
+        public static final int remote_next_button=0x7f040045;
+        public static final int remote_picture=0x7f040040;
+        public static final int remote_play_pause_button=0x7f040044;
+        public static final int remote_previous_button=0x7f040043;
+        public static final int remote_title=0x7f040041;
         public static final int right_menu=0x7f04000c;
         public static final int search_button=0x7f040011;
         public static final int search_menu=0x7f040013;
@@ -331,13 +339,16 @@ containing a value of this type.
         public static final int genre=0x7f03000f;
         public static final int grid_item=0x7f030010;
         public static final int login_fragment=0x7f030011;
+        public static final int widget=0x7f030012;
     }
     public static final class string {
+        public static final int album_cover=0x7f07002d;
         public static final int app_id=0x7f07001a;
         public static final int app_name=0x7f070019;
         public static final int bookmark_button=0x7f070020;
         public static final int bookmarks=0x7f07001c;
         public static final int cancel=0x7f07001e;
+        public static final int cancel_button=0x7f070026;
         public static final int cancel_search_button=0x7f070025;
         public static final int com_facebook_choose_friends=0x7f07000f;
         public static final int com_facebook_dialogloginactivity_ok_button=0x7f070000;
@@ -365,17 +376,17 @@ containing a value of this type.
         public static final int com_facebook_usersettingsfragment_logged_in=0x7f070009;
         public static final int com_facebook_usersettingsfragment_not_logged_in=0x7f07000a;
         public static final int commit_search_button=0x7f070024;
-        public static final int fb_log_in_text=0x7f07002a;
-        public static final int fb_log_out_text=0x7f07002b;
+        public static final int fb_log_in_text=0x7f07002b;
+        public static final int fb_log_out_text=0x7f07002c;
         public static final int genres=0x7f07001d;
-        public static final int menu_button=0x7f070027;
+        public static final int menu_button=0x7f070028;
         public static final int next_button=0x7f070021;
         public static final int nowplaying=0x7f07001b;
-        public static final int open_search_button=0x7f070026;
-        public static final int options_button=0x7f070028;
+        public static final int open_search_button=0x7f070027;
+        public static final int options_button=0x7f070029;
         public static final int play_pause_button=0x7f070022;
         public static final int previous_button=0x7f070023;
-        public static final int seek_bar=0x7f070029;
+        public static final int seek_bar=0x7f07002a;
         public static final int share_button=0x7f07001f;
     }
     public static final class style {

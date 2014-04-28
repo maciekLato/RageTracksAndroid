@@ -454,6 +454,7 @@ public class StreamingBackgroundService extends Service implements
 		if (isPrepared() && player.isPlaying()) {
 			player.stop();
 			sendUpdate(UPDATE_STOP);
+			song = null;
 			if (supportsRemoteControlClient()) {
 				if (remoteControlClient != null)
 					remoteControlClient
@@ -493,6 +494,7 @@ public class StreamingBackgroundService extends Service implements
 
 	private void reset() {
 		Log.d(TAG, "reset");
+		song = null;
 		player.reset();
 		releaseWifiLock();
 		unregisterRemoteClient();
