@@ -19,6 +19,7 @@ public class WaveformSeekBar extends RelativeLayout {
 	private int progress = 0;
 	private int max = 1000;
 	private OnSeekBarChangeListener listener;
+	private String waveformUrl;
 
 	public WaveformSeekBar(Context context) {
 		super(context);
@@ -51,6 +52,7 @@ public class WaveformSeekBar extends RelativeLayout {
 	}
 
 	public void setWaveformUrl(String url, ImageLoader imageLoader) {
+		waveformUrl = url;
 		waveform.setImageUrl(url, imageLoader);
 	}
 
@@ -117,5 +119,9 @@ public class WaveformSeekBar extends RelativeLayout {
 
 	public void setOnSeekBarChangeListener(OnSeekBarChangeListener listener) {
 		this.listener = listener;
+	}
+
+	public String getWaveformUrl() {
+		return waveformUrl;
 	}
 }

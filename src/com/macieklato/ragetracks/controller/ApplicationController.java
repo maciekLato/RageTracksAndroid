@@ -53,7 +53,7 @@ public class ApplicationController extends Application {
 	public static final int UPDATE_ERROR_LOADING_WAVEFORMS = 5;
 	public static final int UPDATE_FINISH = 6;
 
-	public static final int COUNT = 10;
+	public static final int COUNT = 50;
 
 	/**
 	 * Global variables

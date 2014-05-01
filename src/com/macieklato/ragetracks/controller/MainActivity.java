@@ -137,6 +137,8 @@ public class MainActivity extends FragmentActivity {
 			long id = intent.getLongExtra(
 					StreamingBackgroundService.EXTRA_SONG_ID, -1);
 			Song s = SongController.getInstance().getSongById(id);
+			if (s == null)
+				return;
 			switch (intent.getIntExtra(StreamingBackgroundService.EXTRA_UPDATE,
 					-1)) {
 			case StreamingBackgroundService.UPDATE_PLAY:
@@ -156,7 +158,7 @@ public class MainActivity extends FragmentActivity {
 						StreamingBackgroundService.EXTRA_ABSOLUTE_POSITION, -1);
 				int duration = intent.getIntExtra(
 						StreamingBackgroundService.EXTRA_DURATION, -1);
-				onPosition(position, duration);
+				onPosition(s, position, duration);
 				break;
 			case StreamingBackgroundService.UPDATE_ERROR:
 				onSongError(s);
@@ -176,7 +178,6 @@ public class MainActivity extends FragmentActivity {
 		WaveformSeekBar seekBar = (WaveformSeekBar) findViewById(R.id.seek_bar);
 		seekBar.setWaveformUrl(s.getWaveformUrl(), ApplicationController
 				.getInstance().getImageLoader());
-		Log.d("waveform", s.getWaveformUrl());
 		adapter.notifyDataSetChanged();
 	}
 
@@ -211,7 +212,7 @@ public class MainActivity extends FragmentActivity {
 				Toast.LENGTH_SHORT).show();
 	}
 
-	private void onPosition(int position, int duration) {
+	private void onPosition(Song s, int position, int duration) {
 		Log.d(TAG, "onPosition");
 
 		int minutes = duration / 1000 / 60;
@@ -226,6 +227,12 @@ public class MainActivity extends FragmentActivity {
 				currentSeconds));
 		TextView totalTime = (TextView) findViewById(R.id.total_time);
 		totalTime.setText(String.format("%d:%02d", minutes, seconds));
+		totalTime.setText(String.format("%d:%02d", minutes, seconds));
+
+		if (seek.getWaveformUrl() == null) {
+			seek.setWaveformUrl(s.getWaveformUrl(), ApplicationController
+					.getInstance().getImageLoader());
+		}
 	}
 
 	private void onSongsLoading() {
@@ -335,9 +342,7 @@ public class MainActivity extends FragmentActivity {
 				Log.d(TAG, "onScroll");
 
 				int lastVisible = firstVisibleItem + visibleItemCount;
-				if (visibleItemCount > 0
-						&& lastVisible >= totalItemCount
-								- ApplicationController.COUNT) {
+				if (visibleItemCount > 0 && lastVisible >= totalItemCount / 2.0) {
 					ApplicationController.getInstance().loadSongs();
 				}
 			}

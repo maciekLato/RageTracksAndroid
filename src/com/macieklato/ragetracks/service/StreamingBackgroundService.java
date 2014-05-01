@@ -104,6 +104,14 @@ public class StreamingBackgroundService extends Service implements
 		notification.icon = R.drawable.rage;
 		if (supportsCustomNotification()) {
 			remoteViews = new RemoteViews(getPackageName(), R.layout.widget);
+			
+			Intent mainIntent = new Intent(getApplicationContext(),
+					MainActivity.class);
+			PendingIntent mainPendingIntent = PendingIntent.getActivity(
+					getApplicationContext(), 0, mainIntent,
+					PendingIntent.FLAG_UPDATE_CURRENT);
+			remoteViews.setOnClickPendingIntent(R.id.notification,
+					mainPendingIntent);
 
 			Intent nextIntent = new Intent(getApplicationContext(),
 					StreamingBackgroundService.class);
