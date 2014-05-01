@@ -68,8 +68,9 @@ public class MainActivity extends FragmentActivity {
 		gridView = (GridView) findViewById(R.id.gridview);
 		setListeners(); // initialize state
 		loadCategories();
-		if (SongController.getInstance().getNumSongs() <= 0)
+		if (SongController.getInstance().getNumSongs() <= 0) {
 			ApplicationController.getInstance().loadSongs();
+		}
 
 		if (savedInstanceState == null) {
 			// Add the fragment on initial activity setup
@@ -573,67 +574,47 @@ public class MainActivity extends FragmentActivity {
 		}
 	}
 
-	/**
-	 * callback for clicking bookmark header in left-side menu
+	/*
+	 * public void onBookmarksListClicked(View v) { Log.d(TAG,
+	 * "onBookmarksListClicked");
 	 * 
-	 * @param v
-	 *            - bookmark header view
-	 */
-	public void onBookmarksListClicked(View v) {
-		Log.d(TAG, "onBookmarksListClicked");
-
-		if (findViewById(R.id.bookmark_scroller).getVisibility() == View.VISIBLE) {
-			closeBookmarks();
-		} else {
-			openBookmarks();
-		}
-	}
-
-	private void closeBookmarks() {
-		Log.d(TAG, "closeBookmarks");
-
-		findViewById(R.id.bookmark_scroller).setVisibility(View.GONE);
-		findViewById(R.id.bookmark_menu_text).setBackgroundColor(0xff000000);
-	}
-
-	private void openBookmarks() {
-		Log.d(TAG, "openBookmarks");
-
-		findViewById(R.id.bookmark_scroller).setVisibility(View.VISIBLE);
-		findViewById(R.id.bookmark_menu_text).setBackgroundColor(0xff222222);
-		closeGenres();
-	}
-
-	/**
-	 * callback for clicking genre header in left-side menu
+	 * if (findViewById(R.id.bookmark_scroller).getVisibility() == View.VISIBLE)
+	 * { closeBookmarks(); } else { openBookmarks(); }
 	 * 
-	 * @param v
-	 *            - genre header view
+	 * }
+	 * 
+	 * private void closeBookmarks() { Log.d(TAG, "closeBookmarks");
+	 * 
+	 * findViewById(R.id.bookmark_scroller).setVisibility(View.GONE);
+	 * findViewById(R.id.bookmark_menu_text).setBackgroundColor(0xff000000);
+	 * 
+	 * }
+	 * 
+	 * private void openBookmarks() { Log.d(TAG, "openBookmarks");
+	 * 
+	 * findViewById(R.id.bookmark_scroller).setVisibility(View.VISIBLE);
+	 * findViewById(R.id.bookmark_menu_text).setBackgroundColor(0xff222222);
+	 * closeGenres();
+	 * 
+	 * }
+	 * 
+	 * public void onGenresListClicked(View v) { Log.d(TAG,
+	 * "onGenresListClicked");
+	 * 
+	 * if (findViewById(R.id.genre_scroller).getVisibility() == View.VISIBLE) {
+	 * closeGenres(); } else { openGenres(); } }
+	 * 
+	 * private void closeGenres() { Log.d(TAG, "closeGenres");
+	 * 
+	 * findViewById(R.id.genre_scroller).setVisibility(View.GONE);
+	 * findViewById(R.id.genre_menu_text).setBackgroundColor(0xff000000); }
+	 * 
+	 * private void openGenres() { Log.d(TAG, "openGenres");
+	 * 
+	 * findViewById(R.id.genre_scroller).setVisibility(View.VISIBLE);
+	 * findViewById(R.id.genre_menu_text).setBackgroundColor(0xff222222);
+	 * closeBookmarks(); }
 	 */
-	public void onGenresListClicked(View v) {
-		Log.d(TAG, "onGenresListClicked");
-
-		if (findViewById(R.id.genre_scroller).getVisibility() == View.VISIBLE) {
-			closeGenres();
-		} else {
-			openGenres();
-		}
-	}
-
-	private void closeGenres() {
-		Log.d(TAG, "closeGenres");
-
-		findViewById(R.id.genre_scroller).setVisibility(View.GONE);
-		findViewById(R.id.genre_menu_text).setBackgroundColor(0xff000000);
-	}
-
-	private void openGenres() {
-		Log.d(TAG, "openGenres");
-
-		findViewById(R.id.genre_scroller).setVisibility(View.VISIBLE);
-		findViewById(R.id.genre_menu_text).setBackgroundColor(0xff222222);
-		closeBookmarks();
-	}
 
 	private void loadCategories() {
 		Log.d(TAG, "loadCategories");

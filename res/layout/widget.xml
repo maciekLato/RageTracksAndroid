@@ -3,12 +3,14 @@
     android:id="@+id/notification"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:orientation="horizontal" >
+    android:orientation="horizontal"
+    android:background="#000000" >
 
     <ImageView
         android:id="@+id/remote_picture"
         android:layout_width="@dimen/large_icon_width"
         android:layout_height="@dimen/large_icon_height"
+        android:contentDescription="@string/album_cover"
         android:scaleType="fitXY" />
 
     <LinearLayout

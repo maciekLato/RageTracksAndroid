@@ -23,6 +23,9 @@ import com.macieklato.ragetracks.model.Song;
 
 public class FacebookFragment extends Fragment {
 
+	public static final String TAG = "FacebookFragment";
+	public static final int SHARE_REQUEST = 123;
+
 	private Session.StatusCallback callback = new Session.StatusCallback() {
 		@Override
 		public void call(Session session, SessionState state,
@@ -32,6 +35,8 @@ public class FacebookFragment extends Fragment {
 	};
 
 	private UiLifecycleHelper uiHelper;
+	private LoginButton authButton;
+	private Song postSong;
 
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
@@ -44,8 +49,7 @@ public class FacebookFragment extends Fragment {
 	public View onCreateView(LayoutInflater inflater, ViewGroup container,
 			Bundle savedInstanceState) {
 		View view = inflater.inflate(R.layout.login_fragment, container, false);
-		LoginButton authButton = (LoginButton) view
-				.findViewById(R.id.authButton);
+		authButton = (LoginButton) view.findViewById(R.id.authButton);
 		authButton.setPublishPermissions("publish_actions");
 		authButton.setFragment(this);
 
@@ -55,9 +59,13 @@ public class FacebookFragment extends Fragment {
 	private void onSessionStateChange(Session session, SessionState state,
 			Exception exception) {
 		if (state.isOpened()) {
-			Log.i("fb", "Logged in...");
+			Log.i(TAG, "Logged in...");
+			if (postSong != null) {
+				share(postSong);
+				postSong = null;
+			}
 		} else if (state.isClosed()) {
-			Log.i("fb", "Logged out...");
+			Log.i(TAG, "Logged out...");
 		}
 	}
 
@@ -76,14 +84,13 @@ public class FacebookFragment extends Fragment {
 					@Override
 					public void onError(FacebookDialog.PendingCall pendingCall,
 							Exception error, Bundle data) {
-						Log.e("facebook",
-								String.format("Error: %s", error.toString()));
+						Log.e(TAG, String.format("Error: %s", error.toString()));
 					}
 
 					@Override
 					public void onComplete(
 							FacebookDialog.PendingCall pendingCall, Bundle data) {
-						Log.i("facebook", "Success!");
+						Log.i(TAG, "Success!");
 					}
 				});
 	}
@@ -107,23 +114,32 @@ public class FacebookFragment extends Fragment {
 	}
 
 	public void share(Song s) {
-		if (FacebookDialog.canPresentShareDialog(getActivity()
-				.getApplicationContext(),
-				FacebookDialog.ShareDialogFeature.SHARE_DIALOG)) {
-			// Publish the post using the Share Dialog
-			FacebookDialog shareDialog = new FacebookDialog.ShareDialogBuilder(
-					getActivity()).setLink(s.getRageTracksUrl())
-					.setPicture(s.getThumbnailUrl())
-					.setCaption(s.getArtist() + " - " + s.getTitle()).build();
-			uiHelper.trackPendingDialogCall(shareDialog.present());
-
+		if (s == null)
+			return;
+		Session session = Session.getActiveSession();
+		if (session == null || !session.isOpened()) {
+			authButton.performClick();
+			postSong = s;
 		} else {
-			// Fallback. For example, publish the post using the Feed Dialog
-			publishFeedDialog(s);
+			if (FacebookDialog.canPresentShareDialog(getActivity()
+					.getApplicationContext(),
+					FacebookDialog.ShareDialogFeature.SHARE_DIALOG)) {
+				// Publish the post using the Share Dialog
+				FacebookDialog shareDialog = new FacebookDialog.ShareDialogBuilder(
+						getActivity()).setLink(s.getRageTracksUrl())
+						.setPicture(s.getThumbnailUrl())
+						.setCaption(s.getArtist() + " - " + s.getTitle())
+						.setRequestCode(SHARE_REQUEST).build();
+				uiHelper.trackPendingDialogCall(shareDialog.present());
+
+			} else {
+				// Fallback. For example, publish the post using the Feed Dialog
+				publishFeedDialog(s);
+			}
 		}
 	}
 
-	private void publishFeedDialog(Song s) {
+	private void publishFeedDialog(final Song s) {
 		Bundle params = new Bundle();
 		params.putString("caption", s.getArtist() + " - " + s.getTitle());
 		params.putString("link", s.getRageTracksUrl());
@@ -141,8 +157,10 @@ public class FacebookFragment extends Fragment {
 							// and the post Id.
 							final String postId = values.getString("post_id");
 							if (postId != null) {
-								Toast.makeText(getActivity(),
-										"Posted song, id: " + postId,
+								Toast.makeText(
+										getActivity(),
+										"Posted song: " + s.getTitle() + " - "
+												+ s.getArtist(),
 										Toast.LENGTH_SHORT).show();
 							} else {
 								// User clicked the Cancel button

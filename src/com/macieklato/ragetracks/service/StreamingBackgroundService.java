@@ -163,7 +163,7 @@ public class StreamingBackgroundService extends Service implements
 		h.removeCallbacks(update);
 	}
 
-	@TargetApi(Build.VERSION_CODES.ICE_CREAM_SANDWICH)
+	@TargetApi(Build.VERSION_CODES.JELLY_BEAN_MR2)
 	private void initializeRemote() {
 		if (!supportsRemoteControlClient())
 			return;
@@ -175,13 +175,24 @@ public class StreamingBackgroundService extends Service implements
 		PendingIntent mediaPendingIntent = PendingIntent.getBroadcast(this, 0,
 				mediaButtonIntent, 0);
 		remoteControlClient = new RemoteControlClient(mediaPendingIntent);
-		remoteControlClient
-				.setTransportControlFlags(RemoteControlClient.FLAG_KEY_MEDIA_PLAY
-						| RemoteControlClient.FLAG_KEY_MEDIA_PAUSE
-						| RemoteControlClient.FLAG_KEY_MEDIA_PLAY_PAUSE
-						| RemoteControlClient.FLAG_KEY_MEDIA_STOP
-						| RemoteControlClient.FLAG_KEY_MEDIA_PREVIOUS
-						| RemoteControlClient.FLAG_KEY_MEDIA_NEXT);
+		if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN_MR2) {
+			remoteControlClient
+					.setTransportControlFlags(RemoteControlClient.FLAG_KEY_MEDIA_PLAY
+							| RemoteControlClient.FLAG_KEY_MEDIA_PAUSE
+							| RemoteControlClient.FLAG_KEY_MEDIA_PLAY_PAUSE
+							| RemoteControlClient.FLAG_KEY_MEDIA_STOP
+							| RemoteControlClient.FLAG_KEY_MEDIA_PREVIOUS
+							| RemoteControlClient.FLAG_KEY_MEDIA_NEXT
+							| RemoteControlClient.FLAG_KEY_MEDIA_POSITION_UPDATE);
+		} else {
+			remoteControlClient
+					.setTransportControlFlags(RemoteControlClient.FLAG_KEY_MEDIA_PLAY
+							| RemoteControlClient.FLAG_KEY_MEDIA_PAUSE
+							| RemoteControlClient.FLAG_KEY_MEDIA_PLAY_PAUSE
+							| RemoteControlClient.FLAG_KEY_MEDIA_STOP
+							| RemoteControlClient.FLAG_KEY_MEDIA_PREVIOUS
+							| RemoteControlClient.FLAG_KEY_MEDIA_NEXT);
+		}
 	}
 
 	@TargetApi(Build.VERSION_CODES.ICE_CREAM_SANDWICH)

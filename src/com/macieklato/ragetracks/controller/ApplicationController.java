@@ -18,6 +18,7 @@ import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.os.AsyncTask;
 import android.util.Log;
+import android.widget.Toast;
 
 import com.android.volley.RequestQueue;
 import com.android.volley.Response.ErrorListener;
@@ -139,9 +140,11 @@ public class ApplicationController extends Application {
 
 	public void setSearch(String str) {
 		search = str;
+		category = "";
 	}
 
 	public void setCategroy(String str) {
+		search = "";
 		category = str;
 	}
 
@@ -213,14 +216,21 @@ public class ApplicationController extends Application {
 				try {
 					JSONArray arr = obj.getJSONArray(Network.POSTS);
 					ArrayList<Song> songs = JSONUtil.parsePosts(arr, page);
-					ArrayList<String> tracks = new ArrayList<String>();
-					for (Song s : songs) {
-						tracks.add(s.getTrack());
+					if (songs.size() <= 0) {
+						Toast.makeText(
+								getApplicationContext(),
+								"Sorry, no songs matching this genre or search.",
+								Toast.LENGTH_SHORT).show();
+					} else {
+						ArrayList<String> tracks = new ArrayList<String>();
+						for (Song s : songs) {
+							tracks.add(s.getTrack());
+						}
+						getWaveformUrls(songs, tracks);
+						if (songs.size() > 0)
+							page++;
+						SongController.getInstance().addSongs(songs);
 					}
-					getWaveformUrls(songs, tracks);
-					if (songs.size() > 0)
-						page++;
-					SongController.getInstance().addSongs(songs);
 				} catch (JSONException e) {
 					e.printStackTrace();
 				}
@@ -252,6 +262,8 @@ public class ApplicationController extends Application {
 			url += Network.CATEGORY + category + "/";
 		url += "?";
 		url += URLEncodedUtils.format(data, "utf-8");
+
+		Log.d(TAG, "loadSongs: " + url);
 
 		sendUpdate(UPDATE_LOADING_SONGS);
 
@@ -296,6 +308,8 @@ public class ApplicationController extends Application {
 		url += "?";
 		url += URLEncodedUtils.format(data, "utf-8");
 
+		Log.d(TAG, "getWaveforms: " + url);
+
 		sendUpdate(UPDATE_LOADING_WAVEFORMS);
 
 		JsonArrayRequest req = new JsonArrayRequest(url, onResponse, onError);
@@ -308,9 +322,9 @@ public class ApplicationController extends Application {
 	}
 
 	public void reset() {
+		cancelAll();
 		page = 0;
 		SongController.getInstance().reset();
-		cancelAll();
 		sendUpdate(UPDATE_FINISH_LOADING_SONGS);
 	}
 
