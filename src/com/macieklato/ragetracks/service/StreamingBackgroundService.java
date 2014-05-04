@@ -437,8 +437,11 @@ public class StreamingBackgroundService extends Service implements
 					song.getThumbnailUrl(), new Listener<Bitmap>() {
 						@Override
 						public void onResponse(Bitmap bmp) {
-							if (bmp != null && !bmp.isRecycled()
-									&& original.equals(song)) {
+							if (bmp == null || bmp.isRecycled()
+									|| !original.equals(song)) {
+								return;
+							}
+							if (supportsRemoteControlClient()) {
 								if (lockScreenAlbum != null) {
 									lockScreenAlbum.recycle();
 								}
@@ -446,6 +449,8 @@ public class StreamingBackgroundService extends Service implements
 										bmp, bmp.getWidth(), bmp.getHeight(),
 										true);
 								updateMetadata(song);
+							}
+							if (supportsCustomNotification()) {
 
 								int width = (int) getResources().getDimension(
 										R.dimen.large_icon_width);
@@ -467,9 +472,9 @@ public class StreamingBackgroundService extends Service implements
 								remoteViews.setImageViewBitmap(
 										R.id.remote_picture, notificationAlbum);
 								updateNotification();
-								bmp.recycle();
 								temp.recycle();
 							}
+							bmp.recycle();
 						}
 					});
 		}
