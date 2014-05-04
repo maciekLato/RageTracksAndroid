@@ -47,6 +47,8 @@ public class MyAdapter extends BaseAdapter {
 	public View getView(int i, View view, ViewGroup viewGroup) {
 		View v = view;
 		final Song song = (Song) getItem(i);
+		if (song == null)
+			return null;
 
 		if (v == null) {
 			v = inflater.inflate(R.layout.grid_item, null, false);

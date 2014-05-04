@@ -69,7 +69,7 @@
             android:layout_weight="1"
             android:contentDescription="@string/play_pause_button"
             android:padding="10dp"
-            android:src="@drawable/play" />
+            android:src="@drawable/pause" />
 
         <ImageView
             android:id="@+id/remote_next_button"

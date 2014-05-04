@@ -2,12 +2,12 @@ package com.macieklato.ragetracks.service;
 
 import android.annotation.TargetApi;
 import android.app.Notification;
+import android.app.NotificationManager;
 import android.app.PendingIntent;
 import android.app.Service;
 import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
-import android.content.res.Resources;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.media.AudioManager;
@@ -84,6 +84,8 @@ public class StreamingBackgroundService extends Service implements
 	private boolean init;
 	private Notification notification;
 	private RemoteViews remoteViews;
+	private Bitmap lockScreenAlbum;
+	private Bitmap notificationAlbum;
 
 	private final int NOTIFICATION_ID = 101293;
 
@@ -104,7 +106,7 @@ public class StreamingBackgroundService extends Service implements
 		notification.icon = R.drawable.rage;
 		if (supportsCustomNotification()) {
 			remoteViews = new RemoteViews(getPackageName(), R.layout.widget);
-			
+
 			Intent mainIntent = new Intent(getApplicationContext(),
 					MainActivity.class);
 			PendingIntent mainPendingIntent = PendingIntent.getActivity(
@@ -229,16 +231,7 @@ public class StreamingBackgroundService extends Service implements
 			return;
 
 		if (song != null) {
-			setMetadata(song, null);
-			ApplicationController.getInstance().getBitmap(
-					song.getThumbnailUrl(), new Listener<Bitmap>() {
-						@Override
-						public void onResponse(Bitmap bmp) {
-							if (bmp != null) {
-								setMetadata(song, bmp);
-							}
-						}
-					});
+			setMetadata(song, lockScreenAlbum);
 		}
 	}
 
@@ -389,6 +382,11 @@ public class StreamingBackgroundService extends Service implements
 				remoteControlClient
 						.setPlaybackState(RemoteControlClient.PLAYSTATE_PLAYING);
 			}
+			if (supportsCustomNotification()) {
+				remoteViews.setImageViewResource(R.id.remote_play_pause_button,
+						R.drawable.pause);
+				updateNotification();
+			}
 			startUpdateLooper();
 		}
 	}
@@ -418,17 +416,69 @@ public class StreamingBackgroundService extends Service implements
 			sendUpdate(UPDATE_LOADING);
 			player.prepareAsync();
 			aquireWifiLock();
-			startForeground(null);
+			startForeground(notificationAlbum);
 			if (supportsRemoteControlClient()) {
 				registerRemoteClient();
 				remoteControlClient
 						.setPlaybackState(RemoteControlClient.PLAYSTATE_BUFFERING);
 				updateMetadata(song);
 			}
+			updateArt();
 		} catch (Exception e) {
 			e.printStackTrace();
 			sendUpdate(UPDATE_ERROR);
 		}
+	}
+
+	private void updateArt() {
+		if (song != null) {
+			final Song original = song;
+			ApplicationController.getInstance().getBitmap(
+					song.getThumbnailUrl(), new Listener<Bitmap>() {
+						@Override
+						public void onResponse(Bitmap bmp) {
+							if (bmp != null && !bmp.isRecycled()
+									&& original.equals(song)) {
+								if (lockScreenAlbum != null) {
+									lockScreenAlbum.recycle();
+								}
+								lockScreenAlbum = Bitmap.createScaledBitmap(
+										bmp, bmp.getWidth(), bmp.getHeight(),
+										true);
+								updateMetadata(song);
+
+								int width = (int) getResources().getDimension(
+										R.dimen.large_icon_width);
+								int height = (int) getResources().getDimension(
+										R.dimen.large_icon_height);
+
+								if (notificationAlbum == null) {
+									notificationAlbum = Bitmap.createBitmap(
+											width, height, bmp.getConfig());
+								}
+
+								Bitmap temp = Bitmap.createScaledBitmap(bmp,
+										width, height, true);
+								int[] pixels = new int[width * height];
+								temp.getPixels(pixels, 0, width, 0, 0, width,
+										height);
+								notificationAlbum.setPixels(pixels, 0, width,
+										0, 0, width, height);
+								remoteViews.setImageViewBitmap(
+										R.id.remote_picture, notificationAlbum);
+								updateNotification();
+								bmp.recycle();
+								temp.recycle();
+							}
+						}
+					});
+		}
+	}
+
+	private synchronized void updateNotification() {
+		NotificationManager nm = (NotificationManager) this
+				.getSystemService(NOTIFICATION_SERVICE);
+		nm.notify(NOTIFICATION_ID, notification);
 	}
 
 	@TargetApi(Build.VERSION_CODES.HONEYCOMB)
@@ -452,27 +502,8 @@ public class StreamingBackgroundService extends Service implements
 			remoteViews.setTextViewText(R.id.remote_artist, song.getArtist());
 			remoteViews.setTextViewText(R.id.remote_title, song.getTitle());
 			if (bmp == null) {
-				Resources res = getResources();
-				final int size = res
-						.getDimensionPixelSize(android.R.dimen.notification_large_icon_height);
-
 				remoteViews.setImageViewResource(R.id.remote_picture,
 						R.drawable.default_cover);
-
-				ApplicationController.getInstance().getBitmap(
-						song.getThumbnailUrl(), new Listener<Bitmap>() {
-
-							@Override
-							public void onResponse(Bitmap bmp) {
-								if (bmp != null) {
-									Bitmap img = Bitmap.createScaledBitmap(bmp,
-											size, size, true);
-									bmp.recycle();
-									startForeground(img);
-								}
-							}
-						});
-
 			} else {
 				remoteViews.setImageViewBitmap(R.id.remote_picture, bmp);
 			}
@@ -492,6 +523,11 @@ public class StreamingBackgroundService extends Service implements
 		if (supportsRemoteControlClient()) {
 			remoteControlClient
 					.setPlaybackState(RemoteControlClient.PLAYSTATE_PAUSED);
+		}
+		if (supportsCustomNotification()) {
+			remoteViews.setImageViewResource(R.id.remote_play_pause_button,
+					R.drawable.play);
+			updateNotification();
 		}
 		stopForeground(!supportsCustomNotification());
 		stopUpdateLooper();
@@ -572,6 +608,12 @@ public class StreamingBackgroundService extends Service implements
 		player.release();
 		ApplicationController.getInstance().destroy();
 		stopForeground(true);
+		if (notificationAlbum != null) {
+			notificationAlbum.recycle();
+		}
+		if (lockScreenAlbum != null) {
+			lockScreenAlbum.recycle();
+		}
 	}
 
 	public void onAudioFocusChange(int focusChange) {

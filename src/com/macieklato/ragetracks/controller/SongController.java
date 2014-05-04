@@ -8,6 +8,12 @@ import android.util.Log;
 import com.macieklato.ragetracks.model.Song;
 import com.macieklato.ragetracks.service.StreamingBackgroundService;
 
+/**
+ * Controls the list of songs, and makes requests when needed
+ * 
+ * @author justin
+ * 
+ */
 public class SongController {
 
 	public static final String TAG = "SongController";
@@ -25,6 +31,9 @@ public class SongController {
 		autoPlay = false;
 	}
 
+	/**
+	 * @return SongController, will create if null
+	 */
 	public static synchronized SongController getInstance() {
 		if (instance == null) {
 			instance = new SongController();
@@ -32,6 +41,11 @@ public class SongController {
 		return instance;
 	}
 
+	/**
+	 * @param id
+	 *            - songid
+	 * @return Song with the given id, or null
+	 */
 	public Song getSongById(long id) {
 		Log.d(TAG, "getSongById");
 
@@ -42,6 +56,9 @@ public class SongController {
 		return null;
 	}
 
+	/**
+	 * @return current Song, or null
+	 */
 	public Song getSong() {
 		Log.d(TAG, "getSong");
 
@@ -50,6 +67,10 @@ public class SongController {
 		return songs.get(songIndex);
 	}
 
+	/**
+	 * @param index
+	 * @return Song at index i, or null
+	 */
 	public Song getSongAt(int index) {
 		Log.d(TAG, "getSongAt");
 
@@ -58,6 +79,11 @@ public class SongController {
 		return songs.get(index);
 	}
 
+	/**
+	 * Retrieves the next song in the list, or returns null and loads more songs
+	 * 
+	 * @return next Song in list or null
+	 */
 	public Song nextSong() {
 		Log.d(TAG, "getNextSong");
 
@@ -71,6 +97,12 @@ public class SongController {
 		return s;
 	}
 
+	/**
+	 * Retrieves the previous song in the list, or the current song if no
+	 * previous song
+	 * 
+	 * @return previous Song in list or null
+	 */
 	public Song previousSong() {
 		Log.d(TAG, "getPreviousSong");
 
@@ -78,6 +110,12 @@ public class SongController {
 		return getSong();
 	}
 
+	/**
+	 * adds a Song to the list
+	 * 
+	 * @param song
+	 *            - Song
+	 */
 	public void addSong(Song song) {
 		Log.d(TAG, "addSong");
 
@@ -89,6 +127,12 @@ public class SongController {
 		}
 	}
 
+	/**
+	 * adds a list of songs to the list
+	 * 
+	 * @param songs
+	 *            - list of Songs
+	 */
 	public void addSongs(List<Song> songs) {
 		Log.d(TAG, "addSongs");
 
@@ -100,24 +144,46 @@ public class SongController {
 		}
 	}
 
+	/**
+	 * @return length of song list
+	 */
 	public int getNumSongs() {
 		return songs.size();
 	}
 
+	/**
+	 * clears song list and resets current song index to 0
+	 */
 	public void reset() {
 		songIndex = 0;
 		autoPlay = false;
 		songs.clear();
 	}
 
+	/**
+	 * skips to the given song, adds to list if necessary
+	 * 
+	 * @param s
+	 *            - Song
+	 */
 	public void setActiveSong(Song s) {
 		songIndex = songs.indexOf(s);
+		if (s != null && songIndex < 0) {
+			songIndex = songs.size();
+			songs.add(s);
+		}
 	}
 
+	/**
+	 * removes singleton and list
+	 */
 	public void destroy() {
 		instance = null;
 	}
 
+	/**
+	 * @return if currently set to auto-play
+	 */
 	public boolean getAutoPlay() {
 		return autoPlay;
 	}

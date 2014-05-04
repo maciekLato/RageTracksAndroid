@@ -147,6 +147,12 @@ public class JSONUtil {
 		}
 	}
 
+	/**
+	 * parses the waveform image urls from the JSONObjects returned by sound cloud
+	 * 
+	 * @param arr - JSONArray of items to be parsed
+	 * @return Map<String, String> a hashmap from song track string to waveform image url
+	 */
 	public static Map<String, String> parseWaveformUrls(JSONArray arr) {
 		Map<String, String> map = new HashMap<String, String>();
 		for (int i = 0; i < arr.length(); i++) {
@@ -160,13 +166,24 @@ public class JSONUtil {
 		return map;
 	}
 
+	/**
+	 * parses a single waveform url form a json object
+	 * @param map - the map to append with the new key, value
+	 * @param obj - the json object containing the waveform url
+	 * @throws JSONException - if json ojbect does not have id or waveform_url items
+	 */
 	private static void parseWaveformUrl(Map<String, String> map, JSONObject obj)
 			throws JSONException {
-		String key = "" + obj.getInt("id");
+		String key = "" + obj.getLong("id");
 		String value = obj.getString("waveform_url");
 		map.put(key, value);
 	}
 
+	/**
+	 * parses categories from JSONArray
+	 * @param arr - JSONArray
+	 * @return ArrayList<Category>
+	 */
 	public static ArrayList<Category> parseCategories(JSONArray arr) {
 		ArrayList<Category> cats = new ArrayList<Category>();
 		cats.add(new Category("All", ""));

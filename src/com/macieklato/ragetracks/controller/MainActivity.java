@@ -45,10 +45,15 @@ import com.macieklato.ragetracks.util.Network;
 import com.macieklato.ragetracks.widget.FacebookFragment;
 import com.macieklato.ragetracks.widget.WaveformSeekBar;
 
+/**
+ * Main UI controller
+ * 
+ * @author Justin Thorsen
+ */
 public class MainActivity extends FragmentActivity {
 
 	public String TAG = "MainActivity";
-	public int DURATION = 100;
+	public int DURATION = 100; // of toasts
 
 	// views
 	private MyAdapter adapter;
@@ -58,6 +63,7 @@ public class MainActivity extends FragmentActivity {
 	// listeners
 	private OnPullListener pullListener;
 	private UpdateBroadcastReceiver updateReceiver;
+	private boolean seeking = false;
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -67,8 +73,9 @@ public class MainActivity extends FragmentActivity {
 		setContentView(R.layout.activity_main); // set view
 		gridView = (GridView) findViewById(R.id.gridview);
 		setListeners(); // initialize state
-		loadCategories();
-		if (SongController.getInstance().getNumSongs() <= 0) {
+		loadCategories(); // load song genres
+		if (SongController.getInstance().getNumSongs() <= 0) { // if no songs,
+																// load songs
 			ApplicationController.getInstance().loadSongs();
 		}
 
@@ -100,13 +107,21 @@ public class MainActivity extends FragmentActivity {
 	protected void onResume() {
 		super.onResume();
 		registerReceiver();
-		adapter.notifyDataSetChanged();
+		adapter.notifyDataSetChanged(); // reload views
 	}
 
+	/**
+	 * Action handler
+	 */
 	protected void onNewIntent(Intent intent) {
 		Log.d(TAG, "onNewIntent");
-
-		if (intent.getAction().equals(ApplicationController.ACTION_UPDATE)) {
+		if (intent == null)
+			return;
+		String action = intent.getAction();
+		if (action == null)
+			return;
+		// handle network update actions
+		if (action.equals(ApplicationController.ACTION_UPDATE)) {
 			int code = intent.getIntExtra(ApplicationController.EXTRA_UPDATE,
 					-1);
 			switch (code) {
@@ -132,8 +147,9 @@ public class MainActivity extends FragmentActivity {
 				finish();
 				break;
 			}
-		} else if (intent.getAction().equals(
-				StreamingBackgroundService.ACTION_UPDATE)) {
+		} else if (action.equals(StreamingBackgroundService.ACTION_UPDATE)) { // handle
+																				// streaming
+																				// updates
 			long id = intent.getLongExtra(
 					StreamingBackgroundService.EXTRA_SONG_ID, -1);
 			Song s = SongController.getInstance().getSongById(id);
@@ -169,27 +185,45 @@ public class MainActivity extends FragmentActivity {
 		}
 	}
 
+	/**
+	 * song start handler
+	 * 
+	 * @param s
+	 *            - song
+	 */
 	private void onSongPlay(Song s) {
 		Log.d(TAG, "onSongPlay");
 		if (s == null)
 			return;
 		ImageView button = (ImageView) findViewById(R.id.play_pause_button);
-		button.setImageResource(R.drawable.pause);
+		button.setImageResource(R.drawable.pause); // change overlay image
 		WaveformSeekBar seekBar = (WaveformSeekBar) findViewById(R.id.seek_bar);
 		seekBar.setWaveformUrl(s.getWaveformUrl(), ApplicationController
-				.getInstance().getImageLoader());
+				.getInstance().getImageLoader()); // change waveform image url
 		adapter.notifyDataSetChanged();
 	}
 
+	/**
+	 * song pause handler
+	 * 
+	 * @param s
+	 *            - song
+	 */
 	private void onSongPause(Song s) {
 		Log.d(TAG, "onSongPause");
 		if (s == null)
 			return;
 		ImageView button = (ImageView) findViewById(R.id.play_pause_button);
-		button.setImageResource(R.drawable.play);
+		button.setImageResource(R.drawable.play); // change overlay image
 		adapter.notifyDataSetChanged();
 	}
 
+	/**
+	 * song stop handler
+	 * 
+	 * @param s
+	 *            - song
+	 */
 	private void onSongStop(Song s) {
 		Log.d(TAG, "onSongStop");
 		if (s == null)
@@ -197,6 +231,12 @@ public class MainActivity extends FragmentActivity {
 		adapter.notifyDataSetChanged();
 	}
 
+	/**
+	 * song loading handler
+	 * 
+	 * @param s
+	 *            - song
+	 */
 	private void onSongLoading(Song s) {
 		Log.d(TAG, "onSongLoading");
 		if (s == null)
@@ -204,6 +244,12 @@ public class MainActivity extends FragmentActivity {
 		adapter.notifyDataSetChanged();
 	}
 
+	/**
+	 * song error handler
+	 * 
+	 * @param s
+	 *            - song
+	 */
 	private void onSongError(Song s) {
 		Log.d(TAG, "onSongError");
 		if (s == null)
@@ -212,16 +258,36 @@ public class MainActivity extends FragmentActivity {
 				Toast.LENGTH_SHORT).show();
 	}
 
+	/**
+	 * song position handler
+	 * 
+	 * @param s
+	 *            - song
+	 * @param position
+	 *            - current position in milliseconds
+	 * @param duration
+	 *            - song length in milliseconds
+	 */
 	private void onPosition(Song s, int position, int duration) {
 		Log.d(TAG, "onPosition");
+		Log.d(TAG, "number of songs: "
+				+ SongController.getInstance().getNumSongs());
 
+		// convert milliseconds to minutes and seconds
 		int minutes = duration / 1000 / 60;
 		int seconds = duration / 1000 % 60;
 		int currentMinutes = position / 1000 / 60;
 		int currentSeconds = position / 1000 % 60;
+
 		WaveformSeekBar seek = (WaveformSeekBar) findViewById(R.id.seek_bar);
-		int progress = (int) ((float) position * seek.getMax() / duration);
-		seek.setProgress(progress);
+
+		if (!seeking) {
+			// update seekbar progress
+			int progress = (int) ((float) position * seek.getMax() / duration);
+			seek.setProgress(progress);
+		}
+
+		// update seekbar position and duration text views
 		TextView currentTime = (TextView) findViewById(R.id.current_time);
 		currentTime.setText(String.format("%d:%02d", currentMinutes,
 				currentSeconds));
@@ -235,32 +301,51 @@ public class MainActivity extends FragmentActivity {
 		}
 	}
 
+	/**
+	 * network loading songs handler
+	 */
 	private void onSongsLoading() {
 		Log.d(TAG, "onSongsLoading");
-		setLoading(true);
+		setLoading(true); // display loading
 	}
 
+	/**
+	 * network finished loading songs handler
+	 */
 	private void onSongsLoaded() {
 		Log.d(TAG, "onSongsLoaded");
-		setLoading(false);
-		adapter.notifyDataSetChanged();
+		setLoading(false); // remove loading
+		adapter.notifyDataSetChanged(); // refresh songs
 	}
 
+	/**
+	 * network song error handler
+	 */
 	private void onSongsErrorLoading() {
 		Log.d(TAG, "onSongsErrorLoading");
 		Toast.makeText(getApplicationContext(),
 				"Poor network connection, try turning on wifi",
 				Toast.LENGTH_SHORT).show();
+		setLoading(false); // remove loading
 	}
 
+	/**
+	 * network waveforms loading handler
+	 */
 	private void onWaveformsLoading() {
 		Log.d(TAG, "onWaveformsLoading");
 	}
 
+	/**
+	 * network finished loading waveforms handler
+	 */
 	private void onWaveformsLoaded() {
 		Log.d(TAG, "onWaveformsLoaded");
 	}
 
+	/**
+	 * network error loading waveforms handler
+	 */
 	private void onWaveformsErrorLoading() {
 		Log.d(TAG, "onWaveformsErrorLoading");
 		Toast.makeText(getApplicationContext(),
@@ -275,6 +360,9 @@ public class MainActivity extends FragmentActivity {
 		}
 	}
 
+	/**
+	 * registers update listener
+	 */
 	private synchronized void registerReceiver() {
 		updateReceiver = new UpdateBroadcastReceiver();
 		IntentFilter filter = new IntentFilter();
@@ -359,6 +447,7 @@ public class MainActivity extends FragmentActivity {
 
 			@Override
 			public void onStartTrackingTouch(SeekBar seekBar) {
+				seeking = true;
 			}
 
 			@Override
@@ -367,6 +456,7 @@ public class MainActivity extends FragmentActivity {
 
 				float percent = seek.getProgress() * 1f / seek.getMax();
 				ApplicationController.getInstance().sendSeekCommand(percent);
+				seeking = false;
 			}
 
 		});
@@ -483,6 +573,9 @@ public class MainActivity extends FragmentActivity {
 		closeKeyboard();
 	}
 
+	/**
+	 * closes virtual keyboard
+	 */
 	private void closeKeyboard() {
 		Log.d(TAG, "closeKeyboard");
 
@@ -492,19 +585,6 @@ public class MainActivity extends FragmentActivity {
 			inputManager.hideSoftInputFromWindow(v.getWindowToken(),
 					InputMethodManager.HIDE_NOT_ALWAYS);
 		}
-	}
-
-	/**
-	 * callback for clicking the bookmark button
-	 * 
-	 * @param v
-	 *            - the bookmark view
-	 */
-	public void onBookmarkClicked(View v) {
-		Log.d(TAG, "onBookmarkClicked");
-
-		Toast.makeText(this.getApplicationContext(), "You clicked bookmark",
-				Toast.LENGTH_SHORT).show();
 	}
 
 	/**
@@ -579,62 +659,26 @@ public class MainActivity extends FragmentActivity {
 		}
 	}
 
-	/*
-	 * public void onBookmarksListClicked(View v) { Log.d(TAG,
-	 * "onBookmarksListClicked");
-	 * 
-	 * if (findViewById(R.id.bookmark_scroller).getVisibility() == View.VISIBLE)
-	 * { closeBookmarks(); } else { openBookmarks(); }
-	 * 
-	 * }
-	 * 
-	 * private void closeBookmarks() { Log.d(TAG, "closeBookmarks");
-	 * 
-	 * findViewById(R.id.bookmark_scroller).setVisibility(View.GONE);
-	 * findViewById(R.id.bookmark_menu_text).setBackgroundColor(0xff000000);
-	 * 
-	 * }
-	 * 
-	 * private void openBookmarks() { Log.d(TAG, "openBookmarks");
-	 * 
-	 * findViewById(R.id.bookmark_scroller).setVisibility(View.VISIBLE);
-	 * findViewById(R.id.bookmark_menu_text).setBackgroundColor(0xff222222);
-	 * closeGenres();
-	 * 
-	 * }
-	 * 
-	 * public void onGenresListClicked(View v) { Log.d(TAG,
-	 * "onGenresListClicked");
-	 * 
-	 * if (findViewById(R.id.genre_scroller).getVisibility() == View.VISIBLE) {
-	 * closeGenres(); } else { openGenres(); } }
-	 * 
-	 * private void closeGenres() { Log.d(TAG, "closeGenres");
-	 * 
-	 * findViewById(R.id.genre_scroller).setVisibility(View.GONE);
-	 * findViewById(R.id.genre_menu_text).setBackgroundColor(0xff000000); }
-	 * 
-	 * private void openGenres() { Log.d(TAG, "openGenres");
-	 * 
-	 * findViewById(R.id.genre_scroller).setVisibility(View.VISIBLE);
-	 * findViewById(R.id.genre_menu_text).setBackgroundColor(0xff222222);
-	 * closeBookmarks(); }
+	/**
+	 * loads the list of categories (genres), should be in application
+	 * controller and song controller
 	 */
-
 	private void loadCategories() {
 		Log.d(TAG, "loadCategories");
 
+		// response handler
 		Listener<JSONObject> onResponse = new Listener<JSONObject>() {
 			@Override
 			public void onResponse(JSONObject obj) {
 				try {
+					// parse result
 					JSONArray arr = obj.getJSONArray(Network.CATEGORIES);
 					ArrayList<Category> categories = JSONUtil
 							.parseCategories(arr);
 					LayoutInflater inflater = LayoutInflater
 							.from(getApplicationContext());
 					LinearLayout genreList = (LinearLayout) findViewById(R.id.genre_list);
-					for (Category cat : categories) {
+					for (Category cat : categories) { // add to list
 						final String slug = cat.getSlug();
 						View v = inflater.inflate(R.layout.genre, null, false);
 						TextView genre = (TextView) v.findViewById(R.id.genre);
@@ -666,11 +710,15 @@ public class MainActivity extends FragmentActivity {
 
 		JsonObjectRequest req = new JsonObjectRequest(url, null, onResponse,
 				onError);
-		ApplicationController.getInstance().getRequestQueue().add(req);
+		ApplicationController.getInstance().getRequestQueue().add(req); // make
+																		// request
 	}
 
+	/**
+	 * handle touch events
+	 */
 	public boolean dispatchTouchEvent(MotionEvent e) {
-		if (adapter.getCount() <= 0) {
+		if (adapter.getCount() <= 0) { // load songs if none
 			ApplicationController.getInstance().loadSongs();
 		}
 		if (pullListener.onTouch(null, e))
@@ -679,6 +727,13 @@ public class MainActivity extends FragmentActivity {
 
 	}
 
+	/**
+	 * @param v
+	 *            - view
+	 * @param x
+	 * @param y
+	 * @return true if the view v contains the raw point x,y
+	 */
 	private static boolean contains(View v, float x, float y) {
 
 		int l[] = new int[2];
@@ -690,6 +745,11 @@ public class MainActivity extends FragmentActivity {
 		return true;
 	}
 
+	/**
+	 * toggle the loading views
+	 * 
+	 * @param loading
+	 */
 	private void setLoading(boolean loading) {
 		Log.d(TAG, "setLoading:" + loading);
 
@@ -700,6 +760,9 @@ public class MainActivity extends FragmentActivity {
 		}
 	}
 
+	/**
+	 * reset the song list and load new songs with current parameters
+	 */
 	private void reset() {
 		Log.d(TAG, "reset");
 
