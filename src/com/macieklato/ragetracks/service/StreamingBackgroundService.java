@@ -14,6 +14,8 @@ import android.media.AudioManager;
 import android.media.AudioManager.OnAudioFocusChangeListener;
 import android.media.MediaMetadataRetriever;
 import android.media.MediaPlayer;
+import android.media.MediaPlayer.OnBufferingUpdateListener;
+import android.media.MediaPlayer.OnCompletionListener;
 import android.media.MediaPlayer.OnErrorListener;
 import android.media.MediaPlayer.OnPreparedListener;
 import android.media.RemoteControlClient;
@@ -28,6 +30,7 @@ import android.util.Log;
 import android.widget.RemoteViews;
 
 import com.android.volley.Response.Listener;
+import com.facebook.widget.WebDialog.OnCompleteListener;
 import com.macieklato.ragetracks.R;
 import com.macieklato.ragetracks.controller.ApplicationController;
 import com.macieklato.ragetracks.controller.MainActivity;
@@ -86,6 +89,7 @@ public class StreamingBackgroundService extends Service implements
 	private RemoteViews remoteViews;
 	private Bitmap lockScreenAlbum;
 	private Bitmap notificationAlbum;
+	private boolean loaded;
 
 	private final int NOTIFICATION_ID = 101293;
 
@@ -334,11 +338,30 @@ public class StreamingBackgroundService extends Service implements
 		Log.d(TAG, "intializePlayer");
 
 		init = false;
+		loaded = false;
 		player = new MediaPlayer();
 		player.setAudioStreamType(AudioManager.STREAM_MUSIC);
 		player.setWakeMode(getApplicationContext(),
 				PowerManager.PARTIAL_WAKE_LOCK);
 
+		player.setOnBufferingUpdateListener(new OnBufferingUpdateListener(){
+			@Override
+			public void onBufferingUpdate(MediaPlayer mp, int percent) {
+				loaded = percent >= 100;
+			}
+		});
+		player.setOnCompletionListener(new OnCompletionListener(){
+
+			@Override
+			public void onCompletion(MediaPlayer mp) {
+				if(loaded) {
+					next();
+					loaded = false;
+				}
+			}
+		});
+		
+		
 		// When we have prepared the song start playback
 		player.setOnPreparedListener(new OnPreparedListener() {
 			@Override
@@ -427,6 +450,7 @@ public class StreamingBackgroundService extends Service implements
 		} catch (Exception e) {
 			e.printStackTrace();
 			sendUpdate(UPDATE_ERROR);
+			next();
 		}
 	}
 
@@ -441,17 +465,26 @@ public class StreamingBackgroundService extends Service implements
 									|| !original.equals(song)) {
 								return;
 							}
+							Bitmap temp1 = null;
+							Bitmap temp2 = null;
 							if (supportsRemoteControlClient()) {
-								if (lockScreenAlbum != null) {
-									lockScreenAlbum.recycle();
+								int width = 500;
+								int height = 500;
+								if (lockScreenAlbum == null) {
+									lockScreenAlbum = Bitmap.createBitmap(
+											width, height, bmp.getConfig());
 								}
-								lockScreenAlbum = Bitmap.createScaledBitmap(
-										bmp, bmp.getWidth(), bmp.getHeight(),
-										true);
+
+								temp1 = Bitmap.createScaledBitmap(bmp, width,
+										height, true);
+								int[] pixels = new int[width * height];
+								temp1.getPixels(pixels, 0, width, 0, 0, width,
+										height);
+								lockScreenAlbum.setPixels(pixels, 0, width, 0,
+										0, width, height);
 								updateMetadata(song);
 							}
 							if (supportsCustomNotification()) {
-
 								int width = (int) getResources().getDimension(
 										R.dimen.large_icon_width);
 								int height = (int) getResources().getDimension(
@@ -462,17 +495,22 @@ public class StreamingBackgroundService extends Service implements
 											width, height, bmp.getConfig());
 								}
 
-								Bitmap temp = Bitmap.createScaledBitmap(bmp,
-										width, height, true);
+								temp2 = Bitmap.createScaledBitmap(bmp, width,
+										height, true);
 								int[] pixels = new int[width * height];
-								temp.getPixels(pixels, 0, width, 0, 0, width,
+								temp2.getPixels(pixels, 0, width, 0, 0, width,
 										height);
 								notificationAlbum.setPixels(pixels, 0, width,
 										0, 0, width, height);
 								remoteViews.setImageViewBitmap(
 										R.id.remote_picture, notificationAlbum);
 								updateNotification();
-								temp.recycle();
+							}
+							if (temp1 != null) {
+								temp1.recycle();
+							}
+							if (temp2 != null) {
+								temp2.recycle();
 							}
 							bmp.recycle();
 						}
@@ -602,7 +640,9 @@ public class StreamingBackgroundService extends Service implements
 
 	private void releaseWifiLock() {
 		Log.d(TAG, "releaseWifiLock");
-		wifiLock.release();
+		if(wifiLock.isHeld()) {
+			wifiLock.release();
+		}
 	}
 
 	@Override
