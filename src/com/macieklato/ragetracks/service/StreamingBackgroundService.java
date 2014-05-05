@@ -419,6 +419,7 @@ public class StreamingBackgroundService extends Service implements
 		Log.d(TAG, "load");
 		if (s == null)
 			return;
+		loaded = false;
 		if (song != null) {
 			if (song.equals(s))
 				return;
