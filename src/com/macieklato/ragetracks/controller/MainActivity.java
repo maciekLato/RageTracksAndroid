@@ -534,6 +534,9 @@ public class MainActivity extends FragmentActivity {
 
 		findViewById(R.id.top_menu_1).setVisibility(View.GONE);
 		findViewById(R.id.top_menu_2).setVisibility(View.VISIBLE);
+		EditText userInput = (EditText) findViewById(R.id.search_text_edit);
+		userInput.requestFocus();
+		openKeyboard(userInput);
 	}
 
 	/**
@@ -549,7 +552,7 @@ public class MainActivity extends FragmentActivity {
 		ApplicationController.getInstance().setSearch(
 				userInput.getText().toString());
 		reset();
-		closeKeyboard();
+		closeKeyboard(userInput);
 	}
 
 	/**
@@ -570,21 +573,26 @@ public class MainActivity extends FragmentActivity {
 		userInput.setText("");
 		findViewById(R.id.top_menu_1).setVisibility(View.VISIBLE);
 		findViewById(R.id.top_menu_2).setVisibility(View.GONE);
-		closeKeyboard();
+		closeKeyboard(userInput);
+	}
+
+	/**
+	 * open virtual keyboard
+	 */
+	private void openKeyboard(View v) {
+		Log.d(TAG, "openKeyboard");
+		InputMethodManager inputMethodManager = (InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE);
+		inputMethodManager.showSoftInput(v, InputMethodManager.SHOW_IMPLICIT);
 	}
 
 	/**
 	 * closes virtual keyboard
 	 */
-	private void closeKeyboard() {
+	private void closeKeyboard(View v) {
 		Log.d(TAG, "closeKeyboard");
 
-		InputMethodManager inputManager = (InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE);
-		View v = getCurrentFocus();
-		if (v != null) {
-			inputManager.hideSoftInputFromWindow(v.getWindowToken(),
-					InputMethodManager.HIDE_NOT_ALWAYS);
-		}
+		InputMethodManager inputMethodManager = (InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE);
+		inputMethodManager.hideSoftInputFromWindow(v.getWindowToken(), InputMethodManager.HIDE_NOT_ALWAYS);
 	}
 
 	/**
