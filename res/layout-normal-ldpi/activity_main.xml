@@ -22,43 +22,6 @@
             android:layout_height="50dp"
             android:animateLayoutChanges="true"
             android:orientation="vertical" />
-        <!--
-        <TextView
-            android:id="@+id/bookmark_menu_text"
-            android:layout_width="match_parent"
-            android:layout_height="50dp"
-            android:clickable="true"
-            android:gravity="center"
-            android:onClick="onBookmarksListClicked"
-            android:text="@string/bookmarks"
-            android:textColor="#ffffff"
-            android:textSize="19sp" />
-
-        <ScrollView
-            android:id="@+id/bookmark_scroller"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:visibility="gone" >
-
-            <LinearLayout
-                android:id="@+id/bookmark_list"
-                android:layout_width="match_parent"
-                android:layout_height="2dp"
-                android:background="#222222"
-                android:orientation="vertical" />
-        </ScrollView>
-        
-        <TextView
-            android:id="@+id/genre_menu_text"
-            android:layout_width="match_parent"
-            android:layout_height="50dp"
-            android:clickable="true"
-            android:gravity="center"
-            android:onClick="onGenresListClicked"
-            android:text="@string/genres"
-            android:textColor="#ffffff"
-            android:textSize="19sp" />
-        -->
 
         <ScrollView
             android:id="@+id/genre_scroller"

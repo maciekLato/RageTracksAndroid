@@ -22,5 +22,27 @@
     <string name="fb_log_in_text">Log In</string>
     <string name="fb_log_out_text">Log Out</string>
     <string name="album_cover">Album Cover</string>
+    <string-array name="shuffle_array">
+        <item>Everything</item>
+        <item>Long Mixes</item>
+        <item>Light EDM</item>
+        <item>Heavy EDM</item>
+    </string-array>
+    <string-array name="shuffle_extensions_array">
+        <item>Everything</item>
+        <item>Long Mixes</item>
+        <item>Light EDM</item>
+        <item>Heavy EDM</item>
+    </string-array>
+    <string-array name="most_liked_array">
+        <item>Tracks Past 7 Days</item>
+        <item>Tracks Past 30 Days</item>
+        <item>Tracks of All Time</item>
+    </string-array>
+    <string-array name="most_liked_extensions_array">
+        <item>weekly-most-liked/</item>
+        <item>monthly-most-liked/</item>
+        <item>Tracks of All Time</item>
+    </string-array>
 
 </resources>

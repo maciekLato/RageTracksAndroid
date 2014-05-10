@@ -30,7 +30,6 @@ import android.util.Log;
 import android.widget.RemoteViews;
 
 import com.android.volley.Response.Listener;
-import com.facebook.widget.WebDialog.OnCompleteListener;
 import com.macieklato.ragetracks.R;
 import com.macieklato.ragetracks.controller.ApplicationController;
 import com.macieklato.ragetracks.controller.MainActivity;
@@ -90,6 +89,7 @@ public class StreamingBackgroundService extends Service implements
 	private Bitmap lockScreenAlbum;
 	private Bitmap notificationAlbum;
 	private boolean loaded;
+	private boolean resumeOnFocus;
 
 	private final int NOTIFICATION_ID = 101293;
 
@@ -99,6 +99,7 @@ public class StreamingBackgroundService extends Service implements
 		wifiManager = (WifiManager) getSystemService(Context.WIFI_SERVICE);
 		wifiLock = wifiManager.createWifiLock(WifiManager.WIFI_MODE_FULL,
 				"ragetracks_wifi_lock");
+		resumeOnFocus = false;
 		initializeRemote();
 		initializePlayer();
 		initializeUpdate();
@@ -344,24 +345,23 @@ public class StreamingBackgroundService extends Service implements
 		player.setWakeMode(getApplicationContext(),
 				PowerManager.PARTIAL_WAKE_LOCK);
 
-		player.setOnBufferingUpdateListener(new OnBufferingUpdateListener(){
+		player.setOnBufferingUpdateListener(new OnBufferingUpdateListener() {
 			@Override
 			public void onBufferingUpdate(MediaPlayer mp, int percent) {
 				loaded = percent >= 100;
 			}
 		});
-		player.setOnCompletionListener(new OnCompletionListener(){
+		player.setOnCompletionListener(new OnCompletionListener() {
 
 			@Override
 			public void onCompletion(MediaPlayer mp) {
-				if(loaded) {
+				if (loaded) {
 					next();
 					loaded = false;
 				}
 			}
 		});
-		
-		
+
 		// When we have prepared the song start playback
 		player.setOnPreparedListener(new OnPreparedListener() {
 			@Override
@@ -641,7 +641,7 @@ public class StreamingBackgroundService extends Service implements
 
 	private void releaseWifiLock() {
 		Log.d(TAG, "releaseWifiLock");
-		if(wifiLock.isHeld()) {
+		if (wifiLock.isHeld()) {
 			wifiLock.release();
 		}
 	}
@@ -666,15 +666,21 @@ public class StreamingBackgroundService extends Service implements
 		Log.d(TAG, "onAudioFocusChange");
 		switch (focusChange) {
 		case AudioManager.AUDIOFOCUS_GAIN:
-			if (isPrepared() && !player.isPlaying()) {
-				play();
+			if (isPrepared()) {
+				if(resumeOnFocus && !player.isPlaying()) {
+					player.start();
+					resumeOnFocus = false;
+				}
+				player.setVolume(1.0f, 1.0f);// Turn it up!
 			}
-			player.setVolume(1.0f, 1.0f);// Turn it up!
 			break;
 		case AudioManager.AUDIOFOCUS_LOSS:
 			stop();
 			break;
 		case AudioManager.AUDIOFOCUS_LOSS_TRANSIENT:
+			if(isPrepared() && player.isPlaying()) {
+				resumeOnFocus = true;
+			}
 			pause();
 			break;
 		case AudioManager.AUDIOFOCUS_LOSS_TRANSIENT_CAN_DUCK:

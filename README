@@ -1,0 +1,20 @@
+that describes shortly what your program does,
+ lists contributors (team members) 
+
+Description:
+	This project is an android mobile application the is a front end for http://ragetracks.com.
+	It is designed as a two part project: an Activity with UI, and a Service to stream music
+	It supports streaming music, play/pause/next/previous song skipping, seeking, searching by key words,
+	filtering by genre, lock screen controls, notifications with controls for supported devices as well 
+	as Facebook integration for sharing posts
+Contributors:
+	Justin Thorsen
+	Guo Fang
+	Maciek Lato
+	Paulius Dragnus
+	Sammi Lui
+	Sergey Popov
+Install:
+	https://play.google.com/store/apps/details?id=com.macieklato.ragetracks
+Documentation: 
+	../project_documentation.pdf

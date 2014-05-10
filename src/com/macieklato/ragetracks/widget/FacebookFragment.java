@@ -52,7 +52,6 @@ public class FacebookFragment extends Fragment {
 		authButton = (LoginButton) view.findViewById(R.id.authButton);
 		authButton.setPublishPermissions("publish_actions");
 		authButton.setFragment(this);
-
 		return view;
 	}
 
@@ -124,6 +123,7 @@ public class FacebookFragment extends Fragment {
 			if (FacebookDialog.canPresentShareDialog(getActivity()
 					.getApplicationContext(),
 					FacebookDialog.ShareDialogFeature.SHARE_DIALOG)) {
+
 				// Publish the post using the Share Dialog
 				FacebookDialog shareDialog = new FacebookDialog.ShareDialogBuilder(
 						getActivity()).setLink(s.getRageTracksUrl())

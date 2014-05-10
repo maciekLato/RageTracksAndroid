@@ -200,6 +200,7 @@ public class MainActivity extends FragmentActivity {
 		WaveformSeekBar seekBar = (WaveformSeekBar) findViewById(R.id.seek_bar);
 		seekBar.setWaveformUrl(s.getWaveformUrl(), ApplicationController
 				.getInstance().getImageLoader()); // change waveform image url
+
 		adapter.notifyDataSetChanged();
 	}
 
@@ -241,7 +242,6 @@ public class MainActivity extends FragmentActivity {
 		Log.d(TAG, "onSongLoading");
 		if (s == null)
 			return;
-		adapter.notifyDataSetChanged();
 	}
 
 	/**
@@ -592,7 +592,8 @@ public class MainActivity extends FragmentActivity {
 		Log.d(TAG, "closeKeyboard");
 
 		InputMethodManager inputMethodManager = (InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE);
-		inputMethodManager.hideSoftInputFromWindow(v.getWindowToken(), InputMethodManager.HIDE_NOT_ALWAYS);
+		inputMethodManager.hideSoftInputFromWindow(v.getWindowToken(),
+				InputMethodManager.HIDE_NOT_ALWAYS);
 	}
 
 	/**
